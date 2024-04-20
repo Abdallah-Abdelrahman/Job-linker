@@ -28,4 +28,4 @@ The application links between recruiters and candidates in one unified platform.
  + In another session runs the client `yarn dev` or `npm run dev`
 
  **Note :** <br/>
-In order to proxy any endpoint you can edit `vite.config.ts` file.<br/>. All backend code lives in `api/` direcrtoy.
+In order to proxy any endpoint you can edit `vite.config.ts` file.<br/>. All backend code lives in `server/` direcrtoy.
