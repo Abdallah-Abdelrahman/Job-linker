@@ -5,13 +5,13 @@ The application links between recruiters and candidates in one unified platform.
 ## Technologies :
 
 - **Frontend** :
-    + [react](https://react.dev/)
-    + [chakra-ui](https://v2.chakra-ui.com/getting-started)
-    + [react-router-dom](https://reactrouter.com/en/main/start/overview)
+    + [react](https://react.dev/) to build seamless user interfaces
+    + [chakra-ui](https://v2.chakra-ui.com/getting-started) for styling components
+    + [react-router-dom](https://reactrouter.com/en/main/start/overview) for client side routing
     + [vite](https://vitejs.dev/guide/) as the build tool
 - **Backend** :
-    + [flask](https://flask.palletsprojects.com/en/3.0.x/)
-    + [SQLAlchemy](https://www.sqlalchemy.org/)
+    + [flask](https://flask.palletsprojects.com/en/3.0.x/) to manage api services
+    + [SQLAlchemy](https://www.sqlalchemy.org/) the so-called orm
 
 ## Installation :
 
