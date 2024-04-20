@@ -26,6 +26,9 @@ The application links between recruiters and candidates in one unified platform.
 
  + In on terminal runs `api` service `yarn api` or `npm run api`
  + In another session runs the client `yarn dev` or `npm run dev`
+ + You can read more about package.json `scripts` work in
 
- **Note :** <br/>
-In order to proxy any endpoint you can edit `vite.config.ts` file.<br/> All backend code lives in `server/` direcrtoy.
+ **_Notes_ :** <br/>
++ In order to proxy any endpoint you can edit `vite.config.ts` file.<br/>
++ All backend code lives in `server/` direcrtoy.<br/>
++ visit [npm](https://docs.npmjs.com/cli/v10/configuring-npm/package-json) to learn more about the `package.json` file.
