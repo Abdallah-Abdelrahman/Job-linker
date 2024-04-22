@@ -20,6 +20,8 @@ session.add(test_instance)
 session.commit()
 
 queried_instance = session.query(TestModel).first()
+print(queried_instance)
+print()
 print(queried_instance.id)
 print(queried_instance.created_at)
 print(queried_instance.updated_at)
