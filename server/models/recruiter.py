@@ -16,7 +16,7 @@ class Recruiter(Base, BaseModel):
     company_info = Column(String(500))
 
     # Relationship with User & Job
-    user = relationship("User", back_populates="recruiter")
+    user = relationship("User", backref="recruiter")
     jobs = relationship("Job", back_populates="recruiter")
 
     def __repr__(self):
