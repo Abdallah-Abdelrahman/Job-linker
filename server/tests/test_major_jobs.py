@@ -34,9 +34,22 @@ major = Major(name="Computer Science")
 session.add(major)
 session.commit()
 
+# Create a Candidate
 candidate = Candidate(user_id=candidate_user.id, major_id=major.id)
 session.add(candidate)
 session.commit()
+
+# Create some skills
+skills = ["Python", "SQL", "Java", "C++", "JavaScript"]
+for skill_name in skills:
+    skill = Skill(name=skill_name)
+    session.add(skill)
+session.commit()
+
+# Add skills to the candidate
+candidate.skills = session.query(Skill).filter(Skill.name.in_(["Python", "SQL"])).all()
+session.commit()
+
 
 # Create a recruiter user
 recruiter_user = User(email="jane@123.com", password="123123", role="recruiter")

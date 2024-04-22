@@ -27,12 +27,12 @@ class Candidate(Base, BaseModel):
 
     def __repr__(self):
         """Return a string representation of the Candidate instance"""
-        return f"[{self.__class__.__name__}] ({self.id}) {self.major}"
+        return f"[{self.__class__.__name__}] ({self.id}) {self.major.name}"
 
     @property
     def to_dict(self):
         """Return a dictionary representation of the Candidate instance"""
         candidate_dict = super().to_dict
-        candidate_dict["major"] = self.major
-        candidate_dict["skills"] = self.skills
+        candidate_dict["major"] = self.major.name
+        candidate_dict["skills"] = [skill.name for skill in self.skills]
         return candidate_dict
