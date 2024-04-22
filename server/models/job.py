@@ -1,8 +1,9 @@
 """Job Model"""
-from sqlalchemy import Column, Date, ForeignKey, Integer, String
+from sqlalchemy import Column, Date, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 from models.basemodel import Base, BaseModel
+from models.skill import job_skills
 
 
 class Job(Base, BaseModel):
@@ -15,7 +16,7 @@ class Job(Base, BaseModel):
             ForeignKey("recruiters.user_id"),
             nullable=False
             )
-    major_id = Column(Integer, ForeignKey("majors.id"), nullable=False)
+    major_id = Column(String(60), ForeignKey("majors.id"), nullable=False)
     job_title = Column(String(100), nullable=False)
     job_description = Column(String(500), nullable=False)
     experience_start = Column(Date, nullable=True)
@@ -26,6 +27,13 @@ class Job(Base, BaseModel):
 
     # Relationship with Major
     major = relationship("Major", back_populates="jobs")
+
+    # Relationship with Skill
+    skills = relationship(
+        "Skill",
+        secondary=job_skills,
+        back_populates="jobs",
+    )
 
     def __repr__(self):
         """Return a string representation of the Job instance"""
@@ -39,4 +47,5 @@ class Job(Base, BaseModel):
         job_dict["job_description"] = self.job_description
         job_dict["experience_start"] = self.experience_start
         job_dict["experience_end"] = self.experience_end
+        job_dict["skills"] = [skill.name for skill in self.skills]
         return job_dict
