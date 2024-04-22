@@ -3,7 +3,7 @@
 from sqlalchemy import Column, Enum, String
 from sqlalchemy.orm import relationship
 
-from basemodel import Base, BaseModel
+from models.basemodel import Base, BaseModel
 
 
 class User(Base, BaseModel):

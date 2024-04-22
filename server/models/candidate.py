@@ -3,7 +3,8 @@
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from basemodel import Base, BaseModel
+from models.basemodel import Base, BaseModel
+from models.skill import candidate_skills
 
 
 class Candidate(Base, BaseModel):
@@ -15,8 +16,13 @@ class Candidate(Base, BaseModel):
     major = Column(String(100), nullable=False)
     skills = Column(String(500))
 
-    # Relationship with User
+    # Relationship with User & skills
     user = relationship("User", back_populates="candidate")
+    skills = relationship(
+        "Skill",
+        secondary=candidate_skills,
+        back_populates="candidates",
+    )
 
     def __repr__(self):
         """Return a string representation of the Candidate instance"""
