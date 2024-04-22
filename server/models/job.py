@@ -19,7 +19,7 @@ class Job(Base, BaseModel):
     major_id = Column(String(60), ForeignKey("majors.id"), nullable=False)
     job_title = Column(String(100), nullable=False)
     job_description = Column(String(500), nullable=False)
-    exper_year = Column(String(128), nullable=True)
+    exper_years = Column(String(128), nullable=True)
 
     # Relationship with Recruiter
     recruiter = relationship("Recruiter", back_populates="jobs")
@@ -44,6 +44,6 @@ class Job(Base, BaseModel):
         job_dict = super().to_dict
         job_dict["job_title"] = self.job_title
         job_dict["job_description"] = self.job_description
-        job_dict["exper_year"] = self.exper_year
+        job_dict["exper_years"] = self.exper_years
         job_dict["skills"] = [skill.name for skill in self.skills]
         return job_dict

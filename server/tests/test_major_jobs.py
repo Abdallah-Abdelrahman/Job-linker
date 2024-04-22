@@ -7,7 +7,6 @@ from models.basemodel import Base
 from models.candidate import Candidate
 from models.job import Job
 from models.major import Major
-from models.profile import Profile
 from models.recruiter import Recruiter
 from models.skill import Skill
 from models.user import User
@@ -19,14 +18,10 @@ session = Session()
 Base.metadata.create_all(engine)
 
 # Create a candidate user
-candidate_user = User(email="moh@123.com", password="123123", role="candidate")
-session.add(candidate_user)
-session.commit()
-
-candidate_profile = Profile(
-    name="Mohannad", contact_info="1234567890", user_id=candidate_user.id
+candidate_user = User(
+    email="moh@123.com", password="123123", role="candidate", name="Abdallah"
 )
-session.add(candidate_profile)
+session.add(candidate_user)
 session.commit()
 
 # Create a Major
@@ -63,14 +58,10 @@ session.commit()
 
 
 # Create a recruiter user
-recruiter_user = User(email="jane@123.com", password="123123", role="recruiter")
-session.add(recruiter_user)
-session.commit()
-
-recruiter_profile = Profile(
-    name="Abdallah", contact_info="0987654321", user_id=recruiter_user.id
+recruiter_user = User(
+    email="jane@123.com", password="123123", role="recruiter", name="Mohannad"
 )
-session.add(recruiter_profile)
+session.add(recruiter_user)
 session.commit()
 
 recruiter = Recruiter(
@@ -87,8 +78,7 @@ job = Job(
     major_id=major.id,
     job_title="Software Engineer",
     job_description="Develop and maintain software applications",
-    experience_start=datetime.strptime("2022-01-01", "%Y-%m-%d").date(),
-    experience_end=datetime.strptime("2024-01-01", "%Y-%m-%d").date(),
+    exper_years="2 Years",
 )
 session.add(job)
 session.commit()
@@ -99,14 +89,10 @@ session.commit()
 
 
 # Create additional candidate users and profiles
-candidate_user2 = User(email="ali@123.com", password="456456", role="candidate")
-session.add(candidate_user2)
-session.commit()
-
-candidate_profile2 = Profile(
-    name="Ali", contact_info="9876543210", user_id=candidate_user2.id
+candidate_user2 = User(
+    email="ali@123.com", password="456456", role="candidate", name="Jason"
 )
-session.add(candidate_profile2)
+session.add(candidate_user2)
 session.commit()
 
 # Create additional majors
@@ -125,14 +111,10 @@ candidate2.skills = (
 session.commit()
 
 # Create additional recruiter users and profiles
-recruiter_user2 = User(email="emma@123.com", password="789789", role="recruiter")
-session.add(recruiter_user2)
-session.commit()
-
-recruiter_profile2 = Profile(
-    name="Emma", contact_info="5432167890", user_id=recruiter_user2.id
+recruiter_user2 = User(
+    email="emma@123.com", password="789789", role="recruiter", name="HolaHola"
 )
-session.add(recruiter_profile2)
+session.add(recruiter_user2)
 session.commit()
 
 # Create additional recruiters and jobs
@@ -149,8 +131,7 @@ job2 = Job(
     major_id=major.id,
     job_title="Frontend Developer",
     job_description="Design and develop user interfaces",
-    experience_start=datetime.strptime("2023-01-01", "%Y-%m-%d").date(),
-    experience_end=datetime.strptime("2024-12-31", "%Y-%m-%d").date(),
+    exper_years="5 Years",
 )
 session.add(job2)
 session.commit()
@@ -163,7 +144,6 @@ session.commit()
 
 # Query the users, profiles, candidates, recruiters, majors, and jobs
 queried_users = session.query(User).all()
-queried_profiles = session.query(Profile).all()
 queried_candidates = session.query(Candidate).all()
 queried_recruiters = session.query(Recruiter).all()
 queried_majors = session.query(Major).all()
@@ -174,11 +154,6 @@ queried_skills = session.query(Skill).all()
 for user in queried_users:
     print(user)
     print(user.to_dict)
-    print()
-
-for profile in queried_profiles:
-    print(profile)
-    print(profile.to_dict)
     print()
 
 for candidate in queried_candidates:
