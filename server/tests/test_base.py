@@ -1,7 +1,6 @@
+from models.basemodel import Base, BaseModel
 from sqlalchemy import Column, String, create_engine
 from sqlalchemy.orm import sessionmaker
-
-from basemodel import Base, BaseModel
 
 engine = create_engine("sqlite:///:memory:")
 Session = sessionmaker(bind=engine)

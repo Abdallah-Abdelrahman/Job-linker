@@ -1,12 +1,11 @@
 from profile import Profile
 
+from models.basemodel import Base
+from models.candidate import Candidate
+from models.recruiter import Recruiter
+from models.user import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-from basemodel import Base
-from candidate import Candidate
-from recruiter import Recruiter
-from user import User
 
 engine = create_engine("sqlite:///:memory:")
 Session = sessionmaker(bind=engine)
@@ -29,6 +28,26 @@ candidate = Candidate(
     user_id=candidate_user.id, major="Computer Science", skills="Python, SQL"
 )
 session.add(candidate)
+session.commit()
+
+
+# Create another candidate user
+candidate_user_1 = User(
+    email="mohannad@123.com", password="123123123", role="candidate"
+)
+session.add(candidate_user_1)
+session.commit()
+
+candidate_profile_1 = Profile(
+    name="Mohannad Babeker", contact_info="249-1234567890", user_id=candidate_user_1.id
+)
+session.add(candidate_profile_1)
+session.commit()
+
+candidate_1 = Candidate(
+    user_id=candidate_user_1.id, major="Computer Science", skills="Python, SQL"
+)
+session.add(candidate_1)
 session.commit()
 
 # Create a recruiter user

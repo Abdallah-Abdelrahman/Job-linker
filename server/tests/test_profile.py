@@ -1,10 +1,9 @@
 from profile import Profile
 
+from models.basemodel import Base
+from models.user import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
-from basemodel import Base
-from user import User
 
 engine = create_engine("sqlite:///:memory:")
 Session = sessionmaker(bind=engine)
