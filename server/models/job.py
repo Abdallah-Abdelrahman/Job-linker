@@ -1,5 +1,5 @@
 """Job Model"""
-from sqlalchemy import Column, Date, ForeignKey, String
+from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 from models.basemodel import Base, BaseModel
@@ -19,8 +19,7 @@ class Job(Base, BaseModel):
     major_id = Column(String(60), ForeignKey("majors.id"), nullable=False)
     job_title = Column(String(100), nullable=False)
     job_description = Column(String(500), nullable=False)
-    experience_start = Column(Date, nullable=True)
-    experience_end = Column(Date, nullable=True)
+    exper_year = Column(String(128), nullable=True)
 
     # Relationship with Recruiter
     recruiter = relationship("Recruiter", back_populates="jobs")
@@ -45,7 +44,6 @@ class Job(Base, BaseModel):
         job_dict = super().to_dict
         job_dict["job_title"] = self.job_title
         job_dict["job_description"] = self.job_description
-        job_dict["experience_start"] = self.experience_start
-        job_dict["experience_end"] = self.experience_end
+        job_dict["exper_year"] = self.exper_year
         job_dict["skills"] = [skill.name for skill in self.skills]
         return job_dict
