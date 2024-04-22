@@ -9,7 +9,15 @@ candidate_skills = Table(
     "candidate_skills",
     Base.metadata,
     Column("candidate_id", String(60), ForeignKey("candidates.user_id")),
-    Column("skill_id", Integer, ForeignKey("skills.id")),
+    Column("skill_id", String(60), ForeignKey("skills.id")),
+)
+
+# Association table for Job-Skill many-to-many relationship
+job_skills = Table(
+    "job_skills",
+    Base.metadata,
+    Column("job_id", String(60), ForeignKey("jobs.id")),
+    Column("skill_id", String(60), ForeignKey("skills.id")),
 )
 
 
@@ -24,6 +32,13 @@ class Skill(Base, BaseModel):
     candidates = relationship(
         "Candidate",
         secondary=candidate_skills,
+        back_populates="skills",
+    )
+
+    # Relationship with Job
+    jobs = relationship(
+        "Job",
+        secondary=job_skills,
         back_populates="skills",
     )
 

@@ -82,6 +82,10 @@ job = Job(
 session.add(job)
 session.commit()
 
+# Add skills to the job
+job.skills = session.query(Skill).filter(Skill.name.in_(["C++", "Java"])).all()
+session.commit()
+
 # Query the users, profiles, candidates, recruiters, majors, and jobs
 queried_users = session.query(User).all()
 queried_profiles = session.query(Profile).all()
@@ -89,6 +93,7 @@ queried_candidates = session.query(Candidate).all()
 queried_recruiters = session.query(Recruiter).all()
 queried_majors = session.query(Major).all()
 queried_jobs = session.query(Job).all()
+queried_skills = session.query(Skill).all()
 
 # Print the queried data
 for user in queried_users:
@@ -119,4 +124,9 @@ for major in queried_majors:
 for job in queried_jobs:
     print(job)
     print(job.to_dict)
+    print()
+
+for skill in queried_skills:
+    print(skill)
+    print(skill.to_dict)
     print()
