@@ -26,9 +26,11 @@ class BaseModel:
 
     def __init__(self, *args, **kwargs) -> None:
         """Initialization the BaseModel instance"""
-        super().__init__(*args, **kwargs)
-        self.created_at = self._str_to_date(self.created_at)
-        self.updated_at = self._str_to_date(self.updated_at)
+        self.id = str(uuid.uuid4())
+        if isinstance(self.created_at, str):
+            self.created_at = self._str_to_date(self.created_at)
+        if isinstance(self.updated_at, str):
+            self.updated_at = self._str_to_date(self.updated_at)
 
     def _str_to_date(self, date_str):
         """Convert a string to a datetime object"""
