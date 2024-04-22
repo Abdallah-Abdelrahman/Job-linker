@@ -16,8 +16,8 @@ class User(Base, BaseModel):
 
     # Relationships
     profile = relationship("Profile", uselist=False, back_populates="user")
-    #   candidate = relationship("Candidate", uselist=False, back_populates="user")
-    #   recruiter = relationship("Recruiter", uselist=False, back_populates="user")
+    candidate = relationship("Candidate", uselist=False, back_populates="user")
+    recruiter = relationship("Recruiter", uselist=False, back_populates="user")
 
     def __init__(self, *args, **kwargs):
         """Initialize the User instance"""
