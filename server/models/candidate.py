@@ -13,7 +13,7 @@ class Candidate(Base, BaseModel):
     __tablename__ = "candidates"
 
     user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
-    major = Column(String(100), nullable=False)
+    major_id = Column(String(60), ForeignKey("majors.id"), nullable=False)
 
     # Relationship with User & skills
     user = relationship("User", back_populates="candidate")
@@ -22,6 +22,8 @@ class Candidate(Base, BaseModel):
         secondary=candidate_skills,
         back_populates="candidates",
     )
+    # Relationship with Major
+    major = relationship("Major", back_populates="candidates")
 
     def __repr__(self):
         """Return a string representation of the Candidate instance"""

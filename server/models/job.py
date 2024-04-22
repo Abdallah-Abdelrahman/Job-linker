@@ -1,0 +1,42 @@
+"""Job Model"""
+from sqlalchemy import Column, Date, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+
+from models.basemodel import Base, BaseModel
+
+
+class Job(Base, BaseModel):
+    """Job Class"""
+
+    __tablename__ = "jobs"
+
+    recruiter_id = Column(
+            String(60),
+            ForeignKey("recruiters.user_id"),
+            nullable=False
+            )
+    major_id = Column(Integer, ForeignKey("majors.id"), nullable=False)
+    job_title = Column(String(100), nullable=False)
+    job_description = Column(String(500), nullable=False)
+    experience_start = Column(Date, nullable=True)
+    experience_end = Column(Date, nullable=True)
+
+    # Relationship with Recruiter
+    recruiter = relationship("Recruiter", back_populates="jobs")
+
+    # Relationship with Major
+    major = relationship("Major", back_populates="jobs")
+
+    def __repr__(self):
+        """Return a string representation of the Job instance"""
+        return f"[{self.__class__.__name__}] ({self.id}) {self.job_title}"
+
+    @property
+    def to_dict(self):
+        """Return a dictionary representation of the Job instance"""
+        job_dict = super().to_dict
+        job_dict["job_title"] = self.job_title
+        job_dict["job_description"] = self.job_description
+        job_dict["experience_start"] = self.experience_start
+        job_dict["experience_end"] = self.experience_end
+        return job_dict
