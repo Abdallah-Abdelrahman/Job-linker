@@ -12,7 +12,6 @@ class Profile(Base, BaseModel):
     __tablename__ = "profiles"
 
     user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
-    name = Column(String(100), nullable=False)
     contact_info = Column(String(100))
     bio = Column(String(500))
     image_url = Column(String(200))
@@ -26,13 +25,13 @@ class Profile(Base, BaseModel):
 
     def __repr__(self):
         """Return a string representation of the Profile instance"""
-        return f"[{self.__class__.__name__}] ({self.id}) {self.name}"
+        return f"[{self.__class__.__name__}] ({self.id}) {self.user.name}"
 
     @property
     def to_dict(self):
         """Return a dictionary representation of the Profile instance"""
         profile_dict = super().to_dict
-        profile_dict["name"] = self.name
+        profile_dict["name"] = self.user.name
         profile_dict["contact_info"] = self.contact_info
         profile_dict["bio"] = self.bio
         profile_dict["image_url"] = self.image_url

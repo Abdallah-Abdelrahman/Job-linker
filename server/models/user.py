@@ -1,7 +1,6 @@
 """User Class"""
 
 from sqlalchemy import Column, Enum, String
-from sqlalchemy.orm import relationship
 
 from models.basemodel import Base, BaseModel
 
@@ -10,14 +9,10 @@ class User(Base, BaseModel):
     """User Model"""
 
     __tablename__ = "users"
+    name = Column(String(128), nullable=False)
     email = Column(String(100), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
     role = Column(Enum("candidate", "recruiter"), nullable=False)
-
-    # Relationships
-    profile = relationship("Profile", uselist=False, back_populates="user")
-    candidate = relationship("Candidate", uselist=False, back_populates="user")
-    recruiter = relationship("Recruiter", uselist=False, back_populates="user")
 
     def __init__(self, *args, **kwargs):
         """Initialize the User instance"""
