@@ -3,7 +3,7 @@
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from models.basemodel import Base, BaseModel
+from models.base_model import Base, BaseModel
 from models.skill import candidate_skills
 
 
@@ -35,4 +35,6 @@ class Candidate(Base, BaseModel):
         candidate_dict = super().to_dict
         candidate_dict["major"] = self.major.name
         candidate_dict["skills"] = [skill.name for skill in self.skills]
+        candidate_dict['experiences'] = [e.title for e in self.experiences
+                                         if hasattr(self, 'experiences')]
         return candidate_dict

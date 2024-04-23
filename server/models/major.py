@@ -2,7 +2,7 @@
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-from models.basemodel import Base, BaseModel
+from models.base_model import Base, BaseModel
 
 
 class Major(Base, BaseModel):
@@ -19,10 +19,3 @@ class Major(Base, BaseModel):
     def __repr__(self):
         """Return a string representation of the Major instance"""
         return f"[{self.__class__.__name__}] ({self.id}) {self.name}"
-
-    @property
-    def to_dict(self):
-        """Return a dictionary representation of the Major instance"""
-        major_dict = super().to_dict
-        major_dict["name"] = self.name
-        return major_dict

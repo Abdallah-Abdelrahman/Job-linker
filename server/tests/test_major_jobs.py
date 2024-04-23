@@ -3,13 +3,14 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from models.basemodel import Base
+from models.base_model import Base
 from models.candidate import Candidate
 from models.job import Job
 from models.major import Major
 from models.recruiter import Recruiter
 from models.skill import Skill
 from models.user import User
+from models.work_experience import WorkExperience
 
 engine = create_engine("sqlite:///:memory:")
 Session = sessionmaker(bind=engine)
@@ -24,6 +25,7 @@ candidate_user = User(
 session.add(candidate_user)
 session.commit()
 
+
 # Create a Major
 major = Major(name="Computer Science")
 session.add(major)
@@ -32,6 +34,12 @@ session.commit()
 # Create a Candidate
 candidate = Candidate(user_id=candidate_user.id, major_id=major.id)
 session.add(candidate)
+session.commit()
+
+# Create a WorkExperience
+expers = WorkExperience(candidate_id=candidate.id,
+                        title='Software tester', company='X', location='U.S')
+session.add(expers)
 session.commit()
 
 # Create some skills

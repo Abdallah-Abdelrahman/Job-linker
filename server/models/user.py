@@ -2,7 +2,7 @@
 
 from sqlalchemy import Column, Enum, String
 
-from models.basemodel import Base, BaseModel
+from models.base_model import Base, BaseModel
 
 
 class User(Base, BaseModel):
@@ -21,11 +21,3 @@ class User(Base, BaseModel):
     def __repr__(self):
         """Return a string representation of the User instance"""
         return f"[{self.__class__.__name__}] ({self.id}) {self.email}"
-
-    @property
-    def to_dict(self):
-        """Return a dictionary representation of the User instance"""
-        user_dict = super().to_dict
-        user_dict["email"] = self.email
-        user_dict["role"] = self.role
-        return user_dict

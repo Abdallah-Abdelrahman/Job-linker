@@ -1,4 +1,4 @@
-from models.basemodel import Base
+from models.base_model import Base
 from models.user import User
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker

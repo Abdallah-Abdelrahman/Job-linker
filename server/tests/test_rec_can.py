@@ -1,6 +1,6 @@
 from profile import Profile
 
-from models.basemodel import Base
+from models.base_model import Base
 from models.candidate import Candidate
 from models.recruiter import Recruiter
 from models.user import User
