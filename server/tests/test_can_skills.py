@@ -1,4 +1,4 @@
-from models.basemodel import Base
+from models.base_model import Base
 from models.candidate import Candidate
 from models.profile import Profile
 from models.recruiter import Recruiter

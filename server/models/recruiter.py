@@ -3,7 +3,7 @@
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from models.basemodel import Base, BaseModel
+from models.base_model import Base, BaseModel
 
 
 class Recruiter(Base, BaseModel):
@@ -22,11 +22,3 @@ class Recruiter(Base, BaseModel):
     def __repr__(self):
         """Return a string representation of the Recruiter instance"""
         return f"[{self.__class__.__name__}] ({self.id}) {self.company_name}"
-
-    @property
-    def to_dict(self):
-        """Return a dictionary representation of the Recruiter instance"""
-        recruiter_dict = super().to_dict
-        recruiter_dict["company_name"] = self.company_name
-        recruiter_dict["company_info"] = self.company_info
-        return recruiter_dict

@@ -2,7 +2,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
 
-from models.basemodel import Base, BaseModel
+from models.base_model import Base, BaseModel
 
 # Association table for Candidate-Skill many-to-many relationship
 candidate_skills = Table(
@@ -45,10 +45,3 @@ class Skill(Base, BaseModel):
     def __repr__(self):
         """Return a string representation of the Skill instance"""
         return f"[{self.__class__.__name__}] ({self.id}) {self.name}"
-
-    @property
-    def to_dict(self):
-        """Return a dictionary representation of the Skill instance"""
-        skill_dict = super().to_dict
-        skill_dict["name"] = self.name
-        return skill_dict

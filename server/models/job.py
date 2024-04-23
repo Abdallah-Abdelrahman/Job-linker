@@ -2,7 +2,7 @@
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from models.basemodel import Base, BaseModel
+from models.base_model import Base, BaseModel
 from models.skill import job_skills
 
 
@@ -37,13 +37,3 @@ class Job(Base, BaseModel):
     def __repr__(self):
         """Return a string representation of the Job instance"""
         return f"[{self.__class__.__name__}] ({self.id}) {self.job_title}"
-
-    @property
-    def to_dict(self):
-        """Return a dictionary representation of the Job instance"""
-        job_dict = super().to_dict
-        job_dict["job_title"] = self.job_title
-        job_dict["job_description"] = self.job_description
-        job_dict["exper_years"] = self.exper_years
-        job_dict["skills"] = [skill.name for skill in self.skills]
-        return job_dict
