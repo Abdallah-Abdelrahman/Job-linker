@@ -49,3 +49,11 @@ urllib3==2.2.1
 Werkzeug==1.0.1
 zope.event==5.0
 zope.interface==6.2
+bcrypt==4.1.2
+blinker==1.7.0
+Flask-Bcrypt==1.0.1
+Flask-Login==0.6.3
+Flask-WTF==1.2.1
+greenlet==3.0.3
+typing_extensions==4.11.0
+WTForms==3.1.2
