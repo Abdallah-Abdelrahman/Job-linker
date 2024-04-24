@@ -3,7 +3,7 @@
 from sqlalchemy import Column, DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 
-from models.base_model import Base, BaseModel
+from server.models.base_model import Base, BaseModel
 
 
 class WorkExperience(Base, BaseModel):

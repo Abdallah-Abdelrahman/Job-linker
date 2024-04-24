@@ -2,7 +2,7 @@
 
 from sqlalchemy import Column, Enum, String
 
-from models.base_model import Base, BaseModel
+from server.models.base_model import Base, BaseModel
 
 
 class User(Base, BaseModel):

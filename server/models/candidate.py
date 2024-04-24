@@ -3,8 +3,8 @@
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from models.base_model import Base, BaseModel
-from models.skill import candidate_skills
+from server.models.base_model import Base, BaseModel
+from server.models.skill import candidate_skills
 
 
 class Candidate(Base, BaseModel):

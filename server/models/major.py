@@ -2,7 +2,7 @@
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-from models.base_model import Base, BaseModel
+from server.models.base_model import Base, BaseModel
 
 
 class Major(Base, BaseModel):
