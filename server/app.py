@@ -125,6 +125,7 @@ def register_user():
     storage.save()
 
     session["user_id"] = new_user.id
+    session["role"] = role
 
     return jsonify({"id": new_user.id, "email": new_user.email}), 201
 
@@ -157,6 +158,7 @@ def login_user():
         abort(401, description="Unauthorized")
 
     session["user_id"] = user.id
+    session["role"] = user.role
 
     return jsonify({"id": user.id, "email": user.email})
 
