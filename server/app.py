@@ -125,7 +125,7 @@ def register_user():
     storage.save()
 
     session["user_id"] = new_user.id
-    session["role"] = role
+    session["role"] = new_user.role
 
     return jsonify({"id": new_user.id, "email": new_user.email}), 201
 
@@ -168,13 +168,18 @@ def logout_user():
     """
     Log out a user.
 
-    It removes the user_id from the session.
+    It removes the user_id & role from the session.
 
     Returns:
-        A "200" string if the logout is successful.
+        A "200" with a string if the logout is successful.
     """
-    session.pop("user_id")
-    return "200"
+    if "user_id" in session:
+        session.pop("user_id")
+        session.pop("role")
+        return "Logged out successfully", 200
+    else:
+        return "No active session", 400
+
 
 
 if __name__ == "__main__":
