@@ -24,6 +24,7 @@ Functions:
 from flask import Flask, abort, jsonify, request, session
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
+from flask_login import LoginManager, login_required, login_user, logout_user
 from flask_session import Session
 from marshmallow import Schema, ValidationError, fields
 
@@ -41,6 +42,9 @@ bcrypt = Bcrypt(app)
 
 CORS(app, supports_credentials=True)
 server_session = Session(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 
 # Schema for the login data
@@ -66,15 +70,22 @@ class RegistrationSchema(Schema):
 registration_schema = RegistrationSchema()
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    """anonymous user"""
+    return storage.get(User, user_id)
+
+
 @app.route("/@me")
+@login_required
 def get_current_user():
     """
-        Get the current logged-in user's details.
+    Get the current logged-in user's details.
 
-        Returns:
-            A JSON response with the user's id and email if a user is logged in
-            Otherwise, it returns a JSON response with an error message and
-            a 401 status code.
+    Returns:
+        A JSON response with the user's id and email if a user is logged in
+        Otherwise, it returns a JSON response with an error message and
+        a 401 status code.
     """
     user_id = session.get("user_id")
 
@@ -131,7 +142,7 @@ def register_user():
 
 
 @app.route("/login", methods=["POST"])
-def login_user():
+def login_user_():
     """
     Log in a user.
 
@@ -157,6 +168,7 @@ def login_user():
     if not user or not bcrypt.check_password_hash(user.password, password):
         abort(401, description="Unauthorized")
 
+    login_user(user)
     session["user_id"] = user.id
     session["role"] = user.role
 
@@ -164,7 +176,8 @@ def login_user():
 
 
 @app.route("/logout", methods=["POST"])
-def logout_user():
+@login_required
+def logout_user_():
     """
     Log out a user.
 
@@ -176,10 +189,10 @@ def logout_user():
     if "user_id" in session:
         session.pop("user_id")
         session.pop("role")
-        return "Logged out successfully", 200
+        logout_user()
+        return jsonify({"status": "Logged out successfully"}), 200
     else:
-        return "No active session", 400
-
+        return jsonify({"status": "No active session"}), 400
 
 
 if __name__ == "__main__":
