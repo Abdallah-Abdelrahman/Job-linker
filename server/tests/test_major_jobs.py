@@ -160,7 +160,6 @@ queried_majors = storage.all(Major)
 queried_jobs = storage.all(Job)
 queried_skills = storage.all(Skill)
 
-
 # Print the queried data
 for user in queried_users.values():
     print(user)
