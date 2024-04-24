@@ -29,6 +29,8 @@ from marshmallow import Schema, ValidationError, fields
 
 from config import ApplicationConfig
 from models import storage
+from models.candidate import Candidate
+from models.recruiter import Recruiter
 from models.user import User
 
 app = Flask(__name__)
@@ -67,12 +69,12 @@ registration_schema = RegistrationSchema()
 @app.route("/@me")
 def get_current_user():
     """
-    Get the current logged-in user's details.
+        Get the current logged-in user's details.
 
-    Returns:
-        A JSON response with the user's id and email if a user is logged in.
-        Otherwise, it returns a JSON response with an error message and
-        a 401 status code.
+        Returns:
+            A JSON response with the user's id and email if a user is logged in
+            Otherwise, it returns a JSON response with an error message and
+            a 401 status code.
     """
     user_id = session.get("user_id")
 

@@ -1,3 +1,26 @@
+"""
+This module contains the configuration settings for the Flask application.
+
+It uses the dotenv module to load environment variables from a .env file.
+The environment variables are then used to set the configuration variables
+for the Flask application.
+
+The ApplicationConfig class defines the following configuration variables:
+
+- SECRET_KEY: The secret key for the Flask application. It's used for
+    session signing.
+- SQLALCHEMY_TRACK_MODIFICATIONS: Flask-SQLAlchemy will track modifications of
+    objects and emit signals. The default is False.
+- SQLALCHEMY_ECHO: SQLAlchemy will log all the statements issued to stderr.
+- SESSION_TYPE: Specifies the session type set to "redis".
+- SESSION_PERMANENT: Whether the session is permanent or not. Here, False.
+- SESSION_USE_SIGNER: The cookie sid will be signed and secure.
+- SESSION_REDIS: Specifies the Redis server URL.
+
+Classes:
+    ApplicationConfig: A class that contains configuration variables
+    for the Flask application.
+"""
 import os
 
 import redis
