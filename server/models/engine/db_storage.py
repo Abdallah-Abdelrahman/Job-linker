@@ -7,15 +7,15 @@ from os import getenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-import models
-from models.base_model import Base
-from models.candidate import Candidate
-from models.job import Job
-from models.major import Major
-from models.recruiter import Recruiter
-from models.skill import Skill
-from models.user import User
-from models.work_experience import WorkExperience
+import server.models
+from server.models.base_model import Base
+from server.models.candidate import Candidate
+from server.models.job import Job
+from server.models.major import Major
+from server.models.recruiter import Recruiter
+from server.models.skill import Skill
+from server.models.user import User
+from server.models.work_experience import WorkExperience
 
 classes = {
     "Candidate": Candidate,

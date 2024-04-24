@@ -27,11 +27,11 @@ from flask_cors import CORS
 from flask_session import Session
 from marshmallow import Schema, ValidationError, fields
 
-from config import ApplicationConfig
-from models import storage
-from models.candidate import Candidate
-from models.recruiter import Recruiter
-from models.user import User
+from server.config import ApplicationConfig
+from server.models import storage
+from server.models.candidate import Candidate
+from server.models.recruiter import Recruiter
+from server.models.user import User
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
@@ -176,4 +176,4 @@ def logout_user():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
