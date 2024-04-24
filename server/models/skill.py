@@ -1,5 +1,5 @@
 """Skills Model"""
-from sqlalchemy import Column, ForeignKey, Integer, String, Table
+from sqlalchemy import Column, ForeignKey, String, Table
 from sqlalchemy.orm import relationship
 
 from models.base_model import Base, BaseModel

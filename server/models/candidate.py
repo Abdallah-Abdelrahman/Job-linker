@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship
 
 from models.base_model import Base, BaseModel
 from models.skill import candidate_skills
+from models.language import candidate_languages
 
 
 class Candidate(Base, BaseModel):
@@ -22,6 +23,13 @@ class Candidate(Base, BaseModel):
         secondary=candidate_skills,
         back_populates="candidates",
     )
+
+    # Relationship with Languages and associative table
+    languages = relationship(
+            "Language",
+            secondary=candidate_languages,
+            back_populates="candidates")
+
     # Relationship with Major
     major = relationship("Major", back_populates="candidates")
 
@@ -35,6 +43,7 @@ class Candidate(Base, BaseModel):
         candidate_dict = super().to_dict
         candidate_dict["major"] = self.major.name
         candidate_dict["skills"] = [skill.name for skill in self.skills]
-        candidate_dict['experiences'] = [e.title for e in self.experiences
-                                         if hasattr(self, 'experiences')]
+        candidate_dict["experiences"] = [e.title for e in self.experiences
+                                         if hasattr(self, "experiences")]
+        candidate_dict["languages"] = [lang.name for lang in self.languages]
         return candidate_dict
