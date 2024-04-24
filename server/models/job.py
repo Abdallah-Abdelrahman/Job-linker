@@ -34,6 +34,13 @@ class Job(Base, BaseModel):
         back_populates="jobs",
     )
 
+    @property
+    def to_dict(self):
+        '''Return a dictionary reppresentation of Job'''
+        dict_ = super().to_dict
+        dict_["skills"] = [s.name for s in self.skills]
+        return dict_
+
     def __repr__(self):
         """Return a string representation of the Job instance"""
         return f"[{self.__class__.__name__}] ({self.id}) {self.job_title}"
