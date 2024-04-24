@@ -1,5 +1,26 @@
 #!/usr/bin/env python3
-"""Entry point for flask app"""
+"""
+This module serves as the entry point for a Flask application designed for
+job recruitment.
+
+The application provides functionalities for user registration, login, and
+session management. It serves two types of users: candidates and recruiters.
+Candidates can register, login, and manage their sessions. Recruiters can do
+the same.
+
+The application uses Flask, SQLAlchemy, Bcrypt, and Flask-Login for
+authentication. It also uses Marshmallow for data validation.
+
+Classes:
+    LoginSchema: A Schema for validating login data.
+    RegistrationSchema: A Schema for validating registration data.
+
+Functions:
+    get_current_user(): Returns the current logged-in user's details.
+    register_user(): Registers a new user.
+    login_user(): Logs in a user.
+    logout_user(): Logs out a user.
+"""
 from flask import Flask, abort, jsonify, request, session
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
@@ -45,6 +66,14 @@ registration_schema = RegistrationSchema()
 
 @app.route("/@me")
 def get_current_user():
+    """
+    Get the current logged-in user's details.
+
+    Returns:
+        A JSON response with the user's id and email if a user is logged in.
+        Otherwise, it returns a JSON response with an error message and
+        a 401 status code.
+    """
     user_id = session.get("user_id")
 
     if not user_id:
@@ -56,6 +85,17 @@ def get_current_user():
 
 @app.route("/register", methods=["POST"])
 def register_user():
+    """
+    Register a new user.
+
+    The request data should include name, email, password, and role.
+    The role should be either "candidate" or "recruiter".
+
+    Returns:
+        A JSON response with the new user's id and email, and 201 status code.
+        If a user with the given email already exists, it returns a JSON
+        response with an error message and a 409 status code.
+    """
     # Validate the request data
     try:
         data = registration_schema.load(request.json)
@@ -89,6 +129,16 @@ def register_user():
 
 @app.route("/login", methods=["POST"])
 def login_user():
+    """
+    Log in a user.
+
+    The request data should include email and password.
+
+    Returns:
+        A JSON response with the user's id and email if the login is successful
+        If the user does not exist or the password does not match, it returns a
+        401 status code.
+    """
     # Validate the request data
     try:
         data = login_schema.load(request.json)
@@ -111,6 +161,14 @@ def login_user():
 
 @app.route("/logout", methods=["POST"])
 def logout_user():
+    """
+    Log out a user.
+
+    It removes the user_id from the session.
+
+    Returns:
+        A "200" string if the logout is successful.
+    """
     session.pop("user_id")
     return "200"
 
