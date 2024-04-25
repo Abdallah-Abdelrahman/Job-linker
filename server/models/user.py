@@ -1,11 +1,12 @@
 """User Class"""
 
+from flask_login import UserMixin
 from sqlalchemy import Column, Enum, String
 
 from server.models.base_model import Base, BaseModel
 
 
-class User(Base, BaseModel):
+class User(Base, BaseModel, UserMixin):
     """User Model"""
 
     __tablename__ = "users"

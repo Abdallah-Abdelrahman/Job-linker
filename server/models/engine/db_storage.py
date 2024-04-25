@@ -7,7 +7,7 @@ from os import getenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-import server.models
+import server.models as models
 from server.models.base_model import Base
 from server.models.candidate import Candidate
 from server.models.job import Job
