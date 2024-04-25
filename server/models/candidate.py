@@ -3,12 +3,12 @@
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from models.base_model import Base, BaseModel
+from models.base_model import BaseModel, Base
 from models.skill import candidate_skills
 from models.language import candidate_languages
 
 
-class Candidate(Base, BaseModel):
+class Candidate(BaseModel, Base):
     """Candidate Model"""
 
     __tablename__ = "candidates"
@@ -43,7 +43,13 @@ class Candidate(Base, BaseModel):
         candidate_dict = super().to_dict
         candidate_dict["major"] = self.major.name
         candidate_dict["skills"] = [skill.name for skill in self.skills]
-        candidate_dict["experiences"] = [e.title for e in self.experiences
-                                         if hasattr(self, "experiences")]
+        candidate_dict["experiences"] = [
+                {
+                    "title": xp.title,
+                    "start_date": xp.start_date,
+                    "end_date": xp.end_date,
+                    "location": xp.location
+                } for xp in self.experiences
+        ]
         candidate_dict["languages"] = [lang.name for lang in self.languages]
         return candidate_dict

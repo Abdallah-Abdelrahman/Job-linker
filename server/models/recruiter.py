@@ -3,10 +3,10 @@
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from models.base_model import Base, BaseModel
+from models.base_model import BaseModel, Base
 
 
-class Recruiter(Base, BaseModel):
+class Recruiter(BaseModel, Base):
     """Recruiter Model"""
 
     __tablename__ = "recruiters"
