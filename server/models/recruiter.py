@@ -2,11 +2,10 @@
 
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
+from server.models.base_model import BaseModel, Base
 
-from server.models.base_model import Base, BaseModel
 
-
-class Recruiter(Base, BaseModel):
+class Recruiter(BaseModel, Base):
     """Recruiter Model"""
 
     __tablename__ = "recruiters"
