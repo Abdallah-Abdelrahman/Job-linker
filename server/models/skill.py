@@ -2,7 +2,7 @@
 from sqlalchemy import Column, ForeignKey, String, Table
 from sqlalchemy.orm import relationship
 
-from models.base_model import BaseModel, Base
+from server.models.base_model import BaseModel, Base
 
 # Association table for Candidate-Skill many-to-many relationship
 candidate_skills = Table(
@@ -26,7 +26,7 @@ class Skill(BaseModel, Base):
 
     __tablename__ = "skills"
 
-    name = Column(String(100), nullable=False)
+    name = Column(String(100), nullable=False, unique=True, index=True)
 
     # Relationship with Candidate
     candidates = relationship(

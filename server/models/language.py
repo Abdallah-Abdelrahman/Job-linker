@@ -2,7 +2,7 @@
 from sqlalchemy import Column, ForeignKey, String, Table
 from sqlalchemy.orm import relationship
 
-from models.base_model import BaseModel, Base
+from server.models.base_model import BaseModel, Base
 
 # Association table for Language_Skill m:m relationship
 candidate_languages = Table(

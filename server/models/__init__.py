@@ -5,9 +5,7 @@ Attrs:
     storage: an instance of DBStorage
 '''
 
-from models.engine.db import DBStorage
-from os import getenv
+from server.models.engine.db import DBStorage
 
-
-storage = DBStorage()
+storage = DBStorage(engine='sqlite:///ats.db')
 storage.reload()

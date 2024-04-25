@@ -27,3 +27,5 @@ dist-ssr
 *.sln
 *.sw?
 **/.pylintrc
+dump.sql
+ats.db

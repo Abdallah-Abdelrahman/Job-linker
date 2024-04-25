@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlalchemy import Column, DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 
-from models.base_model import BaseModel, Base
+from server.models.base_model import BaseModel, Base
 
 
 class WorkExperience(BaseModel, Base):

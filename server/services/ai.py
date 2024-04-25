@@ -7,7 +7,7 @@ from json import loads, JSONDecodeError
 from pdfminer.high_level import extract_text
 from pdfminer.pdfparser import PDFSyntaxError
 import google.generativeai as genai
-import server.prompts
+from server.prompts import CANDID_PROMPT, JOB_PROMPT
 
 
 class AIService():
@@ -105,14 +105,19 @@ class AIService():
             txt_cp = ''.join([c for c in text if c not in '\n\\'])
             return loads(txt_cp)
         except JSONDecodeError as e:
+            # retry unitl we get valid json
             print('--------->', self.cv, e)
             return self.to_dict(prompt_enquery)
-            # raise
 
 
 if __name__ == '__main__':
+    ai = AIService(cv='jobs/job_desc_front_engineer.pdf')
+    dict_ = ai.to_dict(JOB_PROMPT)
+    print(dict_)
+    '''
     for pdf in listdir('cv'):
         ai = AIService(cv=path.join('cv', pdf))
         dict_ = ai.to_dict(prompts.CANDID_PROMPT)
         print(dict_)
         print('---------->', type(dict_))
+        '''
