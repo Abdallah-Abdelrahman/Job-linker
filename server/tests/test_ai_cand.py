@@ -1,18 +1,17 @@
 '''test ai'''
-from models.candidate import Candidate
-from models.job import Job
-from models.major import Major
-from models.recruiter import Recruiter
-from models.skill import Skill
-from models.user import User
-from models.work_experience import WorkExperience
-from models.language import Language
-from models import storage
-from ai import AIService
-import prompts
+from os import getcwd
+from server.models.candidate import Candidate
+from server.models.major import Major
+from server.models.skill import Skill
+from server.models.user import User
+from server.models.work_experience import WorkExperience
+from server.models.language import Language
+from server.models import storage
+from server.services.ai import AIService
+from server.prompts import CANDID_PROMPT
 
 # parse cv and generate dictionary
-cv_dict = AIService(cv='cv/fola_inv.pdf').to_dict(prompts.CANDID_PROMPT)
+cv_dict = AIService(cv=f'{getcwd()}/server/cv/moe.pdf').to_dict(CANDID_PROMPT)
 
 print(type(cv_dict))
 

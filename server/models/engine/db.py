@@ -1,15 +1,15 @@
 '''Storage engine'''
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
-from models.base_model import Base
-from models.user import User
-from models.candidate import Candidate
-from models.recruiter import Recruiter
-from models.job import Job
-from models.language import Language
-from models.major import Major
-from models.work_experience import WorkExperience
-from models.skill import Skill
+from server.models.base_model import Base
+from server.models.user import User
+from server.models.candidate import Candidate
+from server.models.recruiter import Recruiter
+from server.models.job import Job
+from server.models.language import Language
+from server.models.major import Major
+from server.models.work_experience import WorkExperience
+from server.models.skill import Skill
 
 
 class DBStorage:

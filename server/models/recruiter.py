@@ -3,7 +3,7 @@
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from models.base_model import BaseModel, Base
+from server.models.base_model import BaseModel, Base
 
 
 class Recruiter(BaseModel, Base):

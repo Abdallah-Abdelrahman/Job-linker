@@ -2,8 +2,8 @@
 from sqlalchemy import Column, ForeignKey, Numeric, String
 from sqlalchemy.orm import relationship
 
-from models.base_model import BaseModel, Base
-from models.skill import job_skills
+from server.models.base_model import BaseModel, Base
+from server.models.skill import job_skills
 
 
 class Job(BaseModel, Base):

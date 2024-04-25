@@ -3,9 +3,9 @@
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from models.base_model import BaseModel, Base
-from models.skill import candidate_skills
-from models.language import candidate_languages
+from server.models.base_model import BaseModel, Base
+from server.models.skill import candidate_skills
+from server.models.language import candidate_languages
 
 
 class Candidate(BaseModel, Base):
