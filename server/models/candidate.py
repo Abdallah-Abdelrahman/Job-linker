@@ -35,6 +35,6 @@ class Candidate(Base, BaseModel):
         candidate_dict = super().to_dict
         candidate_dict["major"] = self.major.name
         candidate_dict["skills"] = [skill.name for skill in self.skills]
-        candidate_dict['experiences'] = [e.title for e in self.experiences
-                                         if hasattr(self, 'experiences')]
+        candidate_dict["experiences"] = [e.title for e in self.experiences
+                                         if hasattr(self, "experiences")]
         return candidate_dict

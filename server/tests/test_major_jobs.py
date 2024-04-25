@@ -87,6 +87,7 @@ job = Job(
     job_title="Software Engineer",
     job_description="Develop and maintain software applications",
     exper_years="2 Years",
+    salary=2000.500
 )
 session.add(job)
 session.commit()
