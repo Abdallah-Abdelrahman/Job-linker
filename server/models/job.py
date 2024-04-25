@@ -1,5 +1,5 @@
 """Job Model"""
-from sqlalchemy import Column, ForeignKey, String
+from sqlalchemy import Column, ForeignKey, Numeric, String
 from sqlalchemy.orm import relationship
 
 from models.base_model import BaseModel, Base
@@ -20,6 +20,7 @@ class Job(BaseModel, Base):
     job_title = Column(String(100), nullable=False)
     job_description = Column(String(500), nullable=False)
     exper_years = Column(String(128), nullable=True)
+    salary = Column(Numeric(precision=2, scale=2))
 
     # Relationship with Recruiter
     recruiter = relationship("Recruiter", back_populates="jobs")

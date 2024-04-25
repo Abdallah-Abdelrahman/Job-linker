@@ -7,7 +7,7 @@ from json import loads, JSONDecodeError
 from pdfminer.high_level import extract_text
 from pdfminer.pdfparser import PDFSyntaxError
 import google.generativeai as genai
-import prompts
+import server.prompts
 
 
 class AIService():

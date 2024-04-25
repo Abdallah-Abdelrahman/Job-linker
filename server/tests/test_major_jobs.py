@@ -147,7 +147,8 @@ job2 = Job(
     job_title='Frontend Developer',
     job_description='Design and develop user interfaces',
     exper_years='5 Years',
-    skills=skills[5:10]
+    skills=skills[5:10],
+    salary=5000.678999
 )
 storage.new(job2)
 storage.save()
