@@ -2,10 +2,10 @@
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-from server.models.base_model import Base, BaseModel
+from server.models.base_model import BaseModel, Base
 
 
-class Major(Base, BaseModel):
+class Major(BaseModel, Base):
     """Major Class"""
 
     __tablename__ = "majors"

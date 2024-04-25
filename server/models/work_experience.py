@@ -1,12 +1,13 @@
 """WorkExperience Class"""
 
+from datetime import datetime
 from sqlalchemy import Column, DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
 
-from server.models.base_model import Base, BaseModel
+from server.models.base_model import BaseModel, Base
 
 
-class WorkExperience(Base, BaseModel):
+class WorkExperience(BaseModel, Base):
     """WorkExperience Model
 
     Attrs:
@@ -28,8 +29,8 @@ class WorkExperience(Base, BaseModel):
     title = Column(String(128), nullable=False)
     company = Column(String(128), nullable=False)
     location = Column(String(128))
-    start_date = Column(DateTime)
-    end_date = Column(DateTime)
+    start_date = Column(DateTime, default=datetime.utcnow())
+    end_date = Column(DateTime, default=datetime.utcnow())
     description = Column(Text)
 
     candidate = relationship('Candidate', backref='experiences')
