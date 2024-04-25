@@ -106,7 +106,8 @@ class AIService():
             return loads(txt_cp)
         except JSONDecodeError as e:
             print('--------->', self.cv, e)
-            raise
+            return self.to_dict(prompt_enquery)
+            # raise
 
 
 if __name__ == '__main__':

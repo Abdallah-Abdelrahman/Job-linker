@@ -2,11 +2,11 @@
 from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from models.base_model import Base, BaseModel
+from models.base_model import BaseModel, Base
 from models.skill import job_skills
 
 
-class Job(Base, BaseModel):
+class Job(BaseModel, Base):
     """Job Class"""
 
     __tablename__ = "jobs"

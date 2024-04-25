@@ -11,6 +11,7 @@ Base = declarative_base()
 
 class BaseModel:
     """The BaseModel class from which future classes will be derived"""
+    __DATES = ("updated_at", "created_at", "start_date", "end_date")
 
     id = Column(
             String(60),
@@ -24,7 +25,7 @@ class BaseModel:
             onupdate=datetime.utcnow
             )
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *_, **kwargs) -> None:
         """Initialization the BaseModel instance"""
         self.id = str(uuid.uuid4())
         if isinstance(self.created_at, str):
@@ -32,11 +33,21 @@ class BaseModel:
         if isinstance(self.updated_at, str):
             self.updated_at = self._str_to_date(self.updated_at)
 
+        if len(kwargs) == 0:
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
+            return
+        for k, v in kwargs.items():
+            if k != "__class__":
+                setattr(self, k, v if k not in self.__DATES
+                        else self._str_to_date(v))
+
     def _str_to_date(self, date_str):
         """Convert a string to a datetime object"""
         try:
             return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f")
-        except ValueError:
+        except (ValueError, TypeError) as e:
+            print("----Date issues--------->", e)
             return datetime.utcnow()
 
     def __repr__(self) -> str:

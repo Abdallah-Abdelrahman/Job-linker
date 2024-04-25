@@ -8,11 +8,13 @@ CANDID_PROMPT = '''\
       major,
       skills:[],
       experiences:[
-        {title,company,star_date, end_date,location,descpription:''}
+        {title,company,start_date,end_date,location,descpription:''}
       ],
       languages:[]
     }
-    don't forget to enclose each property in double quotes
+    Notes:
+    - don't forget to enclose each property in double quotes
+    - start_date, end_date should respects this format '%Y-%m-%dT%H:%M:%S.%f'
     '''
 
 JOB_PROMPT = ''' '''

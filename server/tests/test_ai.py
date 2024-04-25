@@ -12,7 +12,8 @@ from ai import AIService
 import prompts
 
 # parse cv and generate dictionary
-cv_dict = AIService(cv='cv/john_doe.pdf').to_dict(prompts.CANDID_PROMPT)
+cv_dict = AIService(cv='cv/fola_inv.pdf').to_dict(prompts.CANDID_PROMPT)
+
 print(type(cv_dict))
 
 # create user
@@ -47,12 +48,8 @@ storage.new(candidate)
 storage.save()
 
 # Create a bulk of WorkExperience
-xps = [WorkExperience(
-    candidate_id=candidate.id,
-    title=x.get('title'),
-    company=x.get('company'),
-    location=x.get('location')
-    ) for x in cv_dict.get('experiences')]
+xps = [WorkExperience(candidate_id=candidate.id, **x)
+       for x in cv_dict.get('experiences')]
 for xp in xps:
     storage.new(xp)
     storage.save()
