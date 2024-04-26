@@ -120,3 +120,11 @@ class DBStorage:
         return self.__session.query(cls).filter(
                 getattr(cls, attr) == value
                 ).first()
+
+    def get_all_by_attr(self, cls, attr, value):
+        """
+        Returns all objects of a class with the given attribute value.
+        """
+        return self.__session.query(cls).filter(
+                getattr(cls, attr) == value
+                ).all()

@@ -105,6 +105,8 @@ set_bcrypt(bcrypt)
 # Import Blueprints
 
 from server.api.views.candidate_views import candidate_views
+from server.api.views.job_views import job_views
+from server.api.views.major_views import major_views
 from server.api.views.recruiter_views import recruiter_views
 from server.api.views.user_views import user_views
 
@@ -112,6 +114,8 @@ from server.api.views.user_views import user_views
 app.register_blueprint(user_views, url_prefix="/api")
 app.register_blueprint(candidate_views, url_prefix="/api")
 app.register_blueprint(recruiter_views, url_prefix="/api")
+app.register_blueprint(job_views, url_prefix="/api")
+app.register_blueprint(major_views, url_prefix="/api")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
