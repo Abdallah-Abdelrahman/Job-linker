@@ -25,6 +25,7 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_login import LoginManager
 from flask_session import Session
+
 from server.api.utils import make_response
 from server.api.views.user_views import set_bcrypt
 from server.config import ApplicationConfig
@@ -100,15 +101,17 @@ def internal_server_error(e):
 
 set_bcrypt(bcrypt)
 
+
 # Import Blueprints
 
 from server.api.views.candidate_views import candidate_views
+from server.api.views.recruiter_views import recruiter_views
 from server.api.views.user_views import user_views
 
 # Register Blueprints
 app.register_blueprint(user_views, url_prefix="/api")
 app.register_blueprint(candidate_views, url_prefix="/api")
-
+app.register_blueprint(recruiter_views, url_prefix="/api")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

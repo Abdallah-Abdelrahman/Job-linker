@@ -22,6 +22,7 @@ Functions:
 from flask import Blueprint, request, session
 from flask_login import login_required, login_user, logout_user
 from marshmallow import ValidationError
+
 from server.api.utils import make_response
 from server.models import storage
 from server.models.user import User
@@ -55,7 +56,7 @@ def register_user():
     except ValidationError as err:
         return make_response("error", err.messages), 400
 
-    user = storage.get_user_by_email(data["email"])
+    user = storage.get_by_attr(User, "email", data["email"])
     if user:
         return make_response("error", "User already exists"), 409
 
@@ -95,8 +96,11 @@ def login_user_():
     except ValidationError as err:
         return make_response("error", err.messages), 400
 
-    user = storage.get_user_by_email(data["email"])
-    if not user or not bcrypt.check_password_hash(user.password, data["password"]):
+    user = storage.get_by_attr(User, "email", data["email"])
+    if not user or not bcrypt.check_password_hash(
+            user.password,
+            data["password"]
+            ):
         return make_response("error", "Unauthorized"), 401
 
     login_user(user)
@@ -104,7 +108,9 @@ def login_user_():
     session["role"] = user.role
 
     return make_response(
-        "success", "User logged in successfully", {"id": user.id, "role": user.role}
+        "success",
+        "User logged in successfully",
+        {"id": user.id, "role": user.role}
     )
 
 
