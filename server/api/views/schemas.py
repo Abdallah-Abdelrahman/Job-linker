@@ -102,3 +102,22 @@ class RecruiterSchema(Schema):
 
 
 recruiter_schema = RecruiterSchema()
+
+
+class JobSchema(Schema):
+    recruiter_id = fields.Str(required=True)
+    major_id = fields.Str(required=True)
+    job_title = fields.Str(required=True)
+    job_description = fields.Str(required=True)
+    exper_years = fields.Str(required=False)
+    salary = fields.Float(required=False)
+
+
+job_schema = JobSchema()
+
+
+class MajorSchema(Schema):
+    name = fields.Str(required=True)
+
+
+major_schema = MajorSchema()
