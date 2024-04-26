@@ -1,17 +1,11 @@
 """
-This module defines the data validation schemas for user login and registration.
+This module defines the data validation schemas for user login and registration
 
 The schemas are defined using the Marshmallow library, which provides a simple
 way to validate data against certain criteria. The schemas are used to validate
-the incoming data for the login and registration endpoints of the Flask application.
+the incoming data for the login and registration endpoints of the
+Flask application.
 
-Classes:
-    LoginSchema: Defines the data validation schema for user login.
-    RegistrationSchema: Defines the data validation schema for user registration.
-
-Instances:
-    login_schema: An instance of the LoginSchema class.
-    registration_schema: An instance of the RegistrationSchema class.
 """
 from marshmallow import Schema, fields
 
@@ -42,13 +36,17 @@ class RegistrationSchema(Schema):
         name (Str): The user's name. This field is required.
         email (Email): The user's email. This field is required.
         password (Str): The user's password. This field is required.
-        role (Str): The user's role. This field is required and must be either "candidate" or "recruiter".
+        role (Str): The user's role. This field is required and must be either
+        "candidate" or "recruiter".
     """
 
     name = fields.Str(required=True)
     email = fields.Email(required=True)
     password = fields.Str(required=True)
-    role = fields.Str(required=True, validate=lambda r: r in ["candidate", "recruiter"])
+    role = fields.Str(
+            required=True,
+            validate=lambda r: r in ["candidate", "recruiter"]
+            )
 
 
 registration_schema = RegistrationSchema()
@@ -89,12 +87,18 @@ class CandidateSchema(Schema):
     Defines the data validation schema for a candidate.
 
     Fields:
-        user_id (Str): The user's ID. This field is required.
         major_id (Str): The major's ID. This field is required.
     """
 
-    user_id = fields.Str(required=True)
     major_id = fields.Str(required=True)
 
 
 candidate_schema = CandidateSchema()
+
+
+class RecruiterSchema(Schema):
+    company_name = fields.Str(required=True)
+    company_info = fields.Str(required=False)
+
+
+recruiter_schema = RecruiterSchema()
