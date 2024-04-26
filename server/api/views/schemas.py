@@ -121,3 +121,22 @@ class MajorSchema(Schema):
 
 
 major_schema = MajorSchema()
+
+
+class SkillSchema(Schema):
+    name = fields.Str(required=True)
+
+
+skill_schema = SkillSchema()
+
+
+class WorkExperienceSchema(Schema):
+    title = fields.Str(required=True)
+    company = fields.Str(required=True)
+    location = fields.Str()
+    start_date = fields.DateTime()
+    end_date = fields.DateTime()
+    description = fields.Str()
+
+
+work_experience_schema = WorkExperienceSchema()
