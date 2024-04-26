@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, session
-from flask_login import login_required
+from flask_login import current_user, login_required
 from marshmallow import ValidationError
 
 from server.api.utils import make_response
@@ -129,37 +129,50 @@ def delete_job(job_id):
 @job_views.route("/jobs", methods=["GET"])
 @login_required
 def get_jobs():
-    user_id = session.get("user_id")
-    if not user_id:
-        return make_response("error", "Unauthorized"), 401
+    if current_user.role == "candidate":
+        candidate = storage.get_by_attr(Candidate, "user_id", current_user.id)
+        if not candidate:
+            return (
+                make_response(
+                    "error",
+                    "You don't have a candidate profile"
+                    ),
+                403,
+                )
 
-    candidate = storage.get_by_attr(Candidate, "user_id", user_id)
-    if not candidate:
-        return make_response("error", "You are not a candidate"), 403
+        jobs = storage.get_all_by_attr(Job, "major_id", candidate.major_id)
+        if not jobs:
+            return make_response("error", "No jobs found for your major"), 404
 
-    major_id = candidate.major_id
-    jobs = storage.get_all_by_attr(Job, "major_id", major_id)
-    if not jobs:
-        return make_response("error", "No jobs found for your major"), 404
+        jobs_data = [job_schema.dump(job) for job in jobs]
+        return jsonify(jobs_data), 200
+    else:
+        return (
+                make_response(
+                    "error",
+                    "Only candidates can access this endpoint"),
+                403,
+                )
 
-    jobs_data = [job_schema.dump(job) for job in jobs]
-    return jsonify(jobs_data), 200
 
-
-@job_views.route("/jobs", methods=["GET"])
+@job_views.route("/my_jobs", methods=["GET"])
 @login_required
 def get_my_jobs():
-    user_id = session.get("user_id")
-    if not user_id:
-        return make_response("error", "Unauthorized"), 401
+    if current_user.role == "recruiter":
+        recruiter = storage.get_by_attr(Recruiter, "user_id", current_user.id)
+        if not recruiter:
+            return make_response("error", "You are not a recruiter"), 403
 
-    recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
-    if not recruiter:
-        return make_response("error", "You are not a recruiter"), 403
+        jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
+        if not jobs:
+            return make_response("error", "No jobs found"), 404
 
-    jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
-    if not jobs:
-        return make_response("error", "No jobs found"), 404
-
-    jobs_data = [job_schema.dump(job) for job in jobs]
-    return jsonify(jobs_data), 200
+        jobs_data = [job_schema.dump(job) for job in jobs]
+        return jsonify(jobs_data), 200
+    else:
+        return (
+                make_response(
+                    "error",
+                    "Only recruiters can access this endpoint"),
+                403,
+                )
