@@ -135,6 +135,14 @@ class SkillSchema(Schema):
 skill_schema = SkillSchema()
 
 
+class LanguageSchema(Schema):
+    id = fields.Str(required=False)
+    name = fields.Str(required=True)
+
+
+language_schema = LanguageSchema()
+
+
 class WorkExperienceSchema(Schema):
     id = fields.Str(required=False)
     title = fields.Str(required=True)
