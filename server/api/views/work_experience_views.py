@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 
-from server.api.utils import make_response
+from server.api.utils import make_response_
 from server.models import storage
 from server.models.major import Major
 from server.models.user import User
@@ -24,7 +24,7 @@ def get_work_experiences(major_id=None):
     if major_id is not None:
         major = storage.get(Major, major_id)
         if not major:
-            return make_response("error", "Major not found"), 404
+            return make_response_("error", "Major not found"), 404
 
         candidates = major.candidates
 
@@ -48,13 +48,13 @@ def create_work_experience():
     current_user = storage.get(User, get_jwt_identity())
     if current_user.role != "candidate":
         return (
-            make_response("error", "Only candidates can add work experiences"),
+            make_response_("error", "Only candidates can add work experiences"),
             403,
         )
 
     if current_user.candidate is None:
         return (
-            make_response(
+            make_response_(
                 "error", "The current user does not have a candidate profile"
             ),
             400,
@@ -63,7 +63,7 @@ def create_work_experience():
     try:
         data = work_experience_schema.load(request.json)
     except ValidationError as err:
-        return make_response("error", err.messages), 400
+        return make_response_("error", err.messages), 400
 
     new_work_experience = WorkExperience(
             candidate_id=current_user.candidate.id,
@@ -73,7 +73,7 @@ def create_work_experience():
     storage.save()
 
     return (
-        make_response(
+        make_response_(
             "success",
             "WorkExperience created successfully",
             {"id": new_work_experience.id},
@@ -91,11 +91,11 @@ def update_work_experience(work_experience_id):
     current_user = storage.get(User, get_jwt_identity())
     work_experience = storage.get(WorkExperience, work_experience_id)
     if not work_experience:
-        return make_response("error", "WorkExperience not found"), 404
+        return make_response_("error", "WorkExperience not found"), 404
 
     if work_experience.candidate_id != current_user.candidate.id:
         return (
-            make_response(
+            make_response_(
                 "error",
                 "You can only update your own work experiences"
                 ),
@@ -105,13 +105,13 @@ def update_work_experience(work_experience_id):
     try:
         data = work_experience_schema.load(request.json)
     except ValidationError as err:
-        return make_response("error", err.messages), 400
+        return make_response_("error", err.messages), 400
 
     for key, value in data.items():
         setattr(work_experience, key, value)
     storage.save()
 
-    return make_response(
+    return make_response_(
         "success",
         "WorkExperience details updated successfully",
         {"id": work_experience.id, "title": work_experience.title},
@@ -126,11 +126,11 @@ def delete_work_experience(work_experience_id):
     current_user = storage.get(User, get_jwt_identity())
     work_experience = storage.get(WorkExperience, work_experience_id)
     if not work_experience:
-        return make_response("error", "WorkExperience not found"), 404
+        return make_response_("error", "WorkExperience not found"), 404
 
     if work_experience.candidate_id != current_user.candidate.id:
         return (
-            make_response(
+            make_response_(
                 "error",
                 "You can only delete your own work experiences"
                 ),
@@ -140,7 +140,7 @@ def delete_work_experience(work_experience_id):
     storage.delete(work_experience)
     storage.save()
 
-    return make_response(
+    return make_response_(
         "success",
         "WorkExperience deleted successfully",
     )

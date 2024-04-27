@@ -17,7 +17,7 @@ Modules:
 
 Functions:
     set_bcrypt(bcrypt_instance): Sets bcrypt instance for password hashing.
-    make_response(status, message, data): Creates a unified response format.
+    make_response_(status, message, data): Creates a unified response format.
 """
 from flask import Blueprint, request
 from flask_jwt_extended import (create_access_token,
@@ -25,7 +25,7 @@ from flask_jwt_extended import (create_access_token,
                                 jwt_required)
 from marshmallow import ValidationError
 
-from server.api.utils import make_response
+from server.api.utils import make_response_
 from server.models import storage
 from server.models.user import User
 
@@ -56,11 +56,11 @@ def register_user():
     try:
         data = registration_schema.load(request.json)
     except ValidationError as err:
-        return make_response("error", err.messages), 400
+        return make_response_("error", err.messages), 400
 
     user = storage.get_by_attr(User, "email", data["email"])
     if user:
-        return make_response("error", "User already exists"), 409
+        return make_response_("error", "User already exists"), 409
 
     hashed_password = bcrypt.generate_password_hash(data["password"])
     new_user = User(
@@ -75,7 +75,7 @@ def register_user():
     access_token = create_access_token(identity=new_user.id)
 
     return (
-        make_response(
+        make_response_(
             "success",
             "User registered successfully",
             {"access_token": access_token, "role": new_user.role},
@@ -95,18 +95,18 @@ def login_user_():
     try:
         data = login_schema.load(request.json)
     except ValidationError as err:
-        return make_response("error", err.messages), 400
+        return make_response_("error", err.messages), 400
 
     user = storage.get_by_attr(User, "email", data["email"])
     if not user or not bcrypt.check_password_hash(
             user.password,
             data["password"]
             ):
-        return make_response("error", "Unauthorized"), 401
+        return make_response_("error", "Unauthorized"), 401
 
     access_token = create_access_token(identity=user.id)
 
-    return make_response(
+    return make_response_(
         "success",
         "User logged in successfully",
         {"access_token": access_token, "role": user.role},
@@ -121,7 +121,7 @@ def logout_user_():
 
     Logs out the user if they are currently logged in.
     """
-    return make_response("success", "Logged out successfully")
+    return make_response_("success", "Logged out successfully")
 
 
 @user_views.route("/@me")
@@ -134,10 +134,10 @@ def get_current_user():
     """
     user_id = get_jwt_identity()
     if not user_id:
-        return make_response("error", "Unauthorized"), 401
+        return make_response_("error", "Unauthorized"), 401
 
     user = storage.get(User, user_id)
-    return make_response(
+    return make_response_(
         "success",
         "User details fetched successfully",
         {"id": user.id, "role": user.role},
@@ -151,18 +151,18 @@ def update_current_user():
     try:
         data = update_schema.load(request.json)
     except ValidationError as err:
-        return make_response("error", err.messages), 400
+        return make_response_("error", err.messages), 400
 
     user_id = get_jwt_identity()
     user = storage.get(User, user_id)
     if not user:
-        return make_response("error", "Unauthorized"), 401
+        return make_response_("error", "Unauthorized"), 401
 
     for key, value in data.items():
         setattr(user, key, value)
     storage.save()
 
-    return make_response(
+    return make_response_(
         "success",
         "User details updated successfully",
         {"id": user.id, "role": user.role},
@@ -176,9 +176,9 @@ def delete_current_user():
     user_id = get_jwt_identity()
     user = storage.get(User, user_id)
     if not user:
-        return make_response("error", "Unauthorized"), 401
+        return make_response_("error", "Unauthorized"), 401
 
     storage.delete(user)
     storage.save()
 
-    return make_response("success", "User deleted successfully")
+    return make_response_("success", "User deleted successfully")
