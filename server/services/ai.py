@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 '''The module defines AI service that parses a pdf file,
-generate a dictionary of info of the cv using gemini.
+generate a dictionary of info of the pdf using gemini.
 '''
-from os import getenv, listdir, path
+from os import getenv, listdir, path, getcwd
 from json import loads, JSONDecodeError
 from pdfminer.high_level import extract_text
 from pdfminer.pdfparser import PDFSyntaxError
@@ -44,24 +44,24 @@ class AIService():
         },
     ]
 
-    def __init__(self, cv='cv/moe.pdf'):
+    def __init__(self, pdf=''):
         '''Initialze the ai model
 
         Args:
-            cv(str): path to resume file
+            pdf(str): path to resume file
         '''
         genai.configure(api_key=getenv('GOOGLE_API_KEY'))
 
-        self.cv = cv
+        self.pdf = pdf
         self.model = genai.GenerativeModel(
             model_name='gemini-1.0-pro',
             generation_config=self.generation_config,
             safety_settings=self.safety_settings)
 
-    def parse_cv(self):
+    def parse_pdf(self):
         '''extract text from pdf'''
         try:
-            txt = extract_text(self.cv).strip()
+            txt = extract_text(self.pdf).strip()
             return txt if txt else None
         except FileNotFoundError:
             print('File not found or path is incorrect')
@@ -77,12 +77,12 @@ class AIService():
         Args:
             line: prompt to provide for gemini
         Notes:
-            the function assumes there's a pdf file called cv.pdf
-            feel free to change this to obtain some info about the the cv
+            the function assumes there's a pdf file called pdf.pdf
+            feel free to change this to obtain some info about the the pdf
         '''
-        input_ = self.parse_cv()
+        input_ = self.parse_pdf()
         if not input_:
-            print(self.cv)
+            print(self.pdf)
             raise ValueError('Text is empty')
 
         resp = self.model.generate_content([line, input_], stream=True)
@@ -106,17 +106,17 @@ class AIService():
             return loads(txt_cp)
         except JSONDecodeError as e:
             # retry unitl we get valid json
-            print('--------->', self.cv, e)
+            print('--------->', self.pdf, e)
             return self.to_dict(prompt_enquery)
 
 
 if __name__ == '__main__':
-    ai = AIService(cv='jobs/job_desc_front_engineer.pdf')
+    ai = AIService(pdf=f'{getcwd()}/server/jobs/job_desc_front_engineer.pdf')
     dict_ = ai.to_dict(JOB_PROMPT)
     print(dict_)
     '''
-    for pdf in listdir('cv'):
-        ai = AIService(cv=path.join('cv', pdf))
+    for pdf in listdir('pdf'):
+        ai = AIService(pdf=path.join('pdf', pdf))
         dict_ = ai.to_dict(prompts.CANDID_PROMPT)
         print(dict_)
         print('---------->', type(dict_))

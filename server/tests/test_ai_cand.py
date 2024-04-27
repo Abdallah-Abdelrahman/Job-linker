@@ -19,7 +19,7 @@ def create_candidate(cv=''):
         instance of newly created candiate
     '''
     # parse cv and generate dictionary
-    cv_dict = AIService(cv=f'{getcwd()}/server/cv/{cv}')\
+    cv_dict = AIService(pdf=f'{getcwd()}/server/cv/{cv}')\
         .to_dict(CANDID_PROMPT)
 
     # create user
@@ -66,8 +66,6 @@ def create_candidate(cv=''):
         storage.new(xp)
         storage.save()
 
-    # Lnaguages
-    print('------lang---------->', cv_dict.get('languages'))
     for l in cv_dict.get('languages'):
         queried_lang = storage._DBStorage__session.query(Language).filter(Language.name.ilike(f'%{l}%')).first()
         if queried_lang:
