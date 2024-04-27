@@ -146,7 +146,7 @@ def get_jobs():
     return jsonify(jobs_data), 200
 
 
-@job_views.route("/jobs", methods=["GET"])
+@job_views.route("/my_jobs", methods=["GET"])
 @jwt_required()
 def get_my_jobs():
     user_id = get_jwt_identity()
