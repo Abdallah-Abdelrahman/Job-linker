@@ -1,7 +1,7 @@
 from flask import jsonify
 
 
-def make_response(status, message, data=None):
+def make_response_(status, message, data=None):
     """
     Creates a unified response format.
 
