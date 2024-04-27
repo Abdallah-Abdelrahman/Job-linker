@@ -90,6 +90,7 @@ class CandidateSchema(Schema):
         major_id (Str): The major's ID. This field is required.
     """
 
+    id = fields.Str(required=False)
     major_id = fields.Str(required=True)
 
 
@@ -97,6 +98,7 @@ candidate_schema = CandidateSchema()
 
 
 class RecruiterSchema(Schema):
+    id = fields.Str(required=False)
     company_name = fields.Str(required=True)
     company_info = fields.Str(required=False)
 
@@ -105,6 +107,7 @@ recruiter_schema = RecruiterSchema()
 
 
 class JobSchema(Schema):
+    id = fields.Str(required=False)
     recruiter_id = fields.Str(required=True)
     major_id = fields.Str(required=True)
     job_title = fields.Str(required=True)
@@ -117,6 +120,7 @@ job_schema = JobSchema()
 
 
 class MajorSchema(Schema):
+    id = fields.Str(required=False)
     name = fields.Str(required=True)
 
 
@@ -124,6 +128,7 @@ major_schema = MajorSchema()
 
 
 class SkillSchema(Schema):
+    id = fields.Str(required=False)
     name = fields.Str(required=True)
 
 
@@ -131,6 +136,7 @@ skill_schema = SkillSchema()
 
 
 class WorkExperienceSchema(Schema):
+    id = fields.Str(required=False)
     title = fields.Str(required=True)
     company = fields.Str(required=True)
     location = fields.Str()

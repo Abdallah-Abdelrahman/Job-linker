@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
-from flask_login import login_required
+from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
+from sqlalchemy.exc import IntegrityError
 
 from server.api.utils import make_response
 from server.models import storage
@@ -12,7 +13,7 @@ skill_views = Blueprint("skill", __name__)
 
 
 @skill_views.route("/skills", methods=["GET"])
-@login_required
+@jwt_required()
 def get_skills():
     skills = storage.all(Skill).values()
     skills_data = [skill_schema.dump(skill) for skill in skills]
@@ -20,7 +21,7 @@ def get_skills():
 
 
 @skill_views.route("/skills", methods=["POST"])
-@login_required
+@jwt_required()
 def create_skill():
     try:
         data = skill_schema.load(request.json)
@@ -29,7 +30,10 @@ def create_skill():
 
     new_skill = Skill(name=data["name"])
     storage.new(new_skill)
-    storage.save()
+    try:
+        storage.save()
+    except IntegrityError:
+        return make_response("error", "Skill name already exists"), 409
 
     return (
         make_response(
@@ -42,7 +46,7 @@ def create_skill():
 
 
 @skill_views.route("/skills/<skill_id>", methods=["PUT"])
-@login_required
+@jwt_required()
 def update_skill(skill_id):
     skill = storage.get(Skill, skill_id)
     if not skill:
@@ -53,9 +57,12 @@ def update_skill(skill_id):
     except ValidationError as err:
         return make_response("error", err.messages), 400
 
-    for key, value in data.items():
-        setattr(skill, key, value)
-    storage.save()
+    try:
+        for key, value in data.items():
+            setattr(skill, key, value)
+        storage.save()
+    except IntegrityError:
+        return make_response("error", "Skill name already exists"), 409
 
     return make_response(
         "success",
@@ -65,7 +72,7 @@ def update_skill(skill_id):
 
 
 @skill_views.route("/skills/<skill_id>", methods=["DELETE"])
-@login_required
+@jwt_required()
 def delete_skill(skill_id):
     skill = storage.get(Skill, skill_id)
     if not skill:

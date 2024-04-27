@@ -1,6 +1,7 @@
-from flask import Blueprint, jsonify, request, session
-from flask_login import login_required
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
+from sqlalchemy.exc import IntegrityError
 
 from server.api.utils import make_response
 from server.models import storage
@@ -13,7 +14,7 @@ major_views = Blueprint("major", __name__)
 
 
 @major_views.route("/majors", methods=["GET"])
-@login_required
+@jwt_required()
 def get_majors():
     majors = storage.all(Major).values()
     majors_data = [major_schema.dump(major) for major in majors]
@@ -21,9 +22,9 @@ def get_majors():
 
 
 @major_views.route("/majors", methods=["POST"])
-@login_required
+@jwt_required()
 def create_major():
-    user = storage.get(User, session.get("user_id"))
+    user = storage.get(User, get_jwt_identity())
     if not user or user.role != "recruiter":
         return make_response("error", "Unauthorized"), 401
 
@@ -34,7 +35,10 @@ def create_major():
 
     new_major = Major(name=data["name"])
     storage.new(new_major)
-    storage.save()
+    try:
+        storage.save()
+    except IntegrityError:
+        return make_response("error", "Major name already exists"), 409
 
     return (
         make_response(
@@ -47,9 +51,9 @@ def create_major():
 
 
 @major_views.route("/majors/<major_id>", methods=["PUT"])
-@login_required
+@jwt_required()
 def update_major(major_id):
-    user = storage.get(User, session.get("user_id"))
+    user = storage.get(User, get_jwt_identity())
     if not user or user.role != "recruiter":
         return make_response("error", "Unauthorized"), 401
 
@@ -62,9 +66,12 @@ def update_major(major_id):
     except ValidationError as err:
         return make_response("error", err.messages), 400
 
-    for key, value in data.items():
-        setattr(major, key, value)
-    storage.save()
+    try:
+        for key, value in data.items():
+            setattr(major, key, value)
+        storage.save()
+    except IntegrityError:
+        return make_response("error", "Major name already exists"), 409
 
     return make_response(
         "success",
@@ -74,9 +81,9 @@ def update_major(major_id):
 
 
 @major_views.route("/majors/<major_id>", methods=["DELETE"])
-@login_required
+@jwt_required()
 def delete_major(major_id):
-    user = storage.get(User, session.get("user_id"))
+    user = storage.get(User, get_jwt_identity())
     if not user or user.role != "recruiter":
         return make_response("error", "Unauthorized"), 401
 

@@ -1,10 +1,11 @@
-from flask import Blueprint, request, session
-from flask_login import login_required
+from flask import Blueprint, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 
 from server.api.utils import make_response
 from server.models import storage
 from server.models.candidate import Candidate
+from server.models.user import User
 
 from .schemas import candidate_schema
 
@@ -12,16 +13,17 @@ candidate_views = Blueprint("candidate", __name__)
 
 
 @candidate_views.route("/candidates", methods=["POST"])
-@login_required
+@jwt_required()
 def create_candidate():
+    user_id = get_jwt_identity()
+    user = storage.get(User, user_id)
+    if not user or user.role != "candidate":
+        return make_response("error", "Unauthorized"), 401
+
     try:
         data = candidate_schema.load(request.json)
     except ValidationError as err:
         return make_response("error", err.messages), 400
-
-    user_id = session.get("user_id")
-    if not user_id:
-        return make_response("error", "Unauthorized"), 401
 
     new_candidate = Candidate(
         user_id=user_id,
@@ -41,9 +43,9 @@ def create_candidate():
 
 
 @candidate_views.route("/candidates/@me", methods=["GET"])
-@login_required
+@jwt_required()
 def get_current_candidate():
-    user_id = session.get("user_id")
+    user_id = get_jwt_identity()
     if not user_id:
         return make_response("error", "Unauthorized"), 401
 
@@ -62,16 +64,21 @@ def get_current_candidate():
 
 
 @candidate_views.route("/candidates/@me", methods=["PUT"])
-@login_required
+@jwt_required()
 def update_current_candidate():
-    data = request.json
-    user_id = session.get("user_id")
-    if not user_id:
+    user_id = get_jwt_identity()
+    user = storage.get(User, user_id)
+    if not user or user.role != "candidate":
         return make_response("error", "Unauthorized"), 401
 
     candidate = storage.get_by_attr(Candidate, "user_id", user_id)
     if not candidate:
         return make_response("error", "Candidate not found"), 404
+
+    try:
+        data = candidate_schema.load(request.json)
+    except ValidationError as err:
+        return make_response("error", err.messages), 400
 
     for key, value in data.items():
         setattr(candidate, key, value)
@@ -82,3 +89,21 @@ def update_current_candidate():
         "Candidate details updated successfully",
         {"id": candidate.id, "major_id": candidate.major_id},
     )
+
+
+@candidate_views.route("/candidates/@me", methods=["DELETE"])
+@jwt_required()
+def delete_current_candidate():
+    user_id = get_jwt_identity()
+    user = storage.get(User, user_id)
+    if not user or user.role != "candidate":
+        return make_response("error", "Unauthorized"), 401
+
+    candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+    if not candidate:
+        return make_response("error", "Candidate not found"), 404
+
+    storage.delete(candidate)
+    storage.save()
+
+    return make_response("success", "Candidate profile deleted successfully")
