@@ -11,6 +11,7 @@ import server.models as models
 from server.models.base_model import Base
 from server.models.candidate import Candidate
 from server.models.job import Job
+from server.models.language import Language
 from server.models.major import Major
 from server.models.recruiter import Recruiter
 from server.models.skill import Skill
@@ -25,6 +26,7 @@ classes = {
     "Skill": Skill,
     "User": User,
     "WorkExperience": WorkExperience,
+    "Language": Language,
 }
 
 

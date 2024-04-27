@@ -31,8 +31,6 @@ from flask_jwt_extended import JWTManager
 from server.api.utils import make_response_
 from server.api.views.user_views import set_bcrypt
 from server.config import ApplicationConfig
-from server.models import storage
-from server.models.user import User
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
@@ -111,6 +109,7 @@ set_bcrypt(bcrypt)
 
 from server.api.views.candidate_views import candidate_views
 from server.api.views.job_views import job_views
+from server.api.views.language_views import language_views
 from server.api.views.major_views import major_views
 from server.api.views.recruiter_views import recruiter_views
 from server.api.views.skill_views import skill_views
@@ -125,6 +124,7 @@ app.register_blueprint(job_views, url_prefix="/api")
 app.register_blueprint(major_views, url_prefix="/api")
 app.register_blueprint(skill_views, url_prefix="/api")
 app.register_blueprint(work_experience_views, url_prefix="/api")
+app.register_blueprint(language_views, url_prefix="/api")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
