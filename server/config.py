@@ -22,8 +22,8 @@ Classes:
     for the Flask application.
 """
 import os
+from datetime import timedelta
 
-import redis
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -34,7 +34,14 @@ class ApplicationConfig:
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
-    SESSION_TYPE = "redis"
-    SESSION_PERMANENT = False
-    SESSION_USE_SIGNER = True
-    SESSION_REDIS = redis.from_url("redis://127.0.0.1:6379")
+    # SESSION_TYPE = "redis"
+    # SESSION_PERMANENT = False
+    # SESSION_USE_SIGNER = True
+    # SESSION_REDIS = redis.from_url("redis://127.0.0.1:6379")
+    JWT_SECRET_KEY = os.environ["SECRET_KEY"]
+
+    # Set the lifespan of access tokens to 15 minutes
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+
+    # Set the lifespan of refresh tokens to 1 day
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)

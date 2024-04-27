@@ -23,8 +23,10 @@ Imports:
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
-from flask_login import LoginManager
-from flask_session import Session
+
+# from flask_login import LoginManager
+# from flask_session import Session
+from flask_jwt_extended import JWTManager
 
 from server.api.utils import make_response
 from server.api.views.user_views import set_bcrypt
@@ -38,30 +40,33 @@ app.url_map.strict_slashes = False
 
 bcrypt = Bcrypt(app)
 CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "*"}})
-server_session = Session(app)
 
-login_manager = LoginManager()
-login_manager.init_app(app)
+jwt = JWTManager(app)
 
+# server_session = Session(app)
 
-@login_manager.user_loader
-def load_user(user_id):
-    """
-    Load a user given the user_id.
-
-    Args:
-        user_id (str): The unique identifier of the user.
-
-    Returns:
-        User: The User object if found, None otherwise.
-    """
-    return storage.get(User, user_id)
+# login_manager = LoginManager()
+# login_manager.init_app(app)
 
 
-@login_manager.unauthorized_handler
-def unauthorized():
-    """Redirects unauthorized users to a custom HTML page."""
-    return make_response("error", "Unauthorized"), 401
+# @login_manager.user_loader
+# def load_user(user_id):
+#    """
+#    Load a user given the user_id.
+#
+#    Args:
+#        user_id (str): The unique identifier of the user.
+#
+#    Returns:
+#        User: The User object if found, None otherwise.
+#    """
+#    return storage.get(User, user_id)
+
+
+# @login_manager.unauthorized_handler
+# def unauthorized():
+#    """Redirects unauthorized users to a custom HTML page."""
+#    return make_response("error", "Unauthorized"), 401
 
 
 @app.errorhandler(400)
