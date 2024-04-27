@@ -5,7 +5,8 @@ Attrs:
     storage: an instance of DBStorage
 """
 
+from os import getenv
 from server.models.engine.db_storage import DBStorage
 
-storage = DBStorage()
+storage = DBStorage(engine=getenv('ENGINE'))
 storage.reload()
