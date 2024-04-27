@@ -28,7 +28,7 @@ from flask_cors import CORS
 # from flask_session import Session
 from flask_jwt_extended import JWTManager
 
-from server.api.utils import make_response
+from server.api.utils import make_response_
 from server.api.views.user_views import set_bcrypt
 from server.config import ApplicationConfig
 from server.models import storage
@@ -66,42 +66,42 @@ jwt = JWTManager(app)
 # @login_manager.unauthorized_handler
 # def unauthorized():
 #    """Redirects unauthorized users to a custom HTML page."""
-#    return make_response("error", "Unauthorized"), 401
+#    return make_response_("error", "Unauthorized"), 401
 
 
 @app.errorhandler(400)
 def bad_request(e):
-    return make_response("error", "Bad Request"), 400
+    return make_response_("error", "Bad Request"), 400
 
 
 @app.errorhandler(401)
 def unauthorized(e):
-    return make_response("error", "Unauthorized"), 401
+    return make_response_("error", "Unauthorized"), 401
 
 
 @app.errorhandler(403)
 def forbidden(e):
-    return make_response("error", "Forbidden"), 403
+    return make_response_("error", "Forbidden"), 403
 
 
 @app.errorhandler(404)
 def not_found(e):
-    return make_response("error", "Not Found"), 404
+    return make_response_("error", "Not Found"), 404
 
 
 @app.errorhandler(405)
 def method_not_allowed(e):
-    return make_response("error", "Method Not Allowed"), 405
+    return make_response_("error", "Method Not Allowed"), 405
 
 
 @app.errorhandler(408)
 def request_timeout(e):
-    return make_response("error", "Request Timeout"), 408
+    return make_response_("error", "Request Timeout"), 408
 
 
 @app.errorhandler(500)
 def internal_server_error(e):
-    return make_response("error", "Internal Server Error"), 500
+    return make_response_("error", "Internal Server Error"), 500
 
 
 set_bcrypt(bcrypt)
