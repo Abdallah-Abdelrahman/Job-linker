@@ -1,5 +1,5 @@
-from flask import Blueprint, request, session
-from flask_login import login_required
+from flask import Blueprint, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 
 from server.api.utils import make_response
@@ -12,14 +12,14 @@ recruiter_views = Blueprint("recruiter", __name__)
 
 
 @recruiter_views.route("/recruiters", methods=["POST"])
-@login_required
+@jwt_required()
 def create_recruiter():
     try:
         data = recruiter_schema.load(request.json)
     except ValidationError as err:
         return make_response("error", err.messages), 400
 
-    user_id = session.get("user_id")
+    user_id = get_jwt_identity()
     if not user_id:
         return make_response("error", "Unauthorized"), 401
 
@@ -42,9 +42,9 @@ def create_recruiter():
 
 
 @recruiter_views.route("/recruiters/@me", methods=["GET"])
-@login_required
+@jwt_required()
 def get_current_recruiter():
-    user_id = session.get("user_id")
+    user_id = get_jwt_identity()
     if not user_id:
         return make_response("error", "Unauthorized"), 401
 
@@ -64,14 +64,14 @@ def get_current_recruiter():
 
 
 @recruiter_views.route("/recruiters/@me", methods=["PUT"])
-@login_required
+@jwt_required()
 def update_current_recruiter():
     try:
         data = recruiter_schema.load(request.json)
     except ValidationError as err:
         return make_response("error", err.messages), 400
 
-    user_id = session.get("user_id")
+    user_id = get_jwt_identity()
     if not user_id:
         return make_response("error", "Unauthorized"), 401
 

@@ -19,8 +19,10 @@ Functions:
     set_bcrypt(bcrypt_instance): Sets bcrypt instance for password hashing.
     make_response(status, message, data): Creates a unified response format.
 """
-from flask import Blueprint, request, session
-from flask_login import login_required, login_user, logout_user
+from flask import Blueprint, request
+from flask_jwt_extended import (create_access_token,
+                                get_jwt_identity,
+                                jwt_required)
 from marshmallow import ValidationError
 
 from server.api.utils import make_response
@@ -70,14 +72,13 @@ def register_user():
     storage.new(new_user)
     storage.save()
 
-    session["user_id"] = new_user.id
-    session["role"] = new_user.role
+    access_token = create_access_token(identity=new_user.id)
 
     return (
         make_response(
             "success",
             "User registered successfully",
-            {"id": new_user.id, "role": new_user.role},
+            {"access_token": access_token, "role": new_user.role},
         ),
         201,
     )
@@ -103,43 +104,35 @@ def login_user_():
             ):
         return make_response("error", "Unauthorized"), 401
 
-    login_user(user)
-    session["user_id"] = user.id
-    session["role"] = user.role
+    access_token = create_access_token(identity=user.id)
 
     return make_response(
         "success",
         "User logged in successfully",
-        {"id": user.id, "role": user.role}
+        {"access_token": access_token, "role": user.role},
     )
 
 
 @user_views.route("/logout", methods=["POST"])
-@login_required
+@jwt_required()
 def logout_user_():
     """
     Handles user logout.
 
     Logs out the user if they are currently logged in.
     """
-    if "user_id" in session:
-        session.pop("user_id")
-        session.pop("role")
-        logout_user()
-        return make_response("success", "Logged out successfully")
-    else:
-        return make_response("error", "No active session"), 400
+    return make_response("success", "Logged out successfully")
 
 
 @user_views.route("/@me")
-@login_required
+@jwt_required()
 def get_current_user():
     """
     Fetches the current user's details.
 
     Returns the details of the user who is currently logged in.
     """
-    user_id = session.get("user_id")
+    user_id = get_jwt_identity()
     if not user_id:
         return make_response("error", "Unauthorized"), 401
 
@@ -152,7 +145,7 @@ def get_current_user():
 
 
 @user_views.route("/@me", methods=["PUT"])
-@login_required
+@jwt_required()
 def update_current_user():
     """Update the current user's details."""
     try:
@@ -160,7 +153,7 @@ def update_current_user():
     except ValidationError as err:
         return make_response("error", err.messages), 400
 
-    user_id = session.get("user_id")
+    user_id = get_jwt_identity()
     user = storage.get(User, user_id)
     if not user:
         return make_response("error", "Unauthorized"), 401
@@ -177,19 +170,15 @@ def update_current_user():
 
 
 @user_views.route("/@me", methods=["DELETE"])
-@login_required
+@jwt_required()
 def delete_current_user():
     """Delete the current user."""
-    user_id = session.get("user_id")
+    user_id = get_jwt_identity()
     user = storage.get(User, user_id)
     if not user:
         return make_response("error", "Unauthorized"), 401
 
     storage.delete(user)
     storage.save()
-
-    session.pop("user_id")
-    session.pop("role")
-    logout_user()
 
     return make_response("success", "User deleted successfully")
