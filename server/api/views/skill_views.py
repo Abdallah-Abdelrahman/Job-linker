@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required
 from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
 
-from server.api.utils import make_response
+from server.api.utils import make_response_
 from server.models import storage
 from server.models.skill import Skill
 
@@ -26,17 +26,17 @@ def create_skill():
     try:
         data = skill_schema.load(request.json)
     except ValidationError as err:
-        return make_response("error", err.messages), 400
+        return make_response_("error", err.messages), 400
 
     new_skill = Skill(name=data["name"])
     storage.new(new_skill)
     try:
         storage.save()
     except IntegrityError:
-        return make_response("error", "Skill name already exists"), 409
+        return make_response_("error", "Skill name already exists"), 409
 
     return (
-        make_response(
+        make_response_(
             "success",
             "Skill created successfully",
             {"id": new_skill.id},
@@ -50,21 +50,21 @@ def create_skill():
 def update_skill(skill_id):
     skill = storage.get(Skill, skill_id)
     if not skill:
-        return make_response("error", "Skill not found"), 404
+        return make_response_("error", "Skill not found"), 404
 
     try:
         data = skill_schema.load(request.json)
     except ValidationError as err:
-        return make_response("error", err.messages), 400
+        return make_response_("error", err.messages), 400
 
     try:
         for key, value in data.items():
             setattr(skill, key, value)
         storage.save()
     except IntegrityError:
-        return make_response("error", "Skill name already exists"), 409
+        return make_response_("error", "Skill name already exists"), 409
 
-    return make_response(
+    return make_response_(
         "success",
         "Skill details updated successfully",
         {"id": skill.id, "name": skill.name},
@@ -76,12 +76,12 @@ def update_skill(skill_id):
 def delete_skill(skill_id):
     skill = storage.get(Skill, skill_id)
     if not skill:
-        return make_response("error", "Skill not found"), 404
+        return make_response_("error", "Skill not found"), 404
 
     storage.delete(skill)
     storage.save()
 
-    return make_response(
+    return make_response_(
         "success",
         "Skill deleted successfully",
     )

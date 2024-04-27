@@ -3,7 +3,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
 
-from server.api.utils import make_response
+from server.api.utils import make_response_
 from server.models import storage
 from server.models.major import Major
 from server.models.user import User
@@ -26,22 +26,22 @@ def get_majors():
 def create_major():
     user = storage.get(User, get_jwt_identity())
     if not user or user.role != "recruiter":
-        return make_response("error", "Unauthorized"), 401
+        return make_response_("error", "Unauthorized"), 401
 
     try:
         data = major_schema.load(request.json)
     except ValidationError as err:
-        return make_response("error", err.messages), 400
+        return make_response_("error", err.messages), 400
 
     new_major = Major(name=data["name"])
     storage.new(new_major)
     try:
         storage.save()
     except IntegrityError:
-        return make_response("error", "Major name already exists"), 409
+        return make_response_("error", "Major name already exists"), 409
 
     return (
-        make_response(
+        make_response_(
             "success",
             "Major created successfully",
             {"id": new_major.id},
@@ -55,25 +55,25 @@ def create_major():
 def update_major(major_id):
     user = storage.get(User, get_jwt_identity())
     if not user or user.role != "recruiter":
-        return make_response("error", "Unauthorized"), 401
+        return make_response_("error", "Unauthorized"), 401
 
     major = storage.get(Major, major_id)
     if not major:
-        return make_response("error", "Major not found"), 404
+        return make_response_("error", "Major not found"), 404
 
     try:
         data = major_schema.load(request.json)
     except ValidationError as err:
-        return make_response("error", err.messages), 400
+        return make_response_("error", err.messages), 400
 
     try:
         for key, value in data.items():
             setattr(major, key, value)
         storage.save()
     except IntegrityError:
-        return make_response("error", "Major name already exists"), 409
+        return make_response_("error", "Major name already exists"), 409
 
-    return make_response(
+    return make_response_(
         "success",
         "Major details updated successfully",
         {"id": major.id, "name": major.name},
@@ -85,16 +85,16 @@ def update_major(major_id):
 def delete_major(major_id):
     user = storage.get(User, get_jwt_identity())
     if not user or user.role != "recruiter":
-        return make_response("error", "Unauthorized"), 401
+        return make_response_("error", "Unauthorized"), 401
 
     major = storage.get(Major, major_id)
     if not major:
-        return make_response("error", "Major not found"), 404
+        return make_response_("error", "Major not found"), 404
 
     storage.delete(major)
     storage.save()
 
-    return make_response(
+    return make_response_(
         "success",
         "Major deleted successfully",
     )
