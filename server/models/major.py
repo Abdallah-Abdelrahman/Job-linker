@@ -2,7 +2,7 @@
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-from server.models.base_model import BaseModel, Base
+from server.models.base_model import Base, BaseModel
 
 
 class Major(BaseModel, Base):
@@ -10,7 +10,7 @@ class Major(BaseModel, Base):
 
     __tablename__ = "majors"
 
-    name = Column(String(100), nullable=False)
+    name = Column(String(100), nullable=False, unique=True)
 
     # Relationship with Jobs & Candidates
     jobs = relationship("Job", back_populates="major")
