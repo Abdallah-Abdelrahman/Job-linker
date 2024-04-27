@@ -2,6 +2,7 @@
 
 import uuid
 from datetime import datetime
+from dateutil.parser import parse
 
 from sqlalchemy import Column, DateTime, String
 from sqlalchemy.ext.declarative import declarative_base
@@ -40,11 +41,13 @@ class BaseModel:
         for k, v in kwargs.items():
             if k != "__class__":
                 setattr(self, k, v if k not in self.__DATES
-                        else self._str_to_date(v))
+                        else self._str_to_date(v, k=k))
 
-    def _str_to_date(self, date_str):
+    def _str_to_date(self, date_str, k=""):
         """Convert a string to a datetime object"""
         try:
+            if k in ("start_date", "end_date"):
+                return parse(date_str)
             return datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%S.%f")
         except (ValueError, TypeError) as e:
             print("----Date issues--------->", e)
