@@ -1,3 +1,4 @@
+'''Module defines utils functions'''
 from flask import jsonify
 
 
