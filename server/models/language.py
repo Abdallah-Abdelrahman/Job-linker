@@ -2,16 +2,24 @@
 from sqlalchemy import Column, ForeignKey, String, Table
 from sqlalchemy.orm import relationship
 
-from server.models.base_model import BaseModel, Base
+from server.models.base_model import Base, BaseModel
 
 # Association table for Language_Skill m:m relationship
 candidate_languages = Table(
     "candidate_languages",
     Base.metadata,
-    Column("candidate_id", String(60),
-           ForeignKey("candidates.user_id"), primary_key=True),
-    Column("lang_id", String(60),
-           ForeignKey("languages.id"), primary_key=True),
+    Column(
+        "candidate_id",
+        String(60),
+        ForeignKey("candidates.user_id"),
+        primary_key=True
+    ),
+    Column(
+        "lang_id",
+        String(60),
+        ForeignKey("languages.id"),
+        primary_key=True
+        ),
 )
 
 
@@ -20,7 +28,7 @@ class Language(BaseModel, Base):
 
     __tablename__ = "languages"
 
-    name = Column(String(100), nullable=False)
+    name = Column(String(100), nullable=False, unique=True)
 
     # Relationship with Candidate and associative table
     candidates = relationship(
