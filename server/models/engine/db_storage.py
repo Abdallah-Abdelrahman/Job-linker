@@ -105,19 +105,26 @@ class DBStorage:
         """
         count the number of objects in storage
         """
-        all_class = classes.values()
-
-        if not cls:
-            count = 0
-            for clas in all_class:
-                count += len(models.storage.all(clas).values())
+        if cls:
+            return self.__session.query(cls).count()
         else:
-            count = len(models.storage.all(cls).values())
+            return sum(
+                    self.__session.query(c).count() for c in classes.values()
+                    )
 
-        return count
+    def get_by_attr(self, cls, attr, value):
+        """
+        Returns the object with the given attribute value,
+        None if not found.
+        """
+        return self.__session.query(cls).filter(
+                getattr(cls, attr) == value
+                ).first()
 
-    def get_user_by_email(self, email):
-        """Returns the User object with the given email, None if not found."""
-        User = classes["User"]
-        user = self.__session.query(User).filter_by(email=email).first()
-        return user
+    def get_all_by_attr(self, cls, attr, value):
+        """
+        Returns all objects of a class with the given attribute value.
+        """
+        return self.__session.query(cls).filter(
+                getattr(cls, attr) == value
+                ).all()

@@ -1,11 +1,11 @@
 """Candidate Class"""
 
 from sqlalchemy import Column, ForeignKey, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
-from server.models.base_model import BaseModel, Base
-from server.models.skill import candidate_skills
+from server.models.base_model import Base, BaseModel
 from server.models.language import candidate_languages
+from server.models.skill import candidate_skills
 
 
 class Candidate(BaseModel, Base):
@@ -17,7 +17,7 @@ class Candidate(BaseModel, Base):
     major_id = Column(String(60), ForeignKey("majors.id"), nullable=False)
 
     # Relationship with User & skills
-    user = relationship("User", backref="candidate")
+    user = relationship("User", backref=backref("candidate", uselist=False))
     skills = relationship(
         "Skill",
         secondary=candidate_skills,
@@ -26,9 +26,8 @@ class Candidate(BaseModel, Base):
 
     # Relationship with Languages and associative table
     languages = relationship(
-            "Language",
-            secondary=candidate_languages,
-            back_populates="candidates")
+        "Language", secondary=candidate_languages, back_populates="candidates"
+    )
 
     # Relationship with Major
     major = relationship("Major", back_populates="candidates")
@@ -44,12 +43,13 @@ class Candidate(BaseModel, Base):
         candidate_dict["major"] = self.major.name
         candidate_dict["skills"] = [skill.name for skill in self.skills]
         candidate_dict["experiences"] = [
-                {
-                    "title": xp.title,
-                    "start_date": xp.start_date,
-                    "end_date": xp.end_date,
-                    "location": xp.location
-                } for xp in self.experiences
+            {
+                "title": xp.title,
+                "start_date": xp.start_date,
+                "end_date": xp.end_date,
+                "location": xp.location,
+            }
+            for xp in self.experiences
         ]
         candidate_dict["languages"] = [lang.name for lang in self.languages]
         return candidate_dict
