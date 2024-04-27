@@ -10,72 +10,76 @@ from server.models import storage
 from server.services.ai import AIService
 from server.prompts import CANDID_PROMPT
 
-# parse cv and generate dictionary
-cv_dict = AIService(cv=f'{getcwd()}/server/cv/moe.pdf').to_dict(CANDID_PROMPT)
 
-print(type(cv_dict))
+def create_candidate(cv=''):
+    '''create new candidate
+    Args:
+        cv: path to resume file
+    Returns:
+        instance of newly created candiate
+    '''
+    # parse cv and generate dictionary
+    cv_dict = AIService(cv=f'{getcwd()}/server/cv/{cv}')\
+        .to_dict(CANDID_PROMPT)
 
-# create user
-user_candid = User(
-        email=cv_dict.get('email'),
-        password='123123',
-        role='candidate',
-        name=cv_dict.get('name'))
+    # create user
+    user_candid = User(
+            email=cv_dict.get('email'),
+            password='123123',
+            role='candidate',
+            name=cv_dict.get('name'))
 
-storage.new(user_candid)
-storage.save()
-
-# create bulk of skills
-skills = [Skill(name=s) for s in cv_dict.get('skills')]
-for skill in skills:
-    storage.new(skill)
+    storage.new(user_candid)
     storage.save()
 
-# Create a Major
-major = Major(name=cv_dict.get('major'))
-storage.new(major)
-storage.save()
-
-# Create a Candidate
-candidate = Candidate(
-        user_id=user_candid.id,
-        major_id=major.id,
-        languages=[Language(name=lang) for lang in cv_dict.get('languages')],
-        skills=skills
-)
-storage.new(candidate)
-storage.save()
-
-# Create a bulk of WorkExperience
-xps = [WorkExperience(candidate_id=candidate.id, **x)
-       for x in cv_dict.get('experiences')]
-for xp in xps:
-    storage.new(xp)
+    # Create a Major
+    queried_major = storage._DBStorage__session.query(Major)\
+        .filter(Major.name.ilike(f'%{cv_dict.get("major")}%'))\
+        .first()
+    if queried_major:
+        major = queried_major
+    else:
+        major = Major(name=cv_dict.get('major'))
+    storage.new(major)
     storage.save()
 
-# Query the users, profiles, candidates, recruiters, majors, and jobs
-queried_users = storage.all(User)
-queried_candidates = storage.all(Candidate)
-queried_majors = storage.all(Major)
-queried_skills = storage.all(Skill)
+    candidate = Candidate(user_id=user_candid.id, major_id=major.id)
+
+    cand_skills = []
+    # create bulk of skills
+    for sk in cv_dict.get('skills'):
+        filter_ = Skill.name.ilike(f'%{sk}%')
+        queried = storage._DBStorage__session.query(Skill).filter(filter_).first()
+        if queried:
+            cand_skills.append(queried)
+        else:
+            cand_skills.append(Skill(name=sk))
+    candidate.skills = cand_skills
+
+    storage.new(candidate)
+    storage.save()
+
+    # Create a bulk of WorkExperience
+    xps = [WorkExperience(candidate_id=candidate.id, **x)
+           for x in cv_dict.get('experiences')]
+    for xp in xps:
+        storage.new(xp)
+        storage.save()
+
+    # Lnaguages
+    print('------lang---------->', cv_dict.get('languages'))
+    for l in cv_dict.get('languages'):
+        queried_lang = storage._DBStorage__session.query(Language).filter(Language.name.ilike(f'%{l}%')).first()
+        if queried_lang:
+            candidate.languages.append(queried_lang)
+        else:
+            candidate.languages.append(Language(name=l))
+
+    return candidate
+
+
+new_candid = create_candidate(cv='bruce_wayne_fullstack.pdf')
 
 # Print the queried data
-for user in queried_users.values():
-    print(user)
-    print(user.to_dict)
-    print()
-
-for candidate in queried_candidates.values():
-    print(candidate)
-    print(candidate.to_dict)
-    print()
-
-for major in queried_majors.values():
-    print(major)
-    print(major.to_dict)
-    print()
-
-for skill in queried_skills.values():
-    print(skill)
-    print(skill.to_dict)
-    print()
+print(new_candid.user.to_dict)
+print(new_candid.to_dict)

@@ -2,8 +2,6 @@
 Contains the class DBStorage
 """
 
-from os import getenv
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -16,6 +14,7 @@ from server.models.recruiter import Recruiter
 from server.models.skill import Skill
 from server.models.user import User
 from server.models.work_experience import WorkExperience
+from server.models.language import Language
 
 classes = {
     "Candidate": Candidate,
@@ -25,6 +24,7 @@ classes = {
     "Skill": Skill,
     "User": User,
     "WorkExperience": WorkExperience,
+    "Language": Language,
 }
 
 
@@ -34,7 +34,7 @@ class DBStorage:
     __engine = None
     __session = None
 
-    def __init__(self):
+    def __init__(self, engine="sqlite:///:memory:"):
         """Instantiate a DBStorage object"""
 
         #        JOBS_MYSQL_USER = getenv("JOBS_MYSQL_USER")
@@ -42,7 +42,7 @@ class DBStorage:
         #        JOBS_MYSQL_HOST = getenv("JOBS_MYSQL_HOST")
         #        JOBS_MYSQL_DB = getenv("JOBS_MYSQL_DB")
         #        JOBS_ENV = getenv("JOBS_ENV")
-        self.__engine = create_engine("sqlite:///database.db")
+        self.__engine = create_engine(engine)
         # .format(
         #    JOBS_MYSQL_USER, JOBS_MYSQL_PWD, JOBS_MYSQL_HOST, JOBS_MYSQL_DB
         # )
