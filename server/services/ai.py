@@ -58,10 +58,10 @@ class AIService():
             generation_config=self.generation_config,
             safety_settings=self.safety_settings)
 
-    def parse_pdf(self):
+    def parse_pdf(self, pdf=''):
         '''extract text from pdf'''
         try:
-            txt = extract_text(self.pdf).strip()
+            txt = extract_text(pdf or self.pdf).strip()
             return txt if txt else None
         except FileNotFoundError:
             print('File not found or path is incorrect')
@@ -70,7 +70,7 @@ class AIService():
             print('Not a valid pdf file')
             raise
 
-    def prompt(self, line):
+    def prompt(self, line, input_txt=None):
         '''ask gemeni and generate a response.
         based on the pdf file.
 
@@ -80,7 +80,7 @@ class AIService():
             the function assumes there's a pdf file called pdf.pdf
             feel free to change this to obtain some info about the the pdf
         '''
-        input_ = self.parse_pdf()
+        input_ = input_txt or self.parse_pdf()
         if not input_:
             print(self.pdf)
             raise ValueError('Text is empty')
@@ -91,7 +91,7 @@ class AIService():
             text += chunk.text
         return text
 
-    def to_dict(self, prompt_enquery):
+    def to_dict(self, prompt_enquiry, text=''):
         '''The function translates gemeni response to a dictionary
 
         Args:
@@ -99,15 +99,16 @@ class AIService():
         Returns:
             dictionary of gemini response
         '''
-        text = self.prompt(prompt_enquery)
+        if not text:
+            text = self.prompt(prompt_enquiry)
         try:
             # strips out any spaces or new lines or back-slashes
             txt_cp = ''.join([c for c in text if c not in '\n\\'])
             return loads(txt_cp)
         except JSONDecodeError as e:
             # retry unitl we get valid json
-            print('--------->', self.pdf, e)
-            return self.to_dict(prompt_enquery)
+            print('---JSON issues------>', self.pdf, e)
+            return self.to_dict(prompt_enquiry)
 
 
 if __name__ == '__main__':
