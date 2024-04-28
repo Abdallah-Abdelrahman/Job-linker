@@ -3,7 +3,7 @@
 from flask_login import UserMixin
 from sqlalchemy import Column, Enum, String
 
-from server.models.base_model import BaseModel, Base
+from server.models.base_model import Base, BaseModel
 
 
 class User(BaseModel, Base, UserMixin):

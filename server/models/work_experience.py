@@ -1,10 +1,11 @@
 """WorkExperience Class"""
 
 from datetime import datetime
-from sqlalchemy import Column, DateTime, ForeignKey, String, Text
-from sqlalchemy.orm import relationship
 
-from server.models.base_model import BaseModel, Base
+from sqlalchemy import Column, DateTime, ForeignKey, String, Text
+from sqlalchemy.orm import backref, relationship
+
+from server.models.base_model import Base, BaseModel
 
 
 class WorkExperience(BaseModel, Base):
@@ -24,8 +25,11 @@ class WorkExperience(BaseModel, Base):
 
     __tablename__ = "work_experiences"
 
-    candidate_id = Column(String(60),
-                          ForeignKey('candidates.id'), nullable=False)
+    candidate_id = Column(
+            String(60),
+            ForeignKey("candidates.id"),
+            nullable=False
+            )
     title = Column(String(128), nullable=False)
     company = Column(String(128), nullable=False)
     location = Column(String(128))
@@ -33,7 +37,9 @@ class WorkExperience(BaseModel, Base):
     end_date = Column(DateTime, default=datetime.utcnow())
     description = Column(Text)
 
-    candidate = relationship('Candidate', backref='experiences')
+    candidate = relationship(
+        "Candidate", backref=backref("experiences", cascade="all, delete")
+    )
 
     def __repr__(self):
         """Return a string representation of the WorkExperience instance"""

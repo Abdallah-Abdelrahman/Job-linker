@@ -1,85 +1,83 @@
+"""
+This module provides views for the WorkExperience model in the
+Job-linker application.
+"""
+
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from marshmallow import ValidationError
 
 from server.api.utils import make_response_
-from server.models import storage
-from server.models.major import Major
-from server.models.user import User
-from server.models.work_experience import WorkExperience
-
-from .schemas import work_experience_schema
+from server.controllers.schemas import work_experience_schema
+from server.controllers.work_experience_controller import WorkExperienceController
+from server.exception import UnauthorizedError
 
 work_experience_views = Blueprint("work_experience_views", __name__)
 
-
-@work_experience_views.route("/work_experiences", methods=["GET"])
-@work_experience_views.route("/work_experiences/<major_id>", methods=["GET"])
-@jwt_required()
-def get_work_experiences(major_id=None):
-    """
-    Get all work experiences by major.
-    If major_id is not provided, get all work experiences.
-    """
-    if major_id is not None:
-        major = storage.get(Major, major_id)
-        if not major:
-            return make_response_("error", "Major not found"), 404
-
-        candidates = major.candidates
-
-        work_experiences = [
-            exp for candidate in candidates for exp in candidate.experiences
-        ]
-    else:
-        work_experiences = storage.all(WorkExperience).values()
-
-    work_experiences_data = [
-        work_experience_schema.dump(work_experience)
-        for work_experience in work_experiences
-    ]
-
-    return jsonify(work_experiences_data), 200
+work_experience_controller = WorkExperienceController()
 
 
 @work_experience_views.route("/work_experiences", methods=["POST"])
 @jwt_required()
 def create_work_experience():
-    current_user = storage.get(User, get_jwt_identity())
-    if current_user.role != "candidate":
-        return (
-            make_response_("error", "Only candidates can add work experiences"),
-            403,
-        )
+    """
+    Creates a new work experience.
 
-    if current_user.candidate is None:
+    Returns:
+        A response object containing the status, message, and work experience
+        data if successful.
+        Otherwise, it returns an error message.
+    """
+    user_id = get_jwt_identity()
+    try:
+        new_work_experience = work_experience_controller.create_work_experience(
+            user_id, request.json
+        )
         return (
             make_response_(
-                "error", "The current user does not have a candidate profile"
+                "success",
+                "WorkExperience created successfully",
+                {"id": new_work_experience.id},
             ),
-            400,
+            201,
         )
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
 
+
+@work_experience_views.route(
+        "/work_experiences/<work_experience_id>",
+        methods=["GET"]
+        )
+@jwt_required()
+def get_work_experience(work_experience_id):
+    """
+    Fetches the details of a specific work experience.
+
+    Returns:
+        A response object containing the status, message, and work experience
+        data if successful.
+        Otherwise, it returns an error message.
+    """
+    user_id = get_jwt_identity()
     try:
-        data = work_experience_schema.load(request.json)
-    except ValidationError as err:
-        return make_response_("error", err.messages), 400
-
-    new_work_experience = WorkExperience(
-            candidate_id=current_user.candidate.id,
-            **data
-            )
-    storage.new(new_work_experience)
-    storage.save()
-
-    return (
-        make_response_(
+        work_experience = work_experience_controller.get_work_experiences(
+            user_id, work_experience_id
+        )
+        return make_response_(
             "success",
-            "WorkExperience created successfully",
-            {"id": new_work_experience.id},
-        ),
-        201,
-    )
+            "WorkExperience details fetched successfully",
+            {
+                "id": work_experience.id,
+                "title": work_experience.title,
+                "description": work_experience.description,
+            },
+        )
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 404
 
 
 @work_experience_views.route(
@@ -88,34 +86,32 @@ def create_work_experience():
         )
 @jwt_required()
 def update_work_experience(work_experience_id):
-    current_user = storage.get(User, get_jwt_identity())
-    work_experience = storage.get(WorkExperience, work_experience_id)
-    if not work_experience:
-        return make_response_("error", "WorkExperience not found"), 404
+    """
+    Updates the details of a specific work experience.
 
-    if work_experience.candidate_id != current_user.candidate.id:
-        return (
-            make_response_(
-                "error",
-                "You can only update your own work experiences"
-                ),
-            403,
-        )
-
+    Returns:
+        A response object containing the status, message, and work experience
+        data if successful.
+        Otherwise, it returns an error message.
+    """
+    user_id = get_jwt_identity()
     try:
-        data = work_experience_schema.load(request.json)
-    except ValidationError as err:
-        return make_response_("error", err.messages), 400
-
-    for key, value in data.items():
-        setattr(work_experience, key, value)
-    storage.save()
-
-    return make_response_(
-        "success",
-        "WorkExperience details updated successfully",
-        {"id": work_experience.id, "title": work_experience.title},
-    )
+        work_experience = work_experience_controller.update_work_experience(
+            user_id, work_experience_id, request.json
+        )
+        return make_response_(
+            "success",
+            "WorkExperience details updated successfully",
+            {
+                "id": work_experience.id,
+                "title": work_experience.title,
+                "description": work_experience.description,
+            },
+        )
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
 
 
 @work_experience_views.route(
@@ -123,24 +119,50 @@ def update_work_experience(work_experience_id):
 )
 @jwt_required()
 def delete_work_experience(work_experience_id):
-    current_user = storage.get(User, get_jwt_identity())
-    work_experience = storage.get(WorkExperience, work_experience_id)
-    if not work_experience:
-        return make_response_("error", "WorkExperience not found"), 404
+    """
+    Deletes a specific work experience.
 
-    if work_experience.candidate_id != current_user.candidate.id:
-        return (
-            make_response_(
-                "error",
-                "You can only delete your own work experiences"
-                ),
-            403,
+    Returns:
+        A response object containing the status and message if successful.
+        Otherwise, it returns an error message.
+    """
+    user_id = get_jwt_identity()
+    try:
+        work_experience_controller.delete_work_experience(
+                user_id,
+                work_experience_id
+                )
+        return make_response_("success", "WorkExperience deleted successfully")
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 404
+
+
+@work_experience_views.route("/work_experiences", methods=["GET"])
+@work_experience_views.route("/work_experiences/<major_id>", methods=["GET"])
+@jwt_required()
+def get_work_experiences(major_id=None):
+    """
+    Fetches all work experiences or work experiences related to a
+    specific major.
+
+    Returns:
+        A list of all work experiences or work experiences related to a
+        specific major in JSON format if successful.
+        Otherwise, it returns an error message.
+    """
+    user_id = get_jwt_identity()
+    try:
+        work_experiences = work_experience_controller.get_work_experiences(
+            user_id, major_id
         )
-
-    storage.delete(work_experience)
-    storage.save()
-
-    return make_response_(
-        "success",
-        "WorkExperience deleted successfully",
-    )
+        work_experiences_data = [
+            work_experience_schema.dump(work_experience)
+            for work_experience in work_experiences
+        ]
+        return jsonify(work_experiences_data), 200
+    except UnauthorizedError as e:
+        return make_response_("error", str(e)), 403
+    except ValueError as e:
+        return make_response_("error", str(e)), 404

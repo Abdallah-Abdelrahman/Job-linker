@@ -1,87 +1,96 @@
+"""
+This module provides views for the Skill model in the Job-linker application.
+"""
+
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
-from marshmallow import ValidationError
-from sqlalchemy.exc import IntegrityError
 
 from server.api.utils import make_response_
-from server.models import storage
-from server.models.skill import Skill
-
-from .schemas import skill_schema
+from server.controllers.schemas import skill_schema
+from server.controllers.skill_controller import SkillController
 
 skill_views = Blueprint("skill", __name__)
+
+skill_controller = SkillController()
 
 
 @skill_views.route("/skills", methods=["GET"])
 @jwt_required()
 def get_skills():
-    skills = storage.all(Skill).values()
-    skills_data = [skill_schema.dump(skill) for skill in skills]
-    return jsonify(skills_data), 200
+    """
+    Fetches all skills.
+
+    Returns:
+        A list of all skills in JSON format if successful.
+        Otherwise, it returns an error message.
+    """
+    try:
+        skills = skill_controller.get_skills()
+        skills_data = [skill_schema.dump(skill) for skill in skills]
+        return jsonify(skills_data), 200
+    except ValueError as e:
+        return make_response_("error", str(e)), 404
 
 
 @skill_views.route("/skills", methods=["POST"])
 @jwt_required()
 def create_skill():
-    try:
-        data = skill_schema.load(request.json)
-    except ValidationError as err:
-        return make_response_("error", err.messages), 400
+    """
+    Creates a new skill.
 
-    new_skill = Skill(name=data["name"])
-    storage.new(new_skill)
+    Returns:
+        A response object containing the status, message, and skill data
+        if successful.
+        Otherwise, it returns an error message.
+    """
     try:
-        storage.save()
-    except IntegrityError:
-        return make_response_("error", "Skill name already exists"), 409
-
-    return (
-        make_response_(
-            "success",
-            "Skill created successfully",
-            {"id": new_skill.id},
-        ),
-        201,
-    )
+        new_skill = skill_controller.create_skill(request.json)
+        return (
+            make_response_(
+                "success",
+                "Skill created successfully",
+                {"id": new_skill.id},
+            ),
+            201,
+        )
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
 
 
 @skill_views.route("/skills/<skill_id>", methods=["PUT"])
 @jwt_required()
 def update_skill(skill_id):
-    skill = storage.get(Skill, skill_id)
-    if not skill:
-        return make_response_("error", "Skill not found"), 404
+    """
+    Updates the details of a specific skill.
 
+    Returns:
+        A response object containing the status, message, and skill data
+        if successful.
+        Otherwise, it returns an error message.
+    """
     try:
-        data = skill_schema.load(request.json)
-    except ValidationError as err:
-        return make_response_("error", err.messages), 400
-
-    try:
-        for key, value in data.items():
-            setattr(skill, key, value)
-        storage.save()
-    except IntegrityError:
-        return make_response_("error", "Skill name already exists"), 409
-
-    return make_response_(
-        "success",
-        "Skill details updated successfully",
-        {"id": skill.id, "name": skill.name},
-    )
+        skill = skill_controller.update_skill(skill_id, request.json)
+        return make_response_(
+            "success",
+            "Skill details updated successfully",
+            {"id": skill.id, "name": skill.name},
+        )
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
 
 
 @skill_views.route("/skills/<skill_id>", methods=["DELETE"])
 @jwt_required()
 def delete_skill(skill_id):
-    skill = storage.get(Skill, skill_id)
-    if not skill:
-        return make_response_("error", "Skill not found"), 404
+    """
+    Deletes a specific skill.
 
-    storage.delete(skill)
-    storage.save()
-
-    return make_response_(
-        "success",
-        "Skill deleted successfully",
-    )
+    Returns:
+        A response object containing the status and message if successful.
+        Otherwise, it returns an error message.
+    """
+    try:
+        skill_controller.delete_skill(skill_id)
+        return make_response_("success", "Skill deleted successfully")
+    except ValueError as e:
+        return make_response_("error", str(e)), 404

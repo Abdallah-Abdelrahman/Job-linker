@@ -1,23 +1,13 @@
 """
-This module defines the data validation schemas for user login and registration
-
-The schemas are defined using the Marshmallow library, which provides a simple
-way to validate data against certain criteria. The schemas are used to validate
-the incoming data for the login and registration endpoints of the
-Flask application.
-
+This module provides schemas for various models in the Job-linker application.
 """
-from marshmallow import Schema, fields
+
+from marshmallow import Schema, fields, validate
 
 
-# Schema for the login data
 class LoginSchema(Schema):
     """
-    Defines the data validation schema for user login.
-
-    Fields:
-        email (Email): The user's email. This field is required.
-        password (Str): The user's password. This field is required.
+    Schema for the login data.
     """
 
     email = fields.Email(required=True)
@@ -27,26 +17,17 @@ class LoginSchema(Schema):
 login_schema = LoginSchema()
 
 
-# Schema for the registration data
 class RegistrationSchema(Schema):
     """
-    Defines the data validation schema for user registration.
-
-    Fields:
-        name (Str): The user's name. This field is required.
-        email (Email): The user's email. This field is required.
-        password (Str): The user's password. This field is required.
-        role (Str): The user's role. This field is required and must be either
-        "candidate" or "recruiter".
+    Schema for the registration data.
     """
 
     name = fields.Str(required=True)
     email = fields.Email(required=True)
     password = fields.Str(required=True)
     role = fields.Str(
-            required=True,
-            validate=lambda r: r in ["candidate", "recruiter"]
-            )
+        required=True, validate=validate.OneOf(["candidate", "recruiter"])
+    )
 
 
 registration_schema = RegistrationSchema()
@@ -54,25 +35,14 @@ registration_schema = RegistrationSchema()
 
 class UpdateUserSchema(Schema):
     """
-    Defines the data validation schema for updating a user.
-
-    Fields:
-        name (Str): The user's name. This field is optional.
-        email (Email): The user's email. This field is optional.
-        password (Str): The user's password. This field is optional.
-        role (Str): The user's role. This field is optional and must be either
-        "candidate" or "recruiter".
-        contact_info (Str): The user's contact information. This field is
-        optional.
-        bio (Str): The user's bio. This field is optional.
-        image_url (Str): The URL of the user's image. This field is optional.
+    Schema for updating user data.
     """
 
     name = fields.Str(required=False)
     email = fields.Email(required=False)
     password = fields.Str(required=False)
     role = fields.Str(
-        required=False, validate=lambda r: r in ["candidate", "recruiter"]
+        required=False, validate=validate.OneOf(["candidate", "recruiter"])
     )
     contact_info = fields.Str(required=False)
     bio = fields.Str(required=False)
@@ -84,10 +54,7 @@ update_schema = UpdateUserSchema()
 
 class CandidateSchema(Schema):
     """
-    Defines the data validation schema for a candidate.
-
-    Fields:
-        major_id (Str): The major's ID. This field is required.
+    Schema for the Candidate model.
     """
 
     id = fields.Str(required=False)
@@ -98,6 +65,10 @@ candidate_schema = CandidateSchema()
 
 
 class RecruiterSchema(Schema):
+    """
+    Schema for the Recruiter model.
+    """
+
     id = fields.Str(required=False)
     company_name = fields.Str(required=True)
     company_info = fields.Str(required=False)
@@ -107,8 +78,12 @@ recruiter_schema = RecruiterSchema()
 
 
 class JobSchema(Schema):
+    """
+    Schema for the Job model.
+    """
+
     id = fields.Str(required=False)
-    recruiter_id = fields.Str(required=True)
+    recruiter_id = fields.Str(required=False)
     major_id = fields.Str(required=True)
     job_title = fields.Str(required=True)
     job_description = fields.Str(required=True)
@@ -120,6 +95,10 @@ job_schema = JobSchema()
 
 
 class MajorSchema(Schema):
+    """
+    Schema for the Major model.
+    """
+
     id = fields.Str(required=False)
     name = fields.Str(required=True)
 
@@ -128,6 +107,10 @@ major_schema = MajorSchema()
 
 
 class SkillSchema(Schema):
+    """
+    Schema for the Skill model.
+    """
+
     id = fields.Str(required=False)
     name = fields.Str(required=True)
 
@@ -136,6 +119,10 @@ skill_schema = SkillSchema()
 
 
 class LanguageSchema(Schema):
+    """
+    Schema for the Language model.
+    """
+
     id = fields.Str(required=False)
     name = fields.Str(required=True)
 
@@ -144,6 +131,10 @@ language_schema = LanguageSchema()
 
 
 class WorkExperienceSchema(Schema):
+    """
+    Schema for the WorkExperience model.
+    """
+
     id = fields.Str(required=False)
     title = fields.Str(required=True)
     company = fields.Str(required=True)
@@ -154,3 +145,24 @@ class WorkExperienceSchema(Schema):
 
 
 work_experience_schema = WorkExperienceSchema()
+
+
+class ApplicationSchema(Schema):
+    """
+    Schema for the Application model.
+    """
+
+    id = fields.Str(required=False)
+    job_id = fields.Str(required=False)
+    candidate_id = fields.Str(required=False)
+    job_title = fields.Str(required=False)
+    application_status = fields.Str(
+        required=False,
+        validate=validate.OneOf(
+            ["applied", "shortlisted", "rejected", "hired"]
+            ),
+        default="applied",
+    )
+
+
+application_schema = ApplicationSchema()
