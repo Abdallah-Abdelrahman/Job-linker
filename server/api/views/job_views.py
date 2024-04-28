@@ -1,165 +1,164 @@
+"""
+This module provides views for the Job model in the Job-linker application.
+"""
+
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from marshmallow import ValidationError
 
 from server.api.utils import make_response_
-from server.models import storage
-from server.models.candidate import Candidate
-from server.models.job import Job
-from server.models.recruiter import Recruiter
-
-from .schemas import job_schema
+from server.controllers.job_controller import JobController
+from server.controllers.schemas import job_schema
+from server.exception import UnauthorizedError
 
 job_views = Blueprint("job", __name__)
+
+job_controller = JobController()
 
 
 @job_views.route("/jobs", methods=["POST"])
 @jwt_required()
 def create_job():
-    try:
-        data = job_schema.load(request.json)
-    except ValidationError as err:
-        return make_response_("error", err.messages), 400
+    """
+    Creates a new job.
 
+    Returns:
+        A response object containing the status, message, and job data
+        if successful.
+        Otherwise, it returns an error message.
+    """
     user_id = get_jwt_identity()
-    if not user_id:
+    try:
+        new_job = job_controller.create_job(user_id, request.json)
+        return (
+            make_response_(
+                "success",
+                "Job created successfully",
+                {"id": new_job.id},
+            ),
+            201,
+        )
+    except UnauthorizedError:
         return make_response_("error", "Unauthorized"), 401
-
-    recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
-    if not recruiter:
-        return make_response_("error", "You are not a recruiter"), 403
-
-    new_job = Job(
-        recruiter_id=recruiter.id,
-        major_id=data["major_id"],
-        job_title=data["job_title"],
-        job_description=data["job_description"],
-        exper_years=data.get("exper_years"),
-        salary=data.get("salary"),
-    )
-    storage.new(new_job)
-    storage.save()
-
-    return (
-        make_response_(
-            "success",
-            "Job created successfully",
-            {"id": new_job.id},
-        ),
-        201,
-    )
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
 
 
 @job_views.route("/jobs/<job_id>", methods=["GET"])
 @jwt_required()
 def get_job(job_id):
-    job = storage.get(Job, job_id)
-    if not job:
-        return make_response_("error", "Job not found"), 404
+    """
+    Fetches the details of a specific job.
 
+    Returns:
+        A response object containing the status, message, and job data
+        if successful.
+        Otherwise, it returns an error message.
+    """
     user_id = get_jwt_identity()
-    recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
-    if not recruiter or job.recruiter_id != recruiter.id:
+    try:
+        job = job_controller.get_job(user_id, job_id)
+        return make_response_(
+            "success",
+            "Job details fetched successfully",
+            {
+                "id": job.id,
+                "job_title": job.job_title,
+                "job_description": job.job_description,
+            },
+        )
+    except UnauthorizedError:
         return make_response_("error", "Unauthorized"), 401
-
-    return make_response_(
-        "success",
-        "Job details fetched successfully",
-        {
-            "id": job.id,
-            "job_title": job.job_title,
-            "job_description": job.job_description,
-        },
-    )
+    except ValueError as e:
+        return make_response_("error", str(e)), 404
 
 
 @job_views.route("/jobs/<job_id>", methods=["PUT"])
 @jwt_required()
 def update_job(job_id):
-    try:
-        data = job_schema.load(request.json)
-    except ValidationError as err:
-        return make_response_("error", err.messages), 400
+    """
+    Updates the details of a specific job.
 
-    job = storage.get(Job, job_id)
-    if not job:
-        return make_response_("error", "Job not found"), 404
-
+    Returns:
+        A response object containing the status, message, and job data
+        if successful.
+        Otherwise, it returns an error message.
+    """
     user_id = get_jwt_identity()
-    recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
-    if not recruiter or job.recruiter_id != recruiter.id:
+    try:
+        job = job_controller.update_job(user_id, job_id, request.json)
+        return make_response_(
+            "success",
+            "Job details updated successfully",
+            {
+                "id": job.id,
+                "job_title": job.job_title,
+                "job_description": job.job_description,
+            },
+        )
+    except UnauthorizedError:
         return make_response_("error", "Unauthorized"), 401
-
-    for key, value in data.items():
-        setattr(job, key, value)
-    storage.save()
-
-    return make_response_(
-        "success",
-        "Job details updated successfully",
-        {
-            "id": job.id,
-            "job_title": job.job_title,
-            "job_description": job.job_description,
-        },
-    )
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
 
 
 @job_views.route("/jobs/<job_id>", methods=["DELETE"])
 @jwt_required()
 def delete_job(job_id):
-    job = storage.get(Job, job_id)
-    if not job:
-        return make_response_("error", "Job not found"), 404
+    """
+    Deletes a specific job.
 
+    Returns:
+        A response object containing the status and message if successful.
+        Otherwise, it returns an error message.
+    """
     user_id = get_jwt_identity()
-    recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
-    if not recruiter or job.recruiter_id != recruiter.id:
+    try:
+        job_controller.delete_job(user_id, job_id)
+        return make_response_("success", "Job deleted successfully")
+    except UnauthorizedError:
         return make_response_("error", "Unauthorized"), 401
-
-    storage.delete(job)
-    storage.save()
-
-    return make_response_(
-        "success",
-        "Job deleted successfully",
-    )
+    except ValueError as e:
+        return make_response_("error", str(e)), 404
 
 
 @job_views.route("/jobs", methods=["GET"])
 @jwt_required()
 def get_jobs():
+    """
+    Fetches all jobs.
+
+    Returns:
+        A list of all jobs in JSON format if successful.
+        Otherwise, it returns an error message.
+    """
     user_id = get_jwt_identity()
-    if not user_id:
-        return make_response_("error", "Unauthorized"), 401
-
-    candidate = storage.get_by_attr(Candidate, "user_id", user_id)
-    if not candidate:
-        return make_response_("error", "You are not a candidate"), 403
-
-    major_id = candidate.major_id
-    jobs = storage.get_all_by_attr(Job, "major_id", major_id)
-    if not jobs:
-        return make_response_("error", "No jobs found for your major"), 404
-
-    jobs_data = [job_schema.dump(job) for job in jobs]
-    return jsonify(jobs_data), 200
+    try:
+        jobs = job_controller.get_jobs(user_id)
+        jobs_data = [job_schema.dump(job) for job in jobs]
+        return jsonify(jobs_data), 200
+    except UnauthorizedError as e:
+        return make_response_("error", str(e)), 403
+    except ValueError as e:
+        return make_response_("error", str(e)), 404
 
 
 @job_views.route("/my_jobs", methods=["GET"])
 @jwt_required()
 def get_my_jobs():
+    """
+    Fetches all jobs created by the current user.
+
+    Returns:
+        A list of all jobs created by the current user in JSON format
+        if successful.
+        Otherwise, it returns an error message.
+    """
     user_id = get_jwt_identity()
-    if not user_id:
-        return make_response_("error", "Unauthorized"), 401
-
-    recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
-    if not recruiter:
-        return make_response_("error", "You are not a recruiter"), 403
-
-    jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
-    if not jobs:
-        return make_response_("error", "No jobs found"), 404
-
-    jobs_data = [job_schema.dump(job) for job in jobs]
-    return jsonify(jobs_data), 200
+    try:
+        jobs = job_controller.get_my_jobs(user_id)
+        jobs_data = [job_schema.dump(job) for job in jobs]
+        return jsonify(jobs_data), 200
+    except UnauthorizedError as e:
+        return make_response_("error", str(e)), 403
+    except ValueError as e:
+        return make_response_("error", str(e)), 404

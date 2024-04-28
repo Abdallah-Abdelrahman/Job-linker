@@ -1,8 +1,8 @@
 """Job Model"""
 from sqlalchemy import Column, ForeignKey, Numeric, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
-from server.models.base_model import BaseModel, Base
+from server.models.base_model import Base, BaseModel
 from server.models.skill import job_skills
 
 
@@ -23,7 +23,9 @@ class Job(BaseModel, Base):
     salary = Column(Numeric(precision=10, scale=2, asdecimal=False))
 
     # Relationship with Recruiter
-    recruiter = relationship("Recruiter", back_populates="jobs")
+    recruiter = relationship(
+        "Recruiter", backref=backref("jobs", cascade="all, delete")
+    )
 
     # Relationship with Major
     major = relationship("Major", back_populates="jobs")
@@ -35,9 +37,14 @@ class Job(BaseModel, Base):
         back_populates="jobs",
     )
 
+    # Relationship with Application
+    applications = relationship(
+        "Application", back_populates="job", cascade="all, delete"
+    )
+
     @property
     def to_dict(self):
-        '''Return a dictionary reppresentation of Job'''
+        """Return a dictionary reppresentation of Job"""
         dict_ = super().to_dict
         dict_["skills"] = [s.name for s in self.skills]
         return dict_

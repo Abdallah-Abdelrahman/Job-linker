@@ -16,8 +16,10 @@ class Recruiter(BaseModel, Base):
     company_info = Column(String(500))
 
     # Relationship with User & Job
-    user = relationship("User", backref=backref("recruiter", uselist=False))
-    jobs = relationship("Job", back_populates="recruiter")
+    user = relationship(
+        "User",
+        backref=backref("recruiter", uselist=False, cascade="all, delete")
+    )
 
     def __repr__(self):
         """Return a string representation of the Recruiter instance"""
