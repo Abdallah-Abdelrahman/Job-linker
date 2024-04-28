@@ -40,6 +40,7 @@ class Candidate(BaseModel, Base):
     def to_dict(self):
         """Return a dictionary representation of the Candidate instance"""
         candidate_dict = super().to_dict
+        candidate_dict['name'] = self.user.name
         candidate_dict["major"] = self.major.name
         candidate_dict["skills"] = [skill.name for skill in self.skills]
         candidate_dict["experiences"] = [

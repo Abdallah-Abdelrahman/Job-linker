@@ -1,5 +1,5 @@
 '''test ai'''
-from os import getcwd
+from os import getcwd, listdir
 from server.models.candidate import Candidate
 from server.models.major import Major
 from server.models.skill import Skill
@@ -76,8 +76,11 @@ def create_candidate(cv=''):
     return candidate
 
 
-new_candid = create_candidate(cv='bruce_wayne_fullstack.pdf')
-
-# Print the queried data
-print(new_candid.user.to_dict)
-print(new_candid.to_dict)
+if __name__ == '__main__':
+    for f in listdir(f'{getcwd()}/server/cv'):
+        try:
+            new_candid = create_candidate(cv=f)
+            print(new_candid.to_dict)
+        except Exception as e:
+            storage._DBStorage__session.rollback()
+            print('-------->', e)
