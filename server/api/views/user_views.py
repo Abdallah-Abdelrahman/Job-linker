@@ -1,37 +1,17 @@
 """
-This module defines the user-related routes for the Flask application.
-
-The routes include user registration, login, logout, and fetching the
-current user's details.
-Each route validates the incoming data using the appropriate Marshmallow
-schema and performs the necessary operations.
-
-Modules:
-    flask: The main class for all Flask applications.
-    flask_login: Provides user session management for Flask.
-    marshmallow: Used for data validation.
-    server.models: Contains the SQLAlchemy models and storage helper.
-    server.models.user: The User SQLAlchemy model.
-    .schemas: Contains the data validation schemas for user login and
-    registration.
-
-Functions:
-    set_bcrypt(bcrypt_instance): Sets bcrypt instance for password hashing.
-    make_response_(status, message, data): Creates a unified response format.
+This module provides views for the User model in the Job-linker application.
 """
+
 from flask import Blueprint, request
-from flask_jwt_extended import (create_access_token,
-                                get_jwt_identity,
-                                jwt_required)
-from marshmallow import ValidationError
+from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from server.api.utils import make_response_
-from server.models import storage
-from server.models.user import User
-
-from .schemas import login_schema, registration_schema, update_schema
+from server.controllers.user_controller import UserController
 
 user_views = Blueprint("user", __name__)
+
+bcrypt = None
+user_controller = None
 
 
 def set_bcrypt(bcrypt_instance):
@@ -41,85 +21,64 @@ def set_bcrypt(bcrypt_instance):
     Args:
         bcrypt_instance: The bcrypt instance.
     """
-    global bcrypt
+    global bcrypt, user_controller
     bcrypt = bcrypt_instance
+    user_controller = UserController(bcrypt)
 
 
 @user_views.route("/register", methods=["POST"])
 def register_user():
     """
-    Handles user registration.
+    Registers a new user.
 
-    Validates the incoming data and creates a new user if the validation
-    is successful.
+    Returns:
+        A response object containing the status, message, and user data
+        if successful.
+        Otherwise, it returns an error message.
     """
     try:
-        data = registration_schema.load(request.json)
-    except ValidationError as err:
-        return make_response_("error", err.messages), 400
-
-    user = storage.get_by_attr(User, "email", data["email"])
-    if user:
-        return make_response_("error", "User already exists"), 409
-
-    hashed_password = bcrypt.generate_password_hash(data["password"])
-    new_user = User(
-        name=data["name"],
-        email=data["email"],
-        password=hashed_password,
-        role=data["role"],
-    )
-    storage.new(new_user)
-    storage.save()
-
-    access_token = create_access_token(identity=new_user.id)
-
-    return (
-        make_response_(
-            "success",
-            "User registered successfully",
-            {"access_token": access_token, "role": new_user.role},
-        ),
-        201,
-    )
+        new_user, access_token = user_controller.register_user(request.json)
+        return (
+            make_response_(
+                "success",
+                "User registered successfully",
+                {"access_token": access_token, "role": new_user.role},
+            ),
+            201,
+        )
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
 
 
 @user_views.route("/login", methods=["POST"])
-def login_user_():
+def login_user():
     """
-    Handles user login.
+    Logs in a user.
 
-    Validates the incoming data and logs in the user if the validation is
-    successful.
+    Returns:
+        A response object containing the status, message, and user data
+        if successful.
+        Otherwise, it returns an error message.
     """
     try:
-        data = login_schema.load(request.json)
-    except ValidationError as err:
-        return make_response_("error", err.messages), 400
-
-    user = storage.get_by_attr(User, "email", data["email"])
-    if not user or not bcrypt.check_password_hash(
-            user.password,
-            data["password"]
-            ):
-        return make_response_("error", "Unauthorized"), 401
-
-    access_token = create_access_token(identity=user.id)
-
-    return make_response_(
-        "success",
-        "User logged in successfully",
-        {"access_token": access_token, "role": user.role},
-    )
+        user, access_token = user_controller.login_user(request.json)
+        return make_response_(
+            "success",
+            "User logged in successfully",
+            {"access_token": access_token, "role": user.role},
+        )
+    except ValueError as e:
+        return make_response_("error", str(e)), 401
 
 
 @user_views.route("/logout", methods=["POST"])
 @jwt_required()
-def logout_user_():
+def logout_user():
     """
-    Handles user logout.
+    Logs out a user.
 
-    Logs out the user if they are currently logged in.
+    Returns:
+        A response object containing the status and message.
     """
     return make_response_("success", "Logged out successfully")
 
@@ -130,55 +89,59 @@ def get_current_user():
     """
     Fetches the current user's details.
 
-    Returns the details of the user who is currently logged in.
+    Returns:
+        A response object containing the status, message, and user
+        data if successful.
+        Otherwise, it returns an error message.
     """
     user_id = get_jwt_identity()
-    if not user_id:
-        return make_response_("error", "Unauthorized"), 401
-
-    user = storage.get(User, user_id)
-    return make_response_(
-        "success",
-        "User details fetched successfully",
-        {"id": user.id, "role": user.role},
-    )
+    try:
+        user = user_controller.get_current_user(user_id)
+        return make_response_(
+            "success",
+            "User details fetched successfully",
+            {"id": user.id, "role": user.role},
+        )
+    except ValueError as e:
+        return make_response_("error", str(e)), 401
 
 
 @user_views.route("/@me", methods=["PUT"])
 @jwt_required()
 def update_current_user():
-    """Update the current user's details."""
-    try:
-        data = update_schema.load(request.json)
-    except ValidationError as err:
-        return make_response_("error", err.messages), 400
+    """
+    Updates the current user's details.
 
+    Returns:
+        A response object containing the status, message, and user
+        data if successful.
+        Otherwise, it returns an error message.
+    """
     user_id = get_jwt_identity()
-    user = storage.get(User, user_id)
-    if not user:
-        return make_response_("error", "Unauthorized"), 401
-
-    for key, value in data.items():
-        setattr(user, key, value)
-    storage.save()
-
-    return make_response_(
-        "success",
-        "User details updated successfully",
-        {"id": user.id, "role": user.role},
-    )
+    try:
+        user = user_controller.update_current_user(user_id, request.json)
+        return make_response_(
+            "success",
+            "User details updated successfully",
+            {"id": user.id, "role": user.role},
+        )
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
 
 
 @user_views.route("/@me", methods=["DELETE"])
 @jwt_required()
 def delete_current_user():
-    """Delete the current user."""
+    """
+    Deletes the current user.
+
+    Returns:
+        A response object containing the status and message if successful.
+        Otherwise, it returns an error message.
+    """
     user_id = get_jwt_identity()
-    user = storage.get(User, user_id)
-    if not user:
-        return make_response_("error", "Unauthorized"), 401
-
-    storage.delete(user)
-    storage.save()
-
-    return make_response_("success", "User deleted successfully")
+    try:
+        user_controller.delete_current_user(user_id)
+        return make_response_("success", "User deleted successfully")
+    except ValueError as e:
+        return make_response_("error", str(e)), 401

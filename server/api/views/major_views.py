@@ -1,100 +1,106 @@
+"""
+This module provides views for the Major model in the Job-linker application.
+"""
+
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-from marshmallow import ValidationError
-from sqlalchemy.exc import IntegrityError
 
 from server.api.utils import make_response_
-from server.models import storage
-from server.models.major import Major
-from server.models.user import User
-
-from .schemas import major_schema
+from server.controllers.major_controller import MajorController
+from server.controllers.schemas import major_schema
+from server.exception import UnauthorizedError
 
 major_views = Blueprint("major", __name__)
+
+major_controller = MajorController()
 
 
 @major_views.route("/majors", methods=["GET"])
 @jwt_required()
 def get_majors():
-    majors = storage.all(Major).values()
-    majors_data = [major_schema.dump(major) for major in majors]
-    return jsonify(majors_data), 200
+    """
+    Fetches all majors.
+
+    Returns:
+        A list of all majors in JSON format if successful.
+        Otherwise, it returns an error message.
+    """
+    try:
+        majors = major_controller.get_majors()
+        majors_data = [major_schema.dump(major) for major in majors]
+        return jsonify(majors_data), 200
+    except ValueError as e:
+        return make_response_("error", str(e)), 404
 
 
 @major_views.route("/majors", methods=["POST"])
 @jwt_required()
 def create_major():
-    user = storage.get(User, get_jwt_identity())
-    if not user or user.role != "recruiter":
+    """
+    Creates a new major.
+
+    Returns:
+        A response object containing the status, message, and major
+        data if successful.
+        Otherwise, it returns an error message.
+    """
+    user_id = get_jwt_identity()
+    try:
+        new_major = major_controller.create_major(user_id, request.json)
+        return (
+            make_response_(
+                "success",
+                "Major created successfully",
+                {"id": new_major.id},
+            ),
+            201,
+        )
+    except UnauthorizedError:
         return make_response_("error", "Unauthorized"), 401
-
-    try:
-        data = major_schema.load(request.json)
-    except ValidationError as err:
-        return make_response_("error", err.messages), 400
-
-    new_major = Major(name=data["name"])
-    storage.new(new_major)
-    try:
-        storage.save()
-    except IntegrityError:
-        return make_response_("error", "Major name already exists"), 409
-
-    return (
-        make_response_(
-            "success",
-            "Major created successfully",
-            {"id": new_major.id},
-        ),
-        201,
-    )
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
 
 
 @major_views.route("/majors/<major_id>", methods=["PUT"])
 @jwt_required()
 def update_major(major_id):
-    user = storage.get(User, get_jwt_identity())
-    if not user or user.role != "recruiter":
+    """
+    Updates the details of a specific major.
+
+    Returns:
+        A response object containing the status, message, and major
+        data if successful.
+        Otherwise, it returns an error message.
+    """
+    user_id = get_jwt_identity()
+    try:
+        major = major_controller.update_major(user_id, major_id, request.json)
+        return make_response_(
+            "success",
+            "Major details updated successfully",
+            {"id": major.id, "name": major.name},
+        )
+    except UnauthorizedError:
         return make_response_("error", "Unauthorized"), 401
-
-    major = storage.get(Major, major_id)
-    if not major:
-        return make_response_("error", "Major not found"), 404
-
-    try:
-        data = major_schema.load(request.json)
-    except ValidationError as err:
-        return make_response_("error", err.messages), 400
-
-    try:
-        for key, value in data.items():
-            setattr(major, key, value)
-        storage.save()
-    except IntegrityError:
-        return make_response_("error", "Major name already exists"), 409
-
-    return make_response_(
-        "success",
-        "Major details updated successfully",
-        {"id": major.id, "name": major.name},
-    )
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
 
 
 @major_views.route("/majors/<major_id>", methods=["DELETE"])
 @jwt_required()
 def delete_major(major_id):
-    user = storage.get(User, get_jwt_identity())
-    if not user or user.role != "recruiter":
+    """
+    Deletes a specific major.
+
+    Returns:
+        A response object containing the status and message if successful.
+        Otherwise, it returns an error message.
+    """
+    user_id = get_jwt_identity()
+    try:
+        major_controller.delete_major(user_id, major_id)
+        return make_response_("success", "Major deleted successfully")
+    except UnauthorizedError:
         return make_response_("error", "Unauthorized"), 401
-
-    major = storage.get(Major, major_id)
-    if not major:
-        return make_response_("error", "Major not found"), 404
-
-    storage.delete(major)
-    storage.save()
-
-    return make_response_(
-        "success",
-        "Major deleted successfully",
-    )
+    except ValueError as e:
+        return make_response_("error", str(e)), 404

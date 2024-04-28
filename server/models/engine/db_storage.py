@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 import server.models as models
+from server.models.application import Application
 from server.models.base_model import Base
 from server.models.candidate import Candidate
 from server.models.job import Job
@@ -27,6 +28,7 @@ classes = {
     "User": User,
     "WorkExperience": WorkExperience,
     "Language": Language,
+    "Application": Application,
 }
 
 
@@ -110,23 +112,17 @@ class DBStorage:
         if cls:
             return self.__session.query(cls).count()
         else:
-            return sum(
-                    self.__session.query(c).count() for c in classes.values()
-                    )
+            return sum(self.__session.query(c).count() for c in classes.values())
 
     def get_by_attr(self, cls, attr, value):
         """
         Returns the object with the given attribute value,
         None if not found.
         """
-        return self.__session.query(cls).filter(
-                getattr(cls, attr) == value
-                ).first()
+        return self.__session.query(cls).filter(getattr(cls, attr) == value).first()
 
     def get_all_by_attr(self, cls, attr, value):
         """
         Returns all objects of a class with the given attribute value.
         """
-        return self.__session.query(cls).filter(
-                getattr(cls, attr) == value
-                ).all()
+        return self.__session.query(cls).filter(getattr(cls, attr) == value).all()
