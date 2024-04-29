@@ -5,8 +5,10 @@ This module provides views for the User model in the Job-linker application.
 from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
+from config import ApplicationConfig
 from server.api.utils import make_response_
 from server.controllers.user_controller import UserController
+from server.services.mail import MailService
 
 user_views = Blueprint("user", __name__)
 
@@ -37,12 +39,12 @@ def register_user():
         Otherwise, it returns an error message.
     """
     try:
-        new_user, access_token = user_controller.register_user(request.json)
+        new_user, _ = user_controller.register_user(request.json)
         return (
             make_response_(
                 "success",
                 "User registered successfully",
-                {"access_token": access_token, "role": new_user.role},
+                {"role": new_user.role},
             ),
             201,
         )
@@ -62,10 +64,18 @@ def login_user():
     """
     try:
         user, access_token = user_controller.login_user(request.json)
+        mail = MailService()
+        ApplicationConfig
+        link = f'''\
+                Follow this <a href="http://localhost:5173?token={access_token}">link</a>\
+                to go your account.
+                '''
+        mail.send_mail(link, user.email, user.name)
+
         return make_response_(
             "success",
             "User logged in successfully",
-            {"access_token": access_token, "role": user.role},
+            { "role": user.role},
         )
     except ValueError as e:
         return make_response_("error", str(e)), 401

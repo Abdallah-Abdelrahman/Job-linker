@@ -97,6 +97,14 @@ def request_timeout(e):
     return make_response_("error", "Request Timeout"), 408
 
 
+@app.errorhandler(413)
+def file_exceed(e):
+    """
+    Handles 413 error when file exceeds 2mb.
+    """
+    return make_response_("error", "File is greater than 2MB"), 413
+
+
 @app.errorhandler(500)
 def internal_server_error(e):
     """
@@ -119,6 +127,7 @@ from server.api.views.recruiter_views import recruiter_views
 from server.api.views.skill_views import skill_views
 from server.api.views.user_views import user_views
 from server.api.views.work_experience_views import work_experience_views
+from server.api.views.file_views import file_views
 
 # Register Blueprints
 
@@ -131,6 +140,7 @@ app.register_blueprint(skill_views, url_prefix="/api")
 app.register_blueprint(work_experience_views, url_prefix="/api")
 app.register_blueprint(language_views, url_prefix="/api")
 app.register_blueprint(application_views, url_prefix="/api")
+app.register_blueprint(file_views, url_prefix="/api")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

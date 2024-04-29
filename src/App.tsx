@@ -11,6 +11,19 @@ const App = () => {
   );
 };
 function Layout() {
+
+  const handleSubmit = (evt) => {
+    evt.preventDefault()
+    const formData = new FormData(evt.currentTarget)
+    console.log({ formData })
+    fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    })
+      .then(resp => resp.json())
+      .then(data => console.log({ data }))
+      .catch(err => console.error({ err }))
+  }
   return (
     <div style={{ width: '100%', height: '100%', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <header style={{ width: '100%' }}>
@@ -20,7 +33,13 @@ function Layout() {
           <li><Link to='signup'>signup</Link></li>
         </ul>
       </header>
-      <main style={{margin: 'auto'}}><Outlet /></main>
+      <main style={{ margin: 'auto' }}>
+        <form onSubmit={handleSubmit}>
+          <input type="file" name='file' /><br />
+          <button type='submit'>upload</button>
+        </form>
+        <Outlet />
+      </main>
       <footer style={{ marginTop: 'auto' }}>ATS &copy; mohanad & abdallah</footer>
 
     </div>

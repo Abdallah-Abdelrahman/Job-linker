@@ -45,3 +45,7 @@ class ApplicationConfig:
 
     # Set the lifespan of refresh tokens to 1 day
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
+    UPLOAD_JOB = f'{os.getcwd()}/server/jobs'
+    UPLOAD_CV = f'{os.getcwd()}/server/cv'
+    ALLOWED_EXTENSIONS = {'pdf'}
+    MAX_CONTENT_LENGTH = 2 * 1000 * 1000
