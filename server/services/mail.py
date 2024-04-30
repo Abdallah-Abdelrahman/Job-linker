@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-'''Mail service'''
+"""Mail service"""
 import smtplib
 import ssl
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 
 class MailService:
