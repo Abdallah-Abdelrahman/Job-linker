@@ -40,7 +40,7 @@ class ApplicationConfig:
     # SESSION_REDIS = redis.from_url("redis://127.0.0.1:6379")
     JWT_SECRET_KEY = os.environ["SECRET_KEY"]
 
-    # Set the lifespan of access tokens to 15 minutes
+    # Set the lifespan of access tokens to 30 minutes
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)
 
     # Set the lifespan of refresh tokens to 1 day
