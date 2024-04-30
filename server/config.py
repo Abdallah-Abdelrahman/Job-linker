@@ -41,7 +41,7 @@ class ApplicationConfig:
     JWT_SECRET_KEY = os.environ["SECRET_KEY"]
 
     # Set the lifespan of access tokens to 30 minutes
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
 
     # Set the lifespan of refresh tokens to 1 day
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
