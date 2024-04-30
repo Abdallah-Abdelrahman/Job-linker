@@ -17,8 +17,8 @@ function Register() {
 
   return (
 
-    <Box className='w-full'>
-    <Heading as='h1' size='3xl' noOfLines={1} className='mb-8'> Signup </Heading>
+    <Box className='w-full max-w-xl'>
+    <Heading as='h1' size='3xl' className='mb-8'> Signup </Heading>
       <form className='w-full flex flex-col gap-4' onSubmit={handleSubmit}>
         <FormControl isRequired>
           <FormLabel> Name </FormLabel>

@@ -1,6 +1,7 @@
-import Register from "./features/auth/Register";
+import { Register } from "./features/auth";
+import { Login } from "./features/auth";
 import "./App.css";
-import { Link, Outlet, Route, createBrowserRouter, createRoutesFromElements, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, Route, createBrowserRouter, createRoutesFromElements, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 const App = () => {
@@ -102,11 +103,11 @@ function Layout() {
 
   return (
     <div className='w-full h-full p-4 flex flex-col items-center'>
-      <header className='w-full' >
-        <ul className='flex justify-end gap-8'>
-          <li><Link to='/'> home </Link></li>
-          <li><Link to='login'>login</Link></li>
-          <li><Link to='signup'>signup</Link></li>
+      <header className='w-full shadow-md rounded-md' >
+        <ul className='flex justify-center p-4 gap-10'>
+          <li className='inline-block h-full'><NavLink to='/'> home </NavLink></li>
+          <li><NavLink to='login'>login</NavLink></li>
+          <li><NavLink to='signup'>signup</NavLink></li>
         </ul>
       </header>
       <main className='w-full m-auto flex justify-center'>
@@ -122,6 +123,7 @@ export const router = createBrowserRouter(createRoutesFromElements(
   <Route path='/' element={<Layout />}>
     <Route index element={<App />} />
     <Route path='signup' element={<Register />} />
+    <Route path='login' element={<Login />} />
     <Route path='verify' element={<Verify />} />
     <Route path='me' element={<Me />} />
   </Route>
