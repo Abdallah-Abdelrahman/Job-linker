@@ -1,5 +1,4 @@
-import Login from "./Login";
-import Register from "./features/auth/Login";
+import Register from "./features/auth/Register";
 import "./App.css";
 import { Link, Outlet, Route, createBrowserRouter, createRoutesFromElements, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -53,6 +52,29 @@ function Me() {
   return (<h1>me</h1>)
 }
 
+function Upload() {
+  const handleSubmit = (evt) => {
+    evt.preventDefault()
+    const formData = new FormData(evt.currentTarget)
+    console.log({ formData })
+    fetch('/api/upload', {
+      method: 'POST',
+      body: formData
+    })
+      .then(resp => resp.json())
+      .then(data => console.log({ data }))
+      .catch(err => console.error({ err }))
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="file" name='file' /><br />
+      <button type='submit'>upload</button>
+    </form>
+
+  )
+}
+
 function Layout() {
   // TODO: request refresh only when token expires
   useEffect(() => {
@@ -70,43 +92,27 @@ function Layout() {
         .catch(err => console.error({ err }));
     };
 
-    window.addEventListener('beforeunload', reloadHandler);
+    //window.addEventListener('beforeunload', reloadHandler);
 
     // cleanup
     return () => {
-      window.removeEventListener('beforeunload', reloadHandler);
+      //window.removeEventListener('beforeunload', reloadHandler);
     }
   }, []);
-  const handleSubmit = (evt) => {
-    evt.preventDefault()
-    const formData = new FormData(evt.currentTarget)
-    console.log({ formData })
-    fetch('/api/upload', {
-      method: 'POST',
-      body: formData
-    })
-      .then(resp => resp.json())
-      .then(data => console.log({ data }))
-      .catch(err => console.error({ err }))
-  }
 
   return (
-    <div style={{ width: '100%', height: '100%', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <header style={{ width: '100%' }}>
-        <ul style={{ display: 'flex', justifyContent: 'flex-end', gap: '1.5rem' }}>
+    <div className='w-full h-full p-4 flex flex-col items-center'>
+      <header className='w-full' >
+        <ul className='flex justify-end gap-8'>
           <li><Link to='/'> home </Link></li>
           <li><Link to='login'>login</Link></li>
           <li><Link to='signup'>signup</Link></li>
         </ul>
       </header>
-      <main style={{ margin: 'auto' }}>
-        <form onSubmit={handleSubmit}>
-          <input type="file" name='file' /><br />
-          <button type='submit'>upload</button>
-        </form>
+      <main className='w-full m-auto flex justify-center'>
         <Outlet />
       </main>
-      <footer style={{ marginTop: 'auto' }}>ATS &copy; mohanad & abdallah</footer>
+      <footer className='mt-auto'>ATS &copy; mohanad & abdallah</footer>
 
     </div>
   )
@@ -115,7 +121,6 @@ function Layout() {
 export const router = createBrowserRouter(createRoutesFromElements(
   <Route path='/' element={<Layout />}>
     <Route index element={<App />} />
-    <Route path='login' element={<Login />} />
     <Route path='signup' element={<Register />} />
     <Route path='verify' element={<Verify />} />
     <Route path='me' element={<Me />} />
