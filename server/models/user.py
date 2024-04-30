@@ -1,7 +1,7 @@
 """User Class"""
 
 from flask_login import UserMixin
-from sqlalchemy import Column, Enum, String
+from sqlalchemy import Boolean, Column, Enum, String
 
 from server.models.base_model import Base, BaseModel
 
@@ -18,6 +18,7 @@ class User(BaseModel, Base, UserMixin):
     contact_info = Column(String(100))
     bio = Column(String(500))
     image_url = Column(String(200))
+    verified = Column(Boolean, default=False)
 
     def __repr__(self):
         """Return a string representation of the User instance"""

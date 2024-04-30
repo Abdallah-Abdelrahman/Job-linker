@@ -2,7 +2,7 @@
 This module sets up the Flask application for the Job-linker application.
 """
 
-from flask import Flask
+from flask import Flask, g
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 
@@ -11,14 +11,22 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
 from server.api.utils import make_response_
-from server.api.views.user_views import set_bcrypt
 from server.config import ApplicationConfig
+from server.controllers.user_controller import UserController
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
 app.url_map.strict_slashes = False
 
 bcrypt = Bcrypt(app)
+user_controller = UserController(bcrypt)
+
+
+@app.before_request
+def before_request():
+    g.user_controller = user_controller
+
+
 CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "*"}})
 
 jwt = JWTManager(app)
@@ -113,9 +121,6 @@ def internal_server_error(e):
     return make_response_("error", "Internal Server Error"), 500
 
 
-set_bcrypt(bcrypt)
-
-
 # Import Blueprints
 
 from server.api.views.application_views import application_views
@@ -141,6 +146,11 @@ app.register_blueprint(work_experience_views, url_prefix="/api")
 app.register_blueprint(language_views, url_prefix="/api")
 app.register_blueprint(application_views, url_prefix="/api")
 app.register_blueprint(file_views, url_prefix="/api")
+
+
+import server.api.views.user_views as user_views
+
+user_views.setup(user_controller)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
