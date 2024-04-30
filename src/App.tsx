@@ -1,5 +1,5 @@
 import Login from "./Login";
-import Register from "./Register";
+import Register from "./features/auth/Login";
 import "./App.css";
 import { Link, Outlet, Route, createBrowserRouter, createRoutesFromElements, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -21,8 +21,7 @@ function Verify() {
   useEffect(() => {
     fetch(`/api/verify?token=${token}`)
       .then(resp => resp.json())
-      .then(data => {
-        console.log({ data });
+      .then(_ => {
         navigate('/me');
       })
       .catch(err => console.error({ err }));
@@ -32,20 +31,18 @@ function Verify() {
 }
 
 function Me() {
-
+  // refresh token request
   useEffect(() => {
-
     let ignore = false;
 
-    if (!ignore)
-      fetch('/api/refresh', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'X-CSRF-TOKEN': document.cookie.split('=')[1] }
+    if (!ignore) {
+      fetch('/api/@me', {
+        headers: { 'Authorization': '' }
       })
         .then(resp => resp.json())
         .then(data => console.log({ data }))
         .catch(err => console.error({ err }));
+    }
 
     // cleanup
     return () => {
@@ -57,6 +54,29 @@ function Me() {
 }
 
 function Layout() {
+  // TODO: request refresh only when token expires
+  useEffect(() => {
+    // refresh token on reload
+    const reloadHandler = (evt) => {
+      console.log({ evt });
+      evt.preventDefault();
+      fetch('/api/refresh', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'X-CSRF-TOKEN': document.cookie.split('=')[1] }
+      })
+        .then(resp => resp.json())
+        .then(data => console.log({ data }, '--------->'))
+        .catch(err => console.error({ err }));
+    };
+
+    window.addEventListener('beforeunload', reloadHandler);
+
+    // cleanup
+    return () => {
+      window.removeEventListener('beforeunload', reloadHandler);
+    }
+  }, []);
   const handleSubmit = (evt) => {
     evt.preventDefault()
     const formData = new FormData(evt.currentTarget)
@@ -69,6 +89,7 @@ function Layout() {
       .then(data => console.log({ data }))
       .catch(err => console.error({ err }))
   }
+
   return (
     <div style={{ width: '100%', height: '100%', padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <header style={{ width: '100%' }}>
@@ -88,9 +109,9 @@ function Layout() {
       <footer style={{ marginTop: 'auto' }}>ATS &copy; mohanad & abdallah</footer>
 
     </div>
-
   )
 }
+
 export const router = createBrowserRouter(createRoutesFromElements(
   <Route path='/' element={<Layout />}>
     <Route index element={<App />} />
@@ -100,4 +121,5 @@ export const router = createBrowserRouter(createRoutesFromElements(
     <Route path='me' element={<Me />} />
   </Route>
 ));
+
 export default App;
