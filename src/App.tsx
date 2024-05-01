@@ -105,7 +105,7 @@ function Layout() {
     <div className='w-full h-full p-4 flex flex-col items-center'>
       <header className='w-full shadow-md rounded-md' >
         <ul className='flex justify-center p-4 gap-10'>
-          <li className='inline-block h-full'><NavLink to='/'> home </NavLink></li>
+          <li><NavLink to='/'> home </NavLink></li>
           <li><NavLink to='login'>login</NavLink></li>
           <li><NavLink to='signup'>signup</NavLink></li>
         </ul>
