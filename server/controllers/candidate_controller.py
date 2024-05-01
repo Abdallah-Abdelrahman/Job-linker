@@ -9,7 +9,9 @@ from server.controllers.schemas import candidate_schema
 from server.exception import UnauthorizedError
 from server.models import storage
 from server.models.candidate import Candidate
+from server.models.job import Job
 from server.models.major import Major
+from server.models.recruiter import Recruiter
 from server.models.user import User
 
 
@@ -40,6 +42,16 @@ class CandidateController:
             is not found.
             UnauthorizedError: If the user role is not 'candidate'.
         """
+        # Check if user is a recruiter
+        existing_recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
+        if existing_recruiter:
+            raise ValueError("A recruiter cannot create a candidate profile")
+
+        # Check if candidate already exists
+        existing_candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+        if existing_candidate:
+            raise ValueError("Candidate already exists for this user")
+
         # Validate data
         try:
             data = candidate_schema.load(data)
@@ -156,3 +168,48 @@ class CandidateController:
         # Delete candidate
         storage.delete(candidate)
         storage.save()
+
+    def recommend_jobs(self, user_id):
+        """
+        Recommend jobs for a specific candidate.
+
+        This method returns a list of jobs that are recommended for the
+        specified candidate based on their skills and major.
+
+        Args:
+            user_id: The ID of the candidate to fetch recommendations for.
+
+        Returns:
+            A list of Job objects that are recommended for the candidate.
+        """
+        # Check user role
+        user = storage.get(User, user_id)
+        if not user or user.role != "candidate":
+            raise UnauthorizedError()
+
+        # Get candidate
+        candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+        if not candidate:
+            raise ValueError("Candidate not found")
+
+        # Fetch the candidate's skills and major
+        candidate_skills = [skill.name for skill in candidate.skills]
+        candidate_major = candidate.major.name
+
+        # Fetch all jobs
+        all_jobs = storage.all(Job).values()
+
+        # Filter jobs based on the candidate's skills and major
+        recommended_jobs = []
+        for job in all_jobs:
+            job_skills = [skill.name for skill in job.skills]
+            job_major = job.major.name
+            # Check if the candidate's skills match the job's skills
+            # and the candidate's major matches the job's major
+            if (
+                set(candidate_skills).intersection(job_skills)
+                and candidate_major == job_major
+            ):
+                recommended_jobs.append(job)
+
+        return recommended_jobs

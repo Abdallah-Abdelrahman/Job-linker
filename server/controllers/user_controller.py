@@ -5,15 +5,15 @@ Job-linker application.
 
 from flask import current_app, url_for
 from flask_jwt_extended import create_access_token, create_refresh_token
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from marshmallow import ValidationError
-from server.exception import UnauthorizedError
 
 from server.controllers.schemas import (
         login_schema,
         registration_schema,
         update_schema
         )
+from server.exception import UnauthorizedError
 from server.models import storage
 from server.models.user import User
 from server.services.mail import MailService
@@ -30,7 +30,7 @@ class UserController:
         password hashing.
         """
         self.bcrypt = bcrypt_instance
-        self.email_service =MailService()
+        self.email_service = MailService()
 
     def get_user(self, user_id):
         """
@@ -76,10 +76,12 @@ class UserController:
         #         token=token,
         #         _external=True
         #         )
-        'localhost:5173/verify?token={token}'
-        html = f'''<p>Click the following link to verify your email:
-                <a href="http://localhost:5173/verify?token={token}">Verify Email</a></p>
-                '''
+        "localhost:5173/verify?token={token}"
+        html = (
+                f"<p>Click the following link to verify your email:"
+                f"<a href='http://localhost:5173/verify?token={token}'>"
+                "Verify Email</a></p>"
+                )
 
         self.email_service.send_mail(html, email, name)
 
@@ -100,7 +102,7 @@ class UserController:
                     salt="email-verification",
                     max_age=3600
                     )
-        except:
+        except (BadSignature, SignatureExpired):
             raise ValueError(
                     "The verification link is invalid or has expired."
                     )
@@ -148,10 +150,10 @@ class UserController:
             email=data["email"],
             password=hashed_password,
             role=data["role"],
+            is_admin=data.get("is_admin", False),
         )
         storage.new(new_user)
         storage.save()
-
 
         return new_user
 
@@ -187,9 +189,13 @@ class UserController:
             verification_token = self.generate_verification_token(user.email)
 
             # Send verification email
-            self.send_verification_email(user.email, user.name, verification_token)
+            self.send_verification_email(
+                    user.email,
+                    user.name,
+                    verification_token
+                    )
 
-            raise UnauthorizedError('configrm your email')
+            raise UnauthorizedError("Verify your email")
         access_token = create_access_token(identity=user.id)
         refresh_token = create_refresh_token(identity=user.id)
 

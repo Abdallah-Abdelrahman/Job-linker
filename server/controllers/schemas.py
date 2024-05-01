@@ -28,6 +28,7 @@ class RegistrationSchema(Schema):
     role = fields.Str(
         required=True, validate=validate.OneOf(["candidate", "recruiter"])
     )
+    is_admin = fields.Bool(required=False)
 
 
 registration_schema = RegistrationSchema()

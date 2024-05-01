@@ -41,11 +41,11 @@ class ApplicationConfig:
     JWT_SECRET_KEY = os.environ["SECRET_KEY"]
 
     # Set the lifespan of access tokens to 30 minutes
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=45)
 
     # Set the lifespan of refresh tokens to 1 day
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
-    UPLOAD_JOB = f'{os.getcwd()}/server/jobs'
-    UPLOAD_CV = f'{os.getcwd()}/server/cv'
-    ALLOWED_EXTENSIONS = {'pdf'}
+    UPLOAD_JOB = f"{os.getcwd()}/server/jobs"
+    UPLOAD_CV = f"{os.getcwd()}/server/cv"
+    ALLOWED_EXTENSIONS = {"pdf"}
     MAX_CONTENT_LENGTH = 2 * 1000 * 1000
