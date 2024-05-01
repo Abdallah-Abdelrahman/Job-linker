@@ -6,14 +6,12 @@ from flask_jwt_extended import (
     create_access_token,
     get_jwt_identity,
     jwt_required,
-    verify_jwt_in_request,
     set_refresh_cookies,
 )
-from server.exception import UnauthorizedError
 
-from server.config import ApplicationConfig
 from server.api.utils import make_response_
 from server.decorators import verified_required
+from server.exception import UnauthorizedError
 
 user_views = Blueprint("user", __name__)
 
@@ -66,14 +64,14 @@ def verify_email():
     Returns:
         A response object containing the status and message.
     """
-    verf_token = request.query_string.decode('utf8').split('=')[-1]
+    verf_token = request.query_string.decode("utf8").split("=")[-1]
     try:
         jwt, jwt_refresh, user = user_controller.verify_email(verf_token)
 
         resp = make_response_(
             "success",
             "User logged in successfully",
-            { "role": user.role, 'name': user.name, 'jwt': jwt},
+            {"role": user.role, "name": user.name, "jwt": jwt},
         )
 
         set_refresh_cookies(resp, jwt_refresh)
@@ -99,12 +97,12 @@ def login_user():
         response_data = make_response_(
             "success",
             "User logged in successfully",
-            { "role": user.role, 'jwt': access_token},
+            {"role": user.role, "jwt": access_token},
         )
     except ValueError as e:
         return make_response_("error", str(e)), 401
     except UnauthorizedError as e:
-        return make_response_('error', str(e)), 200
+        return make_response_("error", str(e)), 200
 
     response = response_data
     set_refresh_cookies(response, refresh_token)
@@ -112,8 +110,18 @@ def login_user():
 
 
 @user_views.route("/refresh", methods=["POST"])
-@jwt_required(refresh=True, locations='cookies')
+@jwt_required(refresh=True, locations="cookies")
 def refresh_token():
+    """
+    Route to refresh the JWT token for a user.
+
+    This route requires a valid refresh token in the cookies. It creates a new
+    access token for the user and returns it in the response. The user ID is
+    extracted from the current identity in the JWT.
+
+    Returns:
+        Response: A response object with a success message and the new JWT.
+    """
     user_id = get_jwt_identity()
     jwt = create_access_token(identity=user_id)
     return (

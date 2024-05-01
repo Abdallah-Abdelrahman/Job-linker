@@ -11,10 +11,8 @@ from server.controllers.application_controller import ApplicationsController
 from server.controllers.schemas import application_schema
 from server.exception import UnauthorizedError
 
-# Create a blueprint for the applications routes
 application_views = Blueprint("applications_bp", __name__)
 
-# Initialize the ApplicationsController
 applications_controller = ApplicationsController()
 
 

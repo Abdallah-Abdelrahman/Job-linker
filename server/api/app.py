@@ -5,9 +5,6 @@ This module sets up the Flask application for the Job-linker application.
 from flask import Flask, g
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
-
-# from flask_login import LoginManager
-# from flask_session import Session
 from flask_jwt_extended import JWTManager, get_jwt_identity, jwt_required
 
 from server.api.utils import make_response_
@@ -20,147 +17,112 @@ app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
 app.url_map.strict_slashes = False
 
-bcrypt = Bcrypt(app)
-user_controller = UserController(bcrypt)
-
-
-@app.before_request
-@jwt_required(optional=True)
-def before_request():
-    g.user_controller = user_controller
-    user_id = get_jwt_identity()
-    if user_id is not None:
-        g.user = storage.get(User, user_id)
-    else:
-        g.user = None
-
-
 CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "*"}})
-
 jwt = JWTManager(app)
 
-# server_session = Session(app)
 
-# login_manager = LoginManager()
-# login_manager.init_app(app)
-
-
-# @login_manager.user_loader
-# def load_user(user_id):
-#    """
-#    Load a user given the user_id.
-#
-#    Args:
-#        user_id (str): The unique identifier of the user.
-#
-#    Returns:
-#        User: The User object if found, None otherwise.
-#    """
-#    return storage.get(User, user_id)
-
-
-# @login_manager.unauthorized_handler
-# def unauthorized():
-#    """Redirects unauthorized users to a custom HTML page."""
-#    return make_response_("error", "Unauthorized"), 401
-
-
-@app.errorhandler(400)
-def bad_request(e):
+def create_app():
     """
-    Handles 400 Bad Request errors.
+    Initializes the Flask application.
+
+    Sets up the bcrypt instance, user controller, registers
+    error handlers, and blueprints.
+    Also sets up the user views.
     """
-    return make_response_("error", "Bad Request"), 400
+    bcrypt = Bcrypt(app)
+    user_controller = UserController(bcrypt)
+
+    @app.before_request
+    @jwt_required(optional=True)
+    def before_request():
+        g.user_controller = user_controller
+        user_id = get_jwt_identity()
+        if user_id is not None:
+            g.user = storage.get(User, user_id)
+        else:
+            g.user = None
+
+    register_error_handlers()
+    register_blueprints()
+
+    import server.api.views.user_views as user_views
+
+    user_views.setup(user_controller)
 
 
-@app.errorhandler(401)
-def unauthorized(e):
+def register_error_handlers():
     """
-    Handles 401 Unauthorized errors.
+    Registers error handlers for the Flask application.
+
+    Each error handler returns a response with an error message and the
+    appropriate HTTP status code.
     """
-    return make_response_("error", "Unauthorized"), 401
+
+    @app.errorhandler(400)
+    def bad_request(e):
+        return make_response_("error", "Bad Request"), 400
+
+    @app.errorhandler(401)
+    def unauthorized(e):
+        return make_response_("error", "Unauthorized"), 401
+
+    @app.errorhandler(403)
+    def forbidden(e):
+        return make_response_("error", "Forbidden"), 403
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return make_response_("error", "Not Found"), 404
+
+    @app.errorhandler(405)
+    def method_not_allowed(e):
+        return make_response_("error", "Method Not Allowed"), 405
+
+    @app.errorhandler(408)
+    def request_timeout(e):
+        return make_response_("error", "Request Timeout"), 408
+
+    @app.errorhandler(413)
+    def file_exceed(e):
+        return make_response_("error", "File is greater than 2MB"), 413
+
+    @app.errorhandler(500)
+    def internal_server_error(e):
+        return make_response_("error", "Internal Server Error"), 500
 
 
-@app.errorhandler(403)
-def forbidden(e):
+def register_blueprints():
     """
-    Handles 403 Forbidden errors.
+    Registers blueprints for the Flask application.
+
+    Each blueprint corresponds to a different part of the application,
+    such as users, jobs, skills, etc.
     """
-    return make_response_("error", "Forbidden"), 403
+    from server.api.views.admin_views import admin_views
+    from server.api.views.application_views import application_views
+    from server.api.views.candidate_views import candidate_views
+    from server.api.views.file_views import file_views
+    from server.api.views.job_views import job_views
+    from server.api.views.language_views import language_views
+    from server.api.views.major_views import major_views
+    from server.api.views.recruiter_views import recruiter_views
+    from server.api.views.skill_views import skill_views
+    from server.api.views.user_views import user_views
+    from server.api.views.work_experience_views import work_experience_views
 
+    app.register_blueprint(user_views, url_prefix="/api")
+    app.register_blueprint(candidate_views, url_prefix="/api")
+    app.register_blueprint(recruiter_views, url_prefix="/api")
+    app.register_blueprint(job_views, url_prefix="/api")
+    app.register_blueprint(major_views, url_prefix="/api")
+    app.register_blueprint(skill_views, url_prefix="/api")
+    app.register_blueprint(work_experience_views, url_prefix="/api")
+    app.register_blueprint(language_views, url_prefix="/api")
+    app.register_blueprint(application_views, url_prefix="/api")
+    app.register_blueprint(file_views, url_prefix="/api")
+    app.register_blueprint(admin_views, url_prefix="/api")
 
-@app.errorhandler(404)
-def not_found(e):
-    """
-    Handles 404 Not Found errors.
-    """
-    return make_response_("error", "Not Found"), 404
-
-
-@app.errorhandler(405)
-def method_not_allowed(e):
-    """
-    Handles 405 Method Not Allowed errors.
-    """
-    return make_response_("error", "Method Not Allowed"), 405
-
-
-@app.errorhandler(408)
-def request_timeout(e):
-    """
-    Handles 408 Request Timeout errors.
-    """
-    return make_response_("error", "Request Timeout"), 408
-
-
-@app.errorhandler(413)
-def file_exceed(e):
-    """
-    Handles 413 error when file exceeds 2mb.
-    """
-    return make_response_("error", "File is greater than 2MB"), 413
-
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    """
-    Handles 500 Internal Server Error errors.
-    """
-    return make_response_("error", "Internal Server Error"), 500
-
-
-# Import Blueprints
-
-from server.api.views.admin_views import admin_views
-from server.api.views.application_views import application_views
-from server.api.views.candidate_views import candidate_views
-from server.api.views.file_views import file_views
-from server.api.views.job_views import job_views
-from server.api.views.language_views import language_views
-from server.api.views.major_views import major_views
-from server.api.views.recruiter_views import recruiter_views
-from server.api.views.skill_views import skill_views
-from server.api.views.user_views import user_views
-from server.api.views.work_experience_views import work_experience_views
-
-# Register Blueprints
-
-app.register_blueprint(user_views, url_prefix="/api")
-app.register_blueprint(candidate_views, url_prefix="/api")
-app.register_blueprint(recruiter_views, url_prefix="/api")
-app.register_blueprint(job_views, url_prefix="/api")
-app.register_blueprint(major_views, url_prefix="/api")
-app.register_blueprint(skill_views, url_prefix="/api")
-app.register_blueprint(work_experience_views, url_prefix="/api")
-app.register_blueprint(language_views, url_prefix="/api")
-app.register_blueprint(application_views, url_prefix="/api")
-app.register_blueprint(file_views, url_prefix="/api")
-app.register_blueprint(admin_views, url_prefix="/api")
-
-
-import server.api.views.user_views as user_views
-
-user_views.setup(user_controller)
 
 if __name__ == "__main__":
+    create_app()
     app.run(host="0.0.0.0", port=5000, debug=True)

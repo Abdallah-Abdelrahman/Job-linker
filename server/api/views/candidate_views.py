@@ -130,6 +130,117 @@ def update_current_candidate():
         return make_response_("error", str(e)), 400
 
 
+@candidate_views.route("/candidates/@me/skills", methods=["POST"])
+@jwt_required()
+def add_skill_to_current_candidate():
+    """
+    Add a skill to the current candidate's profile.
+    The skill ID should be provided in the request body.
+
+    Returns:
+        A success message and the updated list of skill IDs for the candidate.
+    """
+    user_id = get_jwt_identity()
+    skill_id = request.json.get("skill_id")
+    try:
+        candidate = candidate_controller.add_skill(user_id, skill_id)
+        return make_response_(
+            "success",
+            "Skill added successfully",
+            {"id": candidate.id, "skills": [
+                skill.id for skill in candidate.skills
+                ]},
+        )
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
+
+
+@candidate_views.route("/candidates/@me/skills/<skill_id>", methods=["DELETE"])
+@jwt_required()
+def remove_skill_from_current_candidate(skill_id):
+    """
+    Remove a skill from the current candidate's profile.
+    The skill ID should be provided as a path parameter.
+
+    Returns:
+        A success message and the updated list of skill IDs for the candidate.
+    """
+    user_id = get_jwt_identity()
+    try:
+        candidate = candidate_controller.remove_skill(user_id, skill_id)
+        return make_response_(
+            "success",
+            "Skill removed successfully",
+            {"id": candidate.id, "skills": [
+                skill.id for skill in candidate.skills
+                ]},
+        )
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
+
+
+@candidate_views.route("/candidates/@me/languages", methods=["POST"])
+@jwt_required()
+def add_language_to_current_candidate():
+    """
+    Add a language to the current candidate's profile.
+    The language ID should be provided in the request body.
+
+    Returns:
+        A success message and the updated list of language IDs for candidate.
+    """
+    user_id = get_jwt_identity()
+    lang_id = request.json.get("lang_id")
+    try:
+        candidate = candidate_controller.add_language(user_id, lang_id)
+        return make_response_(
+            "success",
+            "Language added successfully",
+            {
+                "id": candidate.id,
+                "languages": [language.id for language in candidate.languages],
+            },
+        )
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
+
+
+@candidate_views.route(
+        "/candidates/@me/languages/<lang_id>",
+        methods=["DELETE"]
+        )
+@jwt_required()
+def remove_language_from_current_candidate(lang_id):
+    """
+    Remove a language from the current candidate's profile.
+    The language ID should be provided as a path parameter.
+
+    Returns:
+        A success message and the updated list of language IDs for candidate.
+    """
+    user_id = get_jwt_identity()
+    try:
+        candidate = candidate_controller.remove_language(user_id, lang_id)
+        return make_response_(
+            "success",
+            "Language removed successfully",
+            {
+                "id": candidate.id,
+                "languages": [language.id for language in candidate.languages],
+            },
+        )
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
+
+
 @candidate_views.route("/candidates/@me", methods=["DELETE"])
 @jwt_required()
 def delete_current_candidate():
