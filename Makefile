@@ -12,8 +12,8 @@ run:
         	echo 'Error: tmux is not installed. Please install tmux to run this target.'; \
     	else \
 	    . server/venv/bin/activate; \
-	    tmux new-session -d -s api 'yarn api'; \
-	    tmux new-session -d -s client 'yarn dev'; \
+	    tmux new-session -d -s api 'npm run api'; \
+	    tmux new-session -d -s client 'npm run dev'; \
     	fi
 stop:
 	tmux send-keys -t api C-c

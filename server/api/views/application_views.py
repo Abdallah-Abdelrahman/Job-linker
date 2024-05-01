@@ -3,7 +3,7 @@ This module provides views for the Application model in the
 Job-linker application.
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from server.api.utils import make_response_

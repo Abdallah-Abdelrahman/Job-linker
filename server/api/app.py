@@ -8,11 +8,13 @@ from flask_cors import CORS
 
 # from flask_login import LoginManager
 # from flask_session import Session
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, get_jwt_identity, jwt_required
 
 from server.api.utils import make_response_
 from server.config import ApplicationConfig
 from server.controllers.user_controller import UserController
+from server.models import storage
+from server.models.user import User
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
@@ -23,8 +25,14 @@ user_controller = UserController(bcrypt)
 
 
 @app.before_request
+@jwt_required(optional=True)
 def before_request():
     g.user_controller = user_controller
+    user_id = get_jwt_identity()
+    if user_id is not None:
+        g.user = storage.get(User, user_id)
+    else:
+        g.user = None
 
 
 CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "*"}})
@@ -123,8 +131,10 @@ def internal_server_error(e):
 
 # Import Blueprints
 
+from server.api.views.admin_views import admin_views
 from server.api.views.application_views import application_views
 from server.api.views.candidate_views import candidate_views
+from server.api.views.file_views import file_views
 from server.api.views.job_views import job_views
 from server.api.views.language_views import language_views
 from server.api.views.major_views import major_views
@@ -132,7 +142,6 @@ from server.api.views.recruiter_views import recruiter_views
 from server.api.views.skill_views import skill_views
 from server.api.views.user_views import user_views
 from server.api.views.work_experience_views import work_experience_views
-from server.api.views.file_views import file_views
 
 # Register Blueprints
 
@@ -146,6 +155,7 @@ app.register_blueprint(work_experience_views, url_prefix="/api")
 app.register_blueprint(language_views, url_prefix="/api")
 app.register_blueprint(application_views, url_prefix="/api")
 app.register_blueprint(file_views, url_prefix="/api")
+app.register_blueprint(admin_views, url_prefix="/api")
 
 
 import server.api.views.user_views as user_views

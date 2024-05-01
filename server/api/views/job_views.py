@@ -162,3 +162,39 @@ def get_my_jobs():
         return make_response_("error", str(e)), 403
     except ValueError as e:
         return make_response_("error", str(e)), 404
+
+
+@job_views.route("/jobs/<job_id>/recommended_candidates", methods=["GET"])
+@jwt_required()
+def get_recommended_candidates(job_id):
+    """
+    Fetch recommended candidates for a specific job.
+
+    This endpoint returns a list of candidates that are recommended for
+    the specified job based on the job's required skills and major. The
+    user must be authenticated and have the role of a recruiter.
+
+    Args:
+        job_id: The ID of the job to fetch recommendations for.
+
+    Returns:
+        A JSON response containing the recommended candidates, or an error
+        message if the candidates could not be fetched.
+    """
+    user_id = get_jwt_identity()
+    try:
+        # Fetch the recommended candidates
+        rec_candidates = job_controller.recommend_candidates(job_id, user_id)
+
+        # Convert the recommended candidates to JSON and return them
+        return make_response_(
+            "success",
+            "Recommended Candidates based on Major & Skills",
+            {"candidates": [
+                candidate.to_dict for candidate in rec_candidates
+                ]},
+        )
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 400

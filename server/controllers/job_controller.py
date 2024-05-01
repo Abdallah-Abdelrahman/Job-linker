@@ -210,3 +210,49 @@ class JobController:
             raise ValueError("No jobs found")
 
         return jobs
+
+    def recommend_candidates(self, job_id, user_id):
+        """
+        Recommend candidates for a specific job.
+
+        This method returns a list of candidates that are recommended for
+        the specified job based on the job's required skills and major.
+
+        Args:
+            job_id: The ID of the job to fetch recommendations for.
+            user_id: The ID of the recruiter requesting the recommendations.
+
+        Returns:
+            A list of Candidate objects that are recommended for the job.
+        """
+        # Check if user is a recruiter
+        recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
+        if not recruiter:
+            raise UnauthorizedError("You are not a recruiter")
+
+        # Get job
+        job = storage.get(Job, job_id)
+        if not job:
+            raise ValueError("Job not found")
+
+        # Fetch the job's required skills and major
+        job_skills = [skill.name for skill in job.skills]
+        job_major = job.major.name
+
+        # Fetch all candidates
+        all_candidates = storage.all(Candidate).values()
+
+        # Filter candidates based on the job's required skills and major
+        recommended_candidates = []
+        for candidate in all_candidates:
+            candidate_skills = [skill.name for skill in candidate.skills]
+            candidate_major = candidate.major.name
+            # Check if the job's required skills match the candidate's skills
+            # and the job's major matches the candidate's major
+            if (
+                set(job_skills).intersection(candidate_skills)
+                and job_major == candidate_major
+            ):
+                recommended_candidates.append(candidate)
+
+        return recommended_candidates
