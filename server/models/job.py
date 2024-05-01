@@ -47,7 +47,8 @@ class Job(BaseModel, Base):
     def to_dict(self):
         """Return a dictionary reppresentation of Job"""
         dict_ = super().to_dict
-        dict_["skills"] = [s.name for s in self.skills]
+        dict_["skills"] = [s.id for s in self.skills]
+        dict_["major"] = self.major.name
         return dict_
 
     def __repr__(self):
