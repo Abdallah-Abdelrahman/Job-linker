@@ -30,8 +30,7 @@ def create_candidate():
     try:
         new_candidate = candidate_controller.create_candidate(
                 user_id,
-                request.json
-                )
+                request.json)
         return (
             make_response_(
                 "success",
@@ -66,6 +65,8 @@ def get_current_candidate():
             {
                 "id": candidate.id,
                 "major_id": candidate.major_id,
+                "skills": [skill.id for skill in candidate.skills],
+                "languages": [language.id for language in candidate.languages],
             },
         )
     except UnauthorizedError:
@@ -147,9 +148,10 @@ def add_skill_to_current_candidate():
         return make_response_(
             "success",
             "Skill added successfully",
-            {"id": candidate.id, "skills": [
-                skill.id for skill in candidate.skills
-                ]},
+            {
+                "id": candidate.id,
+                "skills": [skill.id for skill in candidate.skills]
+                },
         )
     except UnauthorizedError:
         return make_response_("error", "Unauthorized"), 401

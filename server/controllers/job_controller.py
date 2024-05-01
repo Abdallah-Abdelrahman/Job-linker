@@ -192,7 +192,7 @@ class JobController:
             raise UnauthorizedError()
 
         job = storage.get(Job, job_id)
-        if not job or job.recruiter_id != user_id:
+        if not job:
             raise ValueError("Job not found")
 
         skill = storage.get(Skill, skill_id)
@@ -234,7 +234,7 @@ class JobController:
             raise UnauthorizedError()
 
         job = storage.get(Job, job_id)
-        if not job or job.recruiter_id != user_id:
+        if not job:
             raise ValueError("Job not found")
 
         skill = storage.get(Skill, skill_id)
