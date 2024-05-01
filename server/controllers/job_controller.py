@@ -59,6 +59,7 @@ class JobController:
             job_description=data["job_description"],
             exper_years=data.get("exper_years"),
             salary=data.get("salary"),
+            location=data.get("location"),
         )
         storage.new(new_job)
         storage.save()
