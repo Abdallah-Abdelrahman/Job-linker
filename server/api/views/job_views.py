@@ -121,6 +121,56 @@ def delete_job(job_id):
         return make_response_("error", str(e)), 404
 
 
+@job_views.route("/jobs/<job_id>/skills", methods=["POST"])
+@jwt_required()
+def add_skill_to_job(job_id):
+    """
+    Add a skill to a job.
+    The job ID should be provided as a path parameter and the skill ID
+    should be provided in the request body.
+
+    Returns:
+        A success message and the updated list of skill IDs for the job.
+    """
+    user_id = get_jwt_identity()
+    skill_id = request.json.get("skill_id")
+    try:
+        job = job_controller.add_skill(user_id, job_id, skill_id)
+        return make_response_(
+            "success",
+            "Skill added successfully",
+            {"id": job.id, "skills": [skill.id for skill in job.skills]},
+        )
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
+
+
+@job_views.route("/jobs/<job_id>/skills/<skill_id>", methods=["DELETE"])
+@jwt_required()
+def remove_skill_from_job(job_id, skill_id):
+    """
+    Remove a skill from a job.
+    The job ID and skill ID should be provided as path parameters.
+
+    Returns:
+        A success message and the updated list of skill IDs for the job.
+    """
+    user_id = get_jwt_identity()
+    try:
+        job = job_controller.remove_skill(user_id, job_id, skill_id)
+        return make_response_(
+            "success",
+            "Skill removed successfully",
+            {"id": job.id, "skills": [skill.id for skill in job.skills]},
+        )
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
+
+
 @job_views.route("/jobs", methods=["GET"])
 @jwt_required()
 def get_jobs():

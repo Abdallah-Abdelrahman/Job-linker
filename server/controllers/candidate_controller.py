@@ -10,8 +10,10 @@ from server.exception import UnauthorizedError
 from server.models import storage
 from server.models.candidate import Candidate
 from server.models.job import Job
+from server.models.language import Language
 from server.models.major import Major
 from server.models.recruiter import Recruiter
+from server.models.skill import Skill
 from server.models.user import User
 
 
@@ -168,6 +170,170 @@ class CandidateController:
         # Delete candidate
         storage.delete(candidate)
         storage.save()
+
+    def add_skill(self, user_id, skill_id):
+        """
+        Adds a skill to the candidate's profile.
+
+        Args:
+            user_id (str): The ID of the user.
+            skill_id (str): The ID of the skill to be added.
+
+        Returns:
+            Candidate: The updated candidate object.
+
+        Raises:
+            ValueError: If the user ID or skill ID is not provided, or if
+            the candidate or skill does not exist, or if the skill is
+            already added.
+            UnauthorizedError: If the user is not a candidate.
+        """
+        if not user_id or not skill_id:
+            raise ValueError("User ID and Skill ID must be provided")
+
+        user = storage.get(User, user_id)
+        if not user or user.role != "candidate":
+            raise UnauthorizedError()
+
+        candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+        if not candidate:
+            raise ValueError("Candidate not found")
+
+        skill = storage.get(Skill, skill_id)
+        if not skill:
+            raise ValueError("Skill not found")
+
+        if skill in candidate.skills:
+            raise ValueError("Skill already added")
+
+        # Add skill to candidate
+        candidate.skills.append(skill)
+        storage.save()
+
+        return candidate
+
+    def remove_skill(self, user_id, skill_id):
+        """
+        Removes a skill from the candidate's profile.
+
+        Args:
+            user_id (str): The ID of the user.
+            skill_id (str): The ID of the skill to be removed.
+
+        Returns:
+            Candidate: The updated candidate object.
+
+        Raises:
+            ValueError: If the user ID or skill ID is not provided, or
+            if the candidate or skill does not exist, or if the skill is
+            not already removed.
+            UnauthorizedError: If the user is not a candidate.
+        """
+        if not user_id or not skill_id:
+            raise ValueError("User ID and Skill ID must be provided")
+
+        user = storage.get(User, user_id)
+        if not user or user.role != "candidate":
+            raise UnauthorizedError()
+
+        candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+        if not candidate:
+            raise ValueError("Candidate not found")
+
+        skill = storage.get(Skill, skill_id)
+        if not skill:
+            raise ValueError("Skill not found")
+
+        if skill not in candidate.skills:
+            raise ValueError("Skill already removed")
+
+        # Remove skill from candidate
+        candidate.skills.remove(skill)
+        storage.save()
+
+        return candidate
+
+    def add_language(self, user_id, lang_id):
+        """
+        Adds a language to the candidate's profile.
+
+        Args:
+            user_id (str): The ID of the user.
+            lang_id (str): The ID of the language to be added.
+
+        Returns:
+            Candidate: The updated candidate object.
+
+        Raises:
+            ValueError: If the user ID or language ID is not provided,
+            or if the candidate or language does not exist, or if the
+            language is already added.
+            UnauthorizedError: If the user is not a candidate.
+        """
+        if not user_id or not lang_id:
+            raise ValueError("User ID and Language ID must be provided")
+
+        user = storage.get(User, user_id)
+        if not user or user.role != "candidate":
+            raise UnauthorizedError()
+
+        candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+        if not candidate:
+            raise ValueError("Candidate not found")
+
+        language = storage.get(Language, lang_id)
+        if not language:
+            raise ValueError("Language not found")
+
+        if language in candidate.languages:
+            raise ValueError("Language already added")
+
+        # Add language to candidate
+        candidate.languages.append(language)
+        storage.save()
+
+        return candidate
+
+    def remove_language(self, user_id, lang_id):
+        """
+        Removes a language from the candidate's profile.
+
+        Args:
+            user_id (str): The ID of the user.
+            lang_id (str): The ID of the language to be removed.
+
+        Returns:
+            Candidate: The updated candidate object.
+
+        Raises:
+            ValueError: If the user ID or language ID is not provided,
+            or if the candidate or language does not exist, or if the
+            language is not already removed.
+            UnauthorizedError: If the user is not a candidate.
+        """
+        if not user_id or not lang_id:
+            raise ValueError("User ID and Language ID must be provided")
+
+        user = storage.get(User, user_id)
+        if not user or user.role != "candidate":
+            raise UnauthorizedError()
+
+        candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+        if not candidate:
+            raise ValueError("Candidate not found")
+
+        language = storage.get(Language, lang_id)
+        if not language:
+            raise ValueError("Language not found")
+
+        if language not in candidate.languages:
+            raise ValueError("Language already removed")
+
+        # Remove language from candidate
+        candidate.languages.remove(language)
+        storage.save()
+
+        return candidate
 
     def recommend_jobs(self, user_id):
         """
