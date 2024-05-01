@@ -112,8 +112,8 @@ class AIService():
 
 
 if __name__ == '__main__':
-    ai = AIService(pdf=f'{getcwd()}/server/jobs/job_desc_front_engineer.pdf')
-    dict_ = ai.to_dict(JOB_PROMPT)
+    ai = AIService(pdf=f'{getcwd()}/server/cv/Abdallah.pdf')
+    dict_ = ai.to_dict(CANDID_PROMPT)
     print(dict_)
     '''
     for pdf in listdir('pdf'):

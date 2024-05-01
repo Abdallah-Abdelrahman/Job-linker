@@ -8,11 +8,12 @@ CANDID_PROMPT = '''\
       major,
       skills:[],
       experiences:[
-        {title,company,start_date,end_date,location,descpription:''}
+        {title,company,start_date,end_date,location,descpription:str}
       ],
-      languages:[]
+      languages:[str]
     }
     Notes:
+    - extract job description for each work experience
     - don't forget to enclose each property in double quotes
     - start_date, end_date should respects this format '%Y-%m-%dT%H:%M:%S.%f'
     '''

@@ -77,6 +77,10 @@ def create_candidate(cv=''):
 
 
 if __name__ == '__main__':
+    new_candid = create_candidate(cv='Abdallah.pdf')
+    print(new_candid.to_dict)
+
+    '''
     for f in listdir(f'{getcwd()}/server/cv'):
         try:
             new_candid = create_candidate(cv=f)
@@ -84,3 +88,4 @@ if __name__ == '__main__':
         except Exception as e:
             storage._DBStorage__session.rollback()
             print('-------->', e)
+    '''

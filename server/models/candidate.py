@@ -60,6 +60,7 @@ class Candidate(BaseModel, Base):
                 "start_date": xp.start_date,
                 "end_date": xp.end_date,
                 "location": xp.location,
+                "description": xp.description,
             }
             for xp in self.experiences
         ]

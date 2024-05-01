@@ -4,6 +4,7 @@ from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import backref, relationship
+from sqlalchemy.dialects.mysql import LONGTEXT
 
 from server.models.base_model import Base, BaseModel
 
