@@ -87,6 +87,7 @@ class JobSchema(Schema):
     recruiter_id = fields.Str(required=False)
     major_id = fields.Str(required=True)
     job_title = fields.Str(required=True)
+    location = fields.Str(required=False)
     job_description = fields.Str(required=True)
     exper_years = fields.Str(required=False)
     salary = fields.Float(required=False)
