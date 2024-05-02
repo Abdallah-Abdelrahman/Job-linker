@@ -3,9 +3,9 @@ This module provides views for the Candidate model in the
 Job-linker application.
 """
 
-from flask import Blueprint, jsonify, request
+from flasgger.utils import swag_from
+from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-
 from server.api.utils import make_response_
 from server.controllers.candidate_controller import CandidateController
 from server.exception import UnauthorizedError
@@ -17,6 +17,7 @@ candidate_controller = CandidateController()
 
 @candidate_views.route("/candidates", methods=["POST"])
 @jwt_required()
+@swag_from("docs/candidate_views/create_candidate.yaml")
 def create_candidate():
     """
     Creates a new candidate.
@@ -30,7 +31,8 @@ def create_candidate():
     try:
         new_candidate = candidate_controller.create_candidate(
                 user_id,
-                request.json)
+                request.json
+                )
         return (
             make_response_(
                 "success",
@@ -47,6 +49,7 @@ def create_candidate():
 
 @candidate_views.route("/candidates/@me", methods=["GET"])
 @jwt_required()
+@swag_from("docs/candidate_views/get_current_candidate.yaml")
 def get_current_candidate():
     """
     Fetches the current candidate's details.
@@ -77,6 +80,7 @@ def get_current_candidate():
 
 @candidate_views.route("/candidates/recommended_jobs", methods=["GET"])
 @jwt_required()
+@swag_from("docs/candidate_views/get_recommended_jobs.yaml")
 def get_recommended_jobs():
     """
     Recommended jobs for the authenticated candidate.
@@ -105,6 +109,7 @@ def get_recommended_jobs():
 
 @candidate_views.route("/candidates/@me", methods=["PUT"])
 @jwt_required()
+@swag_from("docs/candidate_views/update_current_candidate.yaml")
 def update_current_candidate():
     """
     Updates the current candidate's details.
@@ -133,6 +138,7 @@ def update_current_candidate():
 
 @candidate_views.route("/candidates/@me/skills", methods=["POST"])
 @jwt_required()
+@swag_from("docs/candidate_views/add_skill_to_current_candidate.yaml")
 def add_skill_to_current_candidate():
     """
     Add a skill to the current candidate's profile.
@@ -148,10 +154,9 @@ def add_skill_to_current_candidate():
         return make_response_(
             "success",
             "Skill added successfully",
-            {
-                "id": candidate.id,
-                "skills": [skill.id for skill in candidate.skills]
-                },
+            {"id": candidate.id, "skills": [
+                skill.id for skill in candidate.skills
+                ]},
         )
     except UnauthorizedError:
         return make_response_("error", "Unauthorized"), 401
@@ -161,6 +166,7 @@ def add_skill_to_current_candidate():
 
 @candidate_views.route("/candidates/@me/skills/<skill_id>", methods=["DELETE"])
 @jwt_required()
+@swag_from("docs/candidate_views/remove_skill_from_current_candidate.yaml")
 def remove_skill_from_current_candidate(skill_id):
     """
     Remove a skill from the current candidate's profile.
@@ -187,6 +193,7 @@ def remove_skill_from_current_candidate(skill_id):
 
 @candidate_views.route("/candidates/@me/languages", methods=["POST"])
 @jwt_required()
+@swag_from("docs/candidate_views/add_language_to_current_candidate.yaml")
 def add_language_to_current_candidate():
     """
     Add a language to the current candidate's profile.
@@ -218,6 +225,7 @@ def add_language_to_current_candidate():
         methods=["DELETE"]
         )
 @jwt_required()
+@swag_from("docs/candidate_views/remove_language_from_current_candidate.yaml")
 def remove_language_from_current_candidate(lang_id):
     """
     Remove a language from the current candidate's profile.
@@ -245,6 +253,7 @@ def remove_language_from_current_candidate(lang_id):
 
 @candidate_views.route("/candidates/@me", methods=["DELETE"])
 @jwt_required()
+@swag_from("docs/candidate_views/delete_current_candidate.yaml")
 def delete_current_candidate():
     """
     Deletes the current candidate.

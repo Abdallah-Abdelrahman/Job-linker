@@ -1,0 +1,36 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Candidates
+security:
+  - bearerAuth: []
+parameters:
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        major_id:
+          type: string
+          description: The new ID of the major of the candidate
+        skills:
+          type: array
+          items:
+            type: string
+          description: The new IDs of the skills of the candidate
+        languages:
+          type: array
+          items:
+            type: string
+          description: The new IDs of the languages of the candidate
+responses:
+  200:
+    description: Candidate details updated successfully
+  401:
+    description: Unauthorized access
+  400:
+    description: Invalid input

@@ -1,0 +1,21 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Skills
+security:
+  - bearerAuth: []
+parameters:
+  - name: skill_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the skill to delete
+responses:
+  200:
+    description: Skill deleted successfully
+  404:
+    description: Skill not found

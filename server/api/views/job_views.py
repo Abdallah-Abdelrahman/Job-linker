@@ -2,9 +2,9 @@
 This module provides views for the Job model in the Job-linker application.
 """
 
+from flasgger.utils import swag_from
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-
 from server.api.utils import make_response_
 from server.controllers.job_controller import JobController
 from server.controllers.schemas import job_schema
@@ -17,6 +17,7 @@ job_controller = JobController()
 
 @job_views.route("/jobs", methods=["POST"])
 @jwt_required()
+@swag_from("docs/job_views/create_job.yaml")
 def create_job():
     """
     Creates a new job.
@@ -45,6 +46,7 @@ def create_job():
 
 @job_views.route("/jobs/<job_id>", methods=["GET"])
 @jwt_required()
+@swag_from("docs/job_views/get_job.yaml")
 def get_job(job_id):
     """
     Fetches the details of a specific job.
@@ -74,6 +76,7 @@ def get_job(job_id):
 
 @job_views.route("/jobs/<job_id>", methods=["PUT"])
 @jwt_required()
+@swag_from("docs/job_views/update_job.yaml")
 def update_job(job_id):
     """
     Updates the details of a specific job.
@@ -103,6 +106,7 @@ def update_job(job_id):
 
 @job_views.route("/jobs/<job_id>", methods=["DELETE"])
 @jwt_required()
+@swag_from("docs/job_views/delete_job.yaml")
 def delete_job(job_id):
     """
     Deletes a specific job.
@@ -123,6 +127,7 @@ def delete_job(job_id):
 
 @job_views.route("/jobs/<job_id>/skills", methods=["POST"])
 @jwt_required()
+@swag_from("docs/job_views/add_skill_to_job.yaml")
 def add_skill_to_job(job_id):
     """
     Add a skill to a job.
@@ -149,6 +154,7 @@ def add_skill_to_job(job_id):
 
 @job_views.route("/jobs/<job_id>/skills/<skill_id>", methods=["DELETE"])
 @jwt_required()
+@swag_from("docs/job_views/remove_skill_from_job.yaml")
 def remove_skill_from_job(job_id, skill_id):
     """
     Remove a skill from a job.
@@ -173,6 +179,7 @@ def remove_skill_from_job(job_id, skill_id):
 
 @job_views.route("/jobs", methods=["GET"])
 @jwt_required()
+@swag_from("docs/job_views/get_jobs.yaml")
 def get_jobs():
     """
     Fetches all jobs.
@@ -194,6 +201,7 @@ def get_jobs():
 
 @job_views.route("/my_jobs", methods=["GET"])
 @jwt_required()
+@swag_from("docs/job_views/get_my_jobs.yaml")
 def get_my_jobs():
     """
     Fetches all jobs created by the current user.
@@ -216,6 +224,7 @@ def get_my_jobs():
 
 @job_views.route("/jobs/<job_id>/recommended_candidates", methods=["GET"])
 @jwt_required()
+@swag_from("docs/job_views/get_recommended_candidates.yaml")
 def get_recommended_candidates(job_id):
     """
     Fetch recommended candidates for a specific job.

@@ -1,0 +1,15 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Admins
+security:
+  - bearerAuth: []
+responses:
+  200:
+    description: Returns a list of all users
+  401:
+    description: Unauthorized access

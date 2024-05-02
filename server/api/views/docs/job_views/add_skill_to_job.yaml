@@ -1,0 +1,31 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Jobs
+security:
+  - bearerAuth: []
+parameters:
+  - name: job_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the job to add a skill to
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        skill_id:
+          type: string
+          description: The ID of the skill to add
+responses:
+  200:
+    description: Skill added successfully
+  401:
+    description: Unauthorized access
+  400:
+    description: Invalid job ID or skill ID

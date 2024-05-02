@@ -1,0 +1,22 @@
+tags:
+  - Files
+consumes:
+  - multipart/form-data
+parameters:
+  - in: formData
+    name: file
+    type: file
+    required: true
+    description: The file to upload
+  - in: query
+    name: role
+    type: string
+    required: true
+    description: The role of the user (either 'candidate' or 'recruiter')
+responses:
+  201:
+    description: File uploaded successfully
+  400:
+    description: No file part or unsupported file type
+  415:
+    description: Unsupported file type

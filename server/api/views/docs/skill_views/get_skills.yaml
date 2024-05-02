@@ -1,0 +1,15 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Skills
+security:
+  - bearerAuth: []
+responses:
+  200:
+    description: All skills fetched successfully
+  404:
+    description: Skills not found

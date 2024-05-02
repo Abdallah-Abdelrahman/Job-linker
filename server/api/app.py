@@ -2,11 +2,11 @@
 This module sets up the Flask application for the Job-linker application.
 """
 
+from flasgger import Swagger
 from flask import Flask, g
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, get_jwt_identity, jwt_required
-
 from server.api.utils import make_response_
 from server.config import ApplicationConfig
 from server.controllers.user_controller import UserController
@@ -19,6 +19,13 @@ app.url_map.strict_slashes = False
 
 CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "*"}})
 jwt = JWTManager(app)
+
+swagger = Swagger(app)
+swagger.config["title"] = "Job Linker API"
+swagger.config["version"] = "0.0.1"
+swagger.config[
+        "description"
+        ] = "API End-points to interact with the application"
 
 
 def create_app():

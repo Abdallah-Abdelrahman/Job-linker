@@ -1,0 +1,23 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - WorkExperiences
+security:
+  - bearerAuth: []
+parameters:
+  - name: major_id
+    in: path
+    type: string
+    required: false
+    description: The ID of the major to fetch related work experiences. If None, all work experiences are fetched.
+responses:
+  200:
+    description: All work experiences or work experiences related to a specific major fetched successfully
+  403:
+    description: Unauthorized access
+  404:
+    description: Work experiences not found
