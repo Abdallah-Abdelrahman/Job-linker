@@ -3,9 +3,9 @@ This module provides views for the Application model in the
 Job-linker application.
 """
 
+from flasgger.utils import swag_from
 from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-
 from server.api.utils import make_response_
 from server.controllers.application_controller import ApplicationsController
 from server.controllers.schemas import application_schema
@@ -18,6 +18,7 @@ applications_controller = ApplicationsController()
 
 @application_views.route("/applications", methods=["POST"])
 @jwt_required()
+@swag_from("docs/application_views/create_application.yaml")
 def create_application():
     """
     Create a new job application.
@@ -50,6 +51,7 @@ def create_application():
 
 @application_views.route("/applications/<application_id>", methods=["PUT"])
 @jwt_required()
+@swag_from("docs/application_views/update_application.yaml")
 def update_application(application_id):
     """
     Update an existing job application.
@@ -90,6 +92,7 @@ def update_application(application_id):
 )
 @application_views.route("/applications/<application_id>", methods=["GET"])
 @jwt_required()
+@swag_from("docs/application_views/get_application.yaml")
 def get_application(application_id):
     """
     Fetch one or all job applications.
@@ -130,6 +133,7 @@ def get_application(application_id):
 
 @application_views.route("/applications/<application_id>", methods=["DELETE"])
 @jwt_required()
+@swag_from("docs/application_views/delete_application.yaml")
 def delete_application(application_id):
     """
     Delete a job application.

@@ -1,0 +1,15 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Languages
+security:
+  - bearerAuth: []
+responses:
+  200:
+    description: All languages fetched successfully
+  404:
+    description: Languages not found

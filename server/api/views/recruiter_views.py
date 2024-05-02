@@ -3,9 +3,9 @@ This module provides views for the Recruiter model in the
 Job-linker application.
 """
 
+from flasgger.utils import swag_from
 from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
-
 from server.api.utils import make_response_
 from server.controllers.recruiter_controller import RecruiterController
 
@@ -16,6 +16,7 @@ recruiter_controller = RecruiterController()
 
 @recruiter_views.route("/recruiters", methods=["POST"])
 @jwt_required()
+@swag_from("docs/recruiter_views/create_recruiter.yaml")
 def create_recruiter():
     """
     Creates a new recruiter.
@@ -45,6 +46,7 @@ def create_recruiter():
 
 @recruiter_views.route("/recruiters/@me", methods=["GET"])
 @jwt_required()
+@swag_from("docs/recruiter_views/get_current_recruiter.yaml")
 def get_current_recruiter():
     """
     Fetches the current recruiter's details.
@@ -72,6 +74,7 @@ def get_current_recruiter():
 
 @recruiter_views.route("/recruiters/@me", methods=["PUT"])
 @jwt_required()
+@swag_from("docs/recruiter_views/update_current_recruiter.yaml")
 def update_current_recruiter():
     """
     Updates the current recruiter's details.

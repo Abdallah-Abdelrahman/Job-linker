@@ -1,0 +1,41 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Jobs
+security:
+  - bearerAuth: []
+parameters:
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        major_id:
+          type: string
+          description: The ID of the major required for the job
+        job_title:
+          type: string
+          description: The title of the job
+        job_description:
+          type: string
+          description: The description of the job
+        exper_years:
+          type: integer
+          description: The years of experience required for the job
+        salary:
+          type: number
+          description: The salary for the job
+        location:
+          type: string
+          description: The location of the job
+responses:
+  201:
+    description: Job created successfully
+  401:
+    description: Unauthorized access
+  400:
+    description: Invalid input or major not found

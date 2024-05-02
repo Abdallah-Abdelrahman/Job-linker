@@ -3,9 +3,9 @@ This module provides views for the Adminstrator in the
 Job-linker application.
 """
 
+from flasgger.utils import swag_from
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
-
 from server.api.utils import make_response_
 from server.controllers.admin_controller import AdminController
 from server.exception import UnauthorizedError
@@ -17,6 +17,7 @@ admin_controller = AdminController()
 
 @admin_views.route("/admin/users", methods=["GET"])
 @jwt_required()
+@swag_from("docs/admin_views/get_all_users.yaml")
 def get_all_users():
     """
     Endpoint to get all users.
@@ -31,6 +32,7 @@ def get_all_users():
 
 @admin_views.route("/admin/users/<user_id>", methods=["DELETE"])
 @jwt_required()
+@swag_from("docs/admin_views/delete_user.yaml")
 def delete_user(user_id):
     """
     Endpoint to delete a specific user.
@@ -47,6 +49,7 @@ def delete_user(user_id):
 
 @admin_views.route("/admin/users/<user_id>/disable", methods=["PUT"])
 @jwt_required()
+@swag_from("docs/admin_views/disable_user.yaml")
 def disable_user(user_id):
     """
     Endpoint to disable a specific user.
@@ -63,6 +66,7 @@ def disable_user(user_id):
 
 @admin_views.route("/admin/users/<user_id>/enable", methods=["PUT"])
 @jwt_required()
+@swag_from("docs/admin_views/enable_user.yaml")
 def enable_user(user_id):
     """
     Endpoint to enable a specific user.
@@ -79,6 +83,7 @@ def enable_user(user_id):
 
 @admin_views.route("/admin/users/<user_id>/role", methods=["PUT"])
 @jwt_required()
+@swag_from("docs/admin_views/change_user_role.yaml")
 def change_user_role(user_id):
     """
     Endpoint to change the role of a specific user.
@@ -96,6 +101,7 @@ def change_user_role(user_id):
 
 @admin_views.route("/admin/stats", methods=["GET"])
 @jwt_required()
+@swag_from("docs/admin_views/get_sys_statistics.yaml")
 def get_sys_statistics():
     """
     Endpoint to get system statistics.

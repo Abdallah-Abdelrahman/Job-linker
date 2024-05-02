@@ -1,6 +1,7 @@
 """
 This module provides views for the User model in the Job-linker application.
 """
+from flasgger.utils import swag_from
 from flask import Blueprint, request
 from flask_jwt_extended import (
     create_access_token,
@@ -8,7 +9,6 @@ from flask_jwt_extended import (
     jwt_required,
     set_refresh_cookies,
 )
-
 from server.api.utils import make_response_
 from server.decorators import verified_required
 from server.exception import UnauthorizedError
@@ -31,6 +31,7 @@ def setup(controller):
 
 
 @user_views.route("/register", methods=["POST"])
+@swag_from("docs/user_views/register_user.yaml")
 def register_user():
     """
     Registers a new user.
@@ -54,6 +55,7 @@ def register_user():
 
 
 @user_views.route("/verify", methods=["GET"])
+@swag_from("docs/user_views/verify_email.yaml")
 def verify_email():
     """
     Verifies a user's email.
@@ -81,6 +83,7 @@ def verify_email():
 
 
 @user_views.route("/login", methods=["POST"])
+@swag_from("docs/user_views/login_user.yaml")
 def login_user():
     """
     Logs in a user.
@@ -111,6 +114,7 @@ def login_user():
 
 @user_views.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True, locations="cookies")
+@swag_from("docs/user_views/refresh_token.yaml")
 def refresh_token():
     """
     Route to refresh the JWT token for a user.
@@ -137,6 +141,7 @@ def refresh_token():
 @user_views.route("/logout", methods=["POST"])
 @jwt_required()
 @verified_required
+@swag_from("docs/user_views/logout_user.yaml")
 def logout_user():
     """
     Logs out a user.
@@ -150,6 +155,7 @@ def logout_user():
 @user_views.route("/@me")
 @jwt_required()
 @verified_required
+@swag_from("docs/user_views/get_current_user.yaml")
 def get_current_user():
     """
     Fetches the current user's details.
@@ -174,6 +180,7 @@ def get_current_user():
 @user_views.route("/@me", methods=["PUT"])
 @jwt_required()
 @verified_required
+@swag_from("docs/user_views/update_current_user.yaml")
 def update_current_user():
     """
     Updates the current user's details.
@@ -198,6 +205,7 @@ def update_current_user():
 @user_views.route("/@me", methods=["DELETE"])
 @jwt_required()
 @verified_required
+@swag_from("docs/user_views/delete_current_user.yaml")
 def delete_current_user():
     """
     Deletes the current user.

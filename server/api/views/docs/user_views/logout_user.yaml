@@ -1,0 +1,13 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Users
+security:
+  - bearerAuth: []
+responses:
+  200:
+    description: Logged out successfully

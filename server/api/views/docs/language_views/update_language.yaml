@@ -1,0 +1,31 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Languages
+security:
+  - bearerAuth: []
+parameters:
+  - name: language_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the language to update
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The new name of the language
+responses:
+  200:
+    description: Language details updated successfully
+  401:
+    description: Unauthorized access
+  400:
+    description: Invalid language ID or input
