@@ -155,10 +155,22 @@ class ApplicationsController:
         if not candidate:
             raise UnauthorizedError("You are not a candidate")
 
-        # Get the job by title
-        job = storage.get_by_attr(Job, "job_title", data.get("job_title"))
+        # Get the job by id
+        job = storage.get_by_attr(Job, "id", data.get("job_id"))
         if not job:
             raise ValueError("Job not found")
+
+        # Check if the candidate has already applied for this job
+        existing_application = storage.get_by_attr(
+                Application,
+                "job_id",
+                job.id
+                )
+        if (
+                existing_application and
+                existing_application.candidate_id == candidate.id
+                ):
+            raise ValueError("You have already applied for this job")
 
         # Create new application with default status "applied"
         new_application = Application(
@@ -246,12 +258,12 @@ class ApplicationsController:
         # Check if user is candidate who applied or the recruiter for the job
         if (
                 user.role == "candidate" and
-                application.candidate_id != user_id
+                application.candidate_id != user.candidate.id
                 ):
             raise UnauthorizedError("Unauthorized")
         elif (
                 user.role == "recruiter" and
-                application.job.recruiter_id != user_id
+                application.job.recruiter_id != user.recruiter.id
                 ):
             raise UnauthorizedError("Unauthorized")
 
