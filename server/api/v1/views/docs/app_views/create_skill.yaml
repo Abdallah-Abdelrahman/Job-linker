@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Skills
+summary: Create a new skill
+description: Endpoint to create a new skill. Returns a response object containing the status, message, and skill data if successful. Otherwise, it returns an error message.
+operationId: createSkill
 security:
   - bearerAuth: []
 parameters:

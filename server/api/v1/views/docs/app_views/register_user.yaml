@@ -1,5 +1,8 @@
 tags:
   - Users
+summary: Register a new user
+description: Endpoint to register a new user. Returns a response object containing the status, message, and user data if successful. Otherwise, it returns an error message.
+operationId: registerUser
 parameters:
   - in: body
     name: body

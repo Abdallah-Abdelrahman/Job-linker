@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Jobs
+summary: Create a new job, Recruiters Only.
+description: Endpoint to create a new job. Returns a response object containing the status, message, and job data if successful. Otherwise, it returns an error message. Only accessible by recruiters.
+operationId: createJob
 security:
   - bearerAuth: []
 parameters:

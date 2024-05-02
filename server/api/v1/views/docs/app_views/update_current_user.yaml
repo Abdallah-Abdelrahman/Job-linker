@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Users
+summary: Update the current user's details
+description: Endpoint to update the current user's details. Returns a response object containing the status, message, and user data if successful. Otherwise, it returns an error message.
+operationId: updateCurrentUser
 security:
   - bearerAuth: []
 parameters:
