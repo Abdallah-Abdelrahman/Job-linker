@@ -1,0 +1,23 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Jobs
+security:
+  - bearerAuth: []
+parameters:
+  - name: job_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the job to delete
+responses:
+  200:
+    description: Job deleted successfully
+  401:
+    description: Unauthorized access
+  404:
+    description: Job not found

@@ -28,6 +28,7 @@ class RegistrationSchema(Schema):
     role = fields.Str(
         required=True, validate=validate.OneOf(["candidate", "recruiter"])
     )
+    is_admin = fields.Bool(required=False)
 
 
 registration_schema = RegistrationSchema()
@@ -39,11 +40,6 @@ class UpdateUserSchema(Schema):
     """
 
     name = fields.Str(required=False)
-    email = fields.Email(required=False)
-    password = fields.Str(required=False)
-    role = fields.Str(
-        required=False, validate=validate.OneOf(["candidate", "recruiter"])
-    )
     contact_info = fields.Str(required=False)
     bio = fields.Str(required=False)
     image_url = fields.Str(required=False)
@@ -86,6 +82,7 @@ class JobSchema(Schema):
     recruiter_id = fields.Str(required=False)
     major_id = fields.Str(required=True)
     job_title = fields.Str(required=True)
+    location = fields.Str(required=False)
     job_description = fields.Str(required=True)
     exper_years = fields.Str(required=False)
     salary = fields.Float(required=False)

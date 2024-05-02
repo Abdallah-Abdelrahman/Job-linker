@@ -2,7 +2,8 @@
 This module provides views for the Job model in the Job-linker application.
 """
 
-from flask import Blueprint, jsonify, request
+from flasgger.utils import swag_from
+from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from server.api.utils import make_response_
@@ -17,6 +18,7 @@ job_controller = JobController()
 
 @job_views.route("/jobs", methods=["POST"])
 @jwt_required()
+@swag_from("docs/job_views/create_job.yaml")
 def create_job():
     """
     Creates a new job.
@@ -45,6 +47,7 @@ def create_job():
 
 @job_views.route("/jobs/<job_id>", methods=["GET"])
 @jwt_required()
+@swag_from("docs/job_views/get_job.yaml")
 def get_job(job_id):
     """
     Fetches the details of a specific job.
@@ -74,6 +77,7 @@ def get_job(job_id):
 
 @job_views.route("/jobs/<job_id>", methods=["PUT"])
 @jwt_required()
+@swag_from("docs/job_views/update_job.yaml")
 def update_job(job_id):
     """
     Updates the details of a specific job.
@@ -103,6 +107,7 @@ def update_job(job_id):
 
 @job_views.route("/jobs/<job_id>", methods=["DELETE"])
 @jwt_required()
+@swag_from("docs/job_views/delete_job.yaml")
 def delete_job(job_id):
     """
     Deletes a specific job.
@@ -121,8 +126,61 @@ def delete_job(job_id):
         return make_response_("error", str(e)), 404
 
 
+@job_views.route("/jobs/<job_id>/skills", methods=["POST"])
+@jwt_required()
+@swag_from("docs/job_views/add_skill_to_job.yaml")
+def add_skill_to_job(job_id):
+    """
+    Add a skill to a job.
+    The job ID should be provided as a path parameter and the skill ID
+    should be provided in the request body.
+
+    Returns:
+        A success message and the updated list of skill IDs for the job.
+    """
+    user_id = get_jwt_identity()
+    skill_id = request.json.get("skill_id")
+    try:
+        job = job_controller.add_skill(user_id, job_id, skill_id)
+        return make_response_(
+            "success",
+            "Skill added successfully",
+            {"id": job.id, "skills": [skill.id for skill in job.skills]},
+        )
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
+
+
+@job_views.route("/jobs/<job_id>/skills/<skill_id>", methods=["DELETE"])
+@jwt_required()
+@swag_from("docs/job_views/remove_skill_from_job.yaml")
+def remove_skill_from_job(job_id, skill_id):
+    """
+    Remove a skill from a job.
+    The job ID and skill ID should be provided as path parameters.
+
+    Returns:
+        A success message and the updated list of skill IDs for the job.
+    """
+    user_id = get_jwt_identity()
+    try:
+        job = job_controller.remove_skill(user_id, job_id, skill_id)
+        return make_response_(
+            "success",
+            "Skill removed successfully",
+            {"id": job.id, "skills": [skill.id for skill in job.skills]},
+        )
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
+
+
 @job_views.route("/jobs", methods=["GET"])
 @jwt_required()
+@swag_from("docs/job_views/get_jobs.yaml")
 def get_jobs():
     """
     Fetches all jobs.
@@ -135,7 +193,7 @@ def get_jobs():
     try:
         jobs = job_controller.get_jobs(user_id)
         jobs_data = [job_schema.dump(job) for job in jobs]
-        return jsonify(jobs_data), 200
+        return make_response_("success", "Fetched all jobs", jobs_data), 200
     except UnauthorizedError as e:
         return make_response_("error", str(e)), 403
     except ValueError as e:
@@ -144,6 +202,7 @@ def get_jobs():
 
 @job_views.route("/my_jobs", methods=["GET"])
 @jwt_required()
+@swag_from("docs/job_views/get_my_jobs.yaml")
 def get_my_jobs():
     """
     Fetches all jobs created by the current user.
@@ -157,8 +216,48 @@ def get_my_jobs():
     try:
         jobs = job_controller.get_my_jobs(user_id)
         jobs_data = [job_schema.dump(job) for job in jobs]
-        return jsonify(jobs_data), 200
+        return make_response_("success", "Fetched my jobs", jobs_data), 200
     except UnauthorizedError as e:
         return make_response_("error", str(e)), 403
     except ValueError as e:
         return make_response_("error", str(e)), 404
+
+
+@job_views.route("/jobs/<job_id>/recommended_candidates", methods=["GET"])
+@jwt_required()
+@swag_from("docs/job_views/get_recommended_candidates.yaml")
+def get_recommended_candidates(job_id):
+    """
+    Fetch recommended candidates for a specific job.
+
+    This endpoint returns a list of candidates that are recommended for
+    the specified job based on the job's required skills and major. The
+    user must be authenticated and have the role of a recruiter.
+
+    Args:
+        job_id: The ID of the job to fetch recommendations for.
+
+    Returns:
+        A JSON response containing the recommended candidates, or an error
+        message if the candidates could not be fetched.
+    """
+    user_id = get_jwt_identity()
+    try:
+        # Fetch the recommended candidates
+        rec_candidates = job_controller.recommend_candidates(
+                job_id,
+                user_id
+                )
+
+        # Convert the recommended candidates to JSON and return them
+        return make_response_(
+            "success",
+            "Recommended Candidates based on Major & Skills",
+            {"candidates": [
+                candidate.to_dict for candidate in rec_candidates
+                ]},
+        )
+    except UnauthorizedError:
+        return make_response_("error", "Unauthorized"), 401
+    except ValueError as e:
+        return make_response_("error", str(e)), 400

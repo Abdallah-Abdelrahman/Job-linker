@@ -1,0 +1,28 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Jobs
+security:
+  - bearerAuth: []
+parameters:
+  - name: job_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the job to remove a skill from
+  - name: skill_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the skill to remove
+responses:
+  200:
+    description: Skill removed successfully
+  401:
+    description: Unauthorized access
+  400:
+    description: Invalid job ID or skill ID

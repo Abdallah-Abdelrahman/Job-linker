@@ -1,3 +1,8 @@
+"""
+This module provides a controller for the Application model in the
+Job-linker application.
+"""
+
 from marshmallow import ValidationError
 
 from server.controllers.schemas import application_schema
@@ -11,10 +16,37 @@ from server.models.user import User
 
 
 class ApplicationsController:
+    """
+    Controller for handling operations related to applications.
+    """
+
     def __init__(self):
+        """
+        Initialize the ApplicationsController.
+        """
         pass
 
     def get_application(self, user_id, application_id=None):
+        """
+        Get an application or a list of applications based on the user's role.
+
+        If the user is a recruiter, return all applications for their jobs.
+        If the user is a candidate, return all their applications.
+        If an application_id is provided, return the specific application.
+
+        Args:
+            user_id (str): The ID of the user.
+            application_id (str, optional): The ID of the application.
+            Defaults to None.
+
+        Raises:
+            UnauthorizedError: If the user does not exist or does not have
+            the correct role.
+            ValueError: If the application does not exist.
+
+        Returns:
+            list: A list of dictionaries representing the applications.
+        """
         # Get user
         user = storage.get(User, user_id)
         if not user:
@@ -24,8 +56,13 @@ class ApplicationsController:
             # If user is a recruiter, return all applications for their jobs
             if user.role == "recruiter":
                 recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
+                jobs = storage.get_all_by_attr(
+                        Job,
+                        "recruiter_id",
+                        recruiter.id
+                        )
                 applications = [
-                    app for job in recruiter.jobs for app in job.applications
+                    app for job in jobs for app in job.applications
                 ]
             # If user is a candidate, return all their applications
             elif user.role == "candidate":
@@ -41,9 +78,15 @@ class ApplicationsController:
 
             # Check if user is the candidate who applied or the
             # recruiter for the job
-            if user.role == "candidate" and application.candidate_id != user_id:
+            if (
+                    user.role == "candidate" and
+                    application.candidate_id != user.candidate.id
+                    ):
                 raise UnauthorizedError("Unauthorized")
-            elif user.role == "recruiter" and application.job.recruiter_id != user_id:
+            elif (
+                    user.role == "recruiter" and
+                    application.job.recruiter_id != user.recruiter.id
+                    ):
                 raise UnauthorizedError("Unauthorized")
 
             applications = [application]
@@ -52,20 +95,30 @@ class ApplicationsController:
         response = []
         for application in applications:
             if user.role == "candidate":
+                job_id = application.job.id
+                app_job = storage.get(Job, job_id)
+                recruiter_id = app_job.to_dict['recruiter_id']
+                recruiter = storage.get(Recruiter, recruiter_id)
                 response.append(
                     {
+                        "application_id": application.id,
+                        "job_id": application.job.id,
                         "job_title": application.job.job_title,
                         "application_status": application.application_status,
-                        "company_name": application.job.recruiter.company_name,
+                        "company_name": recruiter.company_name,
+                        "salary": application.job.salary,
                     }
                 )
             elif user.role == "recruiter":
                 response.append(
                     {
+                        "application_id": application.id,
                         "job_title": application.job.job_title,
                         "candidate_name": application.candidate.user.name,
+                        "candidate_email": application.candidate.user.email,
                         "candidate_experience": [
-                            exp.title for exp in application.candidate.experiences
+                            exp.title for exp in
+                            application.candidate.experiences
                         ],
                         "application_status": application.application_status,
                     }
@@ -73,6 +126,24 @@ class ApplicationsController:
         return response
 
     def create_application(self, user_id, data):
+        """
+        Create a new application.
+
+        Validate the provided data, check if the user is a candidate,
+        get the job by title, and create a new application with default
+        status "applied".
+
+        Args:
+            user_id (str): The ID of the user.
+            data (dict): The data for the new application.
+
+        Raises:
+            ValueError: If the data is not valid or the job does not exist.
+            UnauthorizedError: If the user is not a candidate.
+
+        Returns:
+            Application: The newly created application.
+        """
         # Validate data
         try:
             data = application_schema.load(data)
@@ -101,6 +172,25 @@ class ApplicationsController:
         return new_application
 
     def update_application(self, user_id, application_id, data):
+        """
+        Update an existing application.
+
+        Validate the provided data, check if the user is a recruiter,
+        get the application by ID, and update the application's attributes.
+
+        Args:
+            user_id (str): The ID of the user.
+            application_id (str): The ID of the application.
+            data (dict): The new data for the application.
+
+        Raises:
+            ValueError: If the data is not valid or the application does
+            not exist.
+            UnauthorizedError: If the user is not a recruiter.
+
+        Returns:
+            Application: The updated application.
+        """
         # Validate data
         try:
             data = application_schema.load(data)
@@ -124,6 +214,25 @@ class ApplicationsController:
         return application
 
     def delete_application(self, user_id, application_id):
+        """
+        Delete an existing application.
+
+        Get the user and the application by ID, check if the user is the
+        candidate who applied
+        or the recruiter for the job, and delete the application.
+
+        Args:
+            user_id (str): The ID of the user.
+            application_id (str): The ID of the application.
+
+        Raises:
+            ValueError: If the application does not exist.
+            UnauthorizedError: If the user does not exist or does not have the
+            correct role.
+
+        Returns:
+            None
+        """
         # Get user
         user = storage.get(User, user_id)
         if not user:
@@ -134,10 +243,16 @@ class ApplicationsController:
         if not application:
             raise ValueError("Application not found")
 
-        # Check if user is the candidate who applied or the recruiter for the job
-        if user.role == "candidate" and application.candidate_id != user_id:
+        # Check if user is candidate who applied or the recruiter for the job
+        if (
+                user.role == "candidate" and
+                application.candidate_id != user_id
+                ):
             raise UnauthorizedError("Unauthorized")
-        elif user.role == "recruiter" and application.job.recruiter_id != user_id:
+        elif (
+                user.role == "recruiter" and
+                application.job.recruiter_id != user_id
+                ):
             raise UnauthorizedError("Unauthorized")
 
         # Delete application

@@ -1,0 +1,23 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Jobs
+security:
+  - bearerAuth: []
+parameters:
+  - name: job_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the job to fetch recommendations for
+responses:
+  200:
+    description: Recommended candidates fetched successfully
+  401:
+    description: Unauthorized access
+  400:
+    description: Invalid job ID

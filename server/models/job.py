@@ -19,6 +19,7 @@ class Job(BaseModel, Base):
     major_id = Column(String(60), ForeignKey("majors.id"), nullable=False)
     job_title = Column(String(100), nullable=False)
     job_description = Column(String(500), nullable=False)
+    location = Column(String(128), nullable=True)
     exper_years = Column(String(128), nullable=True)
     salary = Column(Numeric(precision=10, scale=2, asdecimal=False))
 
@@ -47,6 +48,7 @@ class Job(BaseModel, Base):
         """Return a dictionary reppresentation of Job"""
         dict_ = super().to_dict
         dict_["skills"] = [s.name for s in self.skills]
+        dict_["major"] = self.major.name
         return dict_
 
     def __repr__(self):

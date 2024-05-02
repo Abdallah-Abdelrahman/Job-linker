@@ -3,7 +3,8 @@ This module provides views for the Language model in the
 Job-linker application.
 """
 
-from flask import Blueprint, jsonify, request
+from flasgger.utils import swag_from
+from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from server.api.utils import make_response_
@@ -18,6 +19,7 @@ language_controller = LanguageController()
 
 @language_views.route("/languages", methods=["GET"])
 @jwt_required()
+@swag_from("docs/language_views/get_languages.yaml")
 def get_languages():
     """
     Fetches all languages.
@@ -31,13 +33,18 @@ def get_languages():
         languages_data = [
                 language_schema.dump(language) for language in languages
                 ]
-        return jsonify(languages_data), 200
+        return make_response_(
+                "success",
+                "Fetched all languages",
+                languages_data
+                ), 200
     except ValueError as e:
         return make_response_("error", str(e)), 404
 
 
 @language_views.route("/languages", methods=["POST"])
 @jwt_required()
+@swag_from("docs/language_views/create_language.yaml")
 def create_language():
     """
     Creates a new language.
@@ -69,6 +76,7 @@ def create_language():
 
 @language_views.route("/languages/<language_id>", methods=["PUT"])
 @jwt_required()
+@swag_from("docs/language_views/update_language.yaml")
 def update_language(language_id):
     """
     Updates the details of a specific language.
@@ -96,6 +104,7 @@ def update_language(language_id):
 
 @language_views.route("/languages/<language_id>", methods=["DELETE"])
 @jwt_required()
+@swag_from("docs/language_views/delete_language.yaml")
 def delete_language(language_id):
     """
     Deletes a specific language.
