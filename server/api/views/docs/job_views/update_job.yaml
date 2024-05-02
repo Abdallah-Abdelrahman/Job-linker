@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Jobs
+summary: Update the details of a specific job, Recruiters Only.
+description: Endpoint to update the details of a specific job. Returns a response object containing the status, message, and job data if successful. Otherwise, it returns an error message. Only accessible by recruiters.
+operationId: updateJob
 security:
   - bearerAuth: []
 parameters:

@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - WorkExperiences
+summary: Create a new work experience
+description: Endpoint to create a new work experience. Returns a response object containing the status, message, and work experience data if successful. Otherwise, it returns an error message.
+operationId: createWorkExperience
 security:
   - bearerAuth: []
 parameters:

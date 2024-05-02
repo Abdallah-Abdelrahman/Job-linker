@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Admins
+summary: Get all users
+description: Endpoint to get all users. Only accessible by admin users.
+operationId: getAllUsers
 security:
   - bearerAuth: []
 responses:
