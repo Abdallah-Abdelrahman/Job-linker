@@ -376,6 +376,14 @@ class CandidateController:
                 set(candidate_skills).intersection(job_skills)
                 and candidate_major == job_major
             ):
-                recommended_jobs.append(job)
+                # Check if the candidate has applied for this job before
+                has_applied = any(
+                        application.job_id == job.id
+                        for application in candidate.applications
+                        )
+                recommended_jobs.append({
+                    "job": job,
+                    "has_applied": has_applied
+                    })
 
         return recommended_jobs

@@ -99,7 +99,15 @@ def get_recommended_jobs():
         return make_response_(
             "success",
             "Recommended Jobs based on Major & Skills",
-            {"jobs": [job.to_dict for job in rec_jobs]},
+            {
+                "jobs": [
+                    {
+                        "job": job["job"].to_dict,
+                        "has_applied": job["has_applied"]
+                    }
+                    for job in rec_jobs
+                ]
+            },
         )
     except UnauthorizedError:
         return make_response_("error", "Unauthorized"), 401
