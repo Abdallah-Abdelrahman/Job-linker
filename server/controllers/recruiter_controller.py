@@ -7,6 +7,7 @@ from marshmallow import ValidationError
 
 from server.controllers.schemas import recruiter_schema
 from server.models import storage
+from server.models.candidate import Candidate
 from server.models.recruiter import Recruiter
 
 
@@ -35,6 +36,16 @@ class RecruiterController:
         Raises:
             ValueError: If there is a validation error.
         """
+        # Check if user is a candidate
+        existing_candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+        if existing_candidate:
+            raise ValueError("A candidate cannot create a recruiter profile")
+
+        # Check if recruiter already exists
+        existing_recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
+        if existing_recruiter:
+            raise ValueError("Recruiter already exists for this user")
+
         # Validate data
         try:
             data = recruiter_schema.load(data)

@@ -1,0 +1,29 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Skills
+security:
+  - bearerAuth: []
+parameters:
+  - name: skill_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the skill to update
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The new name of the skill
+responses:
+  200:
+    description: Skill details updated successfully
+  400:
+    description: Invalid skill ID or input

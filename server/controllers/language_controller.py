@@ -58,7 +58,7 @@ class LanguageController:
 
         # Check if user is a recruiter
         user = storage.get(User, user_id)
-        if not user or user.role != "recruiter":
+        if not user:
             raise UnauthorizedError("Unauthorized")
 
         # Create new language

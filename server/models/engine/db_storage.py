@@ -16,7 +16,6 @@ from server.models.recruiter import Recruiter
 from server.models.skill import Skill
 from server.models.user import User
 from server.models.work_experience import WorkExperience
-from server.models.language import Language
 
 classes = {
     "Candidate": Candidate,
@@ -111,17 +110,23 @@ class DBStorage:
         if cls:
             return self.__session.query(cls).count()
         else:
-            return sum(self.__session.query(c).count() for c in classes.values())
+            return sum(
+                    self.__session.query(c).count() for c in classes.values()
+                    )
 
     def get_by_attr(self, cls, attr, value):
         """
         Returns the object with the given attribute value,
         None if not found.
         """
-        return self.__session.query(cls).filter(getattr(cls, attr) == value).first()
+        return self.__session.query(cls).filter(
+                getattr(cls, attr) == value
+                ).first()
 
     def get_all_by_attr(self, cls, attr, value):
         """
         Returns all objects of a class with the given attribute value.
         """
-        return self.__session.query(cls).filter(getattr(cls, attr) == value).all()
+        return self.__session.query(cls).filter(
+                getattr(cls, attr) == value
+                ).all()

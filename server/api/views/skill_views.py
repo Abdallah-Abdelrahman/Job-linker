@@ -2,7 +2,8 @@
 This module provides views for the Skill model in the Job-linker application.
 """
 
-from flask import Blueprint, jsonify, request
+from flasgger.utils import swag_from
+from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 
 from server.api.utils import make_response_
@@ -16,6 +17,7 @@ skill_controller = SkillController()
 
 @skill_views.route("/skills", methods=["GET"])
 @jwt_required()
+@swag_from("docs/skill_views/get_skills.yaml")
 def get_skills():
     """
     Fetches all skills.
@@ -27,13 +29,18 @@ def get_skills():
     try:
         skills = skill_controller.get_skills()
         skills_data = [skill_schema.dump(skill) for skill in skills]
-        return jsonify(skills_data), 200
+        return make_response_(
+                "success",
+                "Fetched all skills",
+                skills_data
+                ), 200
     except ValueError as e:
         return make_response_("error", str(e)), 404
 
 
 @skill_views.route("/skills", methods=["POST"])
 @jwt_required()
+@swag_from("docs/skill_views/create_skill.yaml")
 def create_skill():
     """
     Creates a new skill.
@@ -59,6 +66,7 @@ def create_skill():
 
 @skill_views.route("/skills/<skill_id>", methods=["PUT"])
 @jwt_required()
+@swag_from("docs/skill_views/update_skill.yaml")
 def update_skill(skill_id):
     """
     Updates the details of a specific skill.
@@ -81,6 +89,7 @@ def update_skill(skill_id):
 
 @skill_views.route("/skills/<skill_id>", methods=["DELETE"])
 @jwt_required()
+@swag_from("docs/skill_views/delete_skill.yaml")
 def delete_skill(skill_id):
     """
     Deletes a specific skill.

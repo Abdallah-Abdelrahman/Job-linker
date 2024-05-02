@@ -1,0 +1,17 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Jobs
+security:
+  - bearerAuth: []
+responses:
+  200:
+    description: All jobs created by the current user fetched successfully
+  403:
+    description: Unauthorized access
+  404:
+    description: Jobs not found

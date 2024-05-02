@@ -1,19 +1,18 @@
 """
 This module provides views for the User model in the Job-linker application.
 """
+from flasgger.utils import swag_from
 from flask import Blueprint, request
 from flask_jwt_extended import (
     create_access_token,
     get_jwt_identity,
     jwt_required,
-    verify_jwt_in_request,
     set_refresh_cookies,
 )
-from server.exception import UnauthorizedError
 
-from server.config import ApplicationConfig
 from server.api.utils import make_response_
 from server.decorators import verified_required
+from server.exception import UnauthorizedError
 
 user_views = Blueprint("user", __name__)
 
@@ -33,6 +32,7 @@ def setup(controller):
 
 
 @user_views.route("/register", methods=["POST"])
+@swag_from("docs/user_views/register_user.yaml")
 def register_user():
     """
     Registers a new user.
@@ -56,6 +56,7 @@ def register_user():
 
 
 @user_views.route("/verify", methods=["GET"])
+@swag_from("docs/user_views/verify_email.yaml")
 def verify_email():
     """
     Verifies a user's email.
@@ -66,14 +67,14 @@ def verify_email():
     Returns:
         A response object containing the status and message.
     """
-    verf_token = request.query_string.decode('utf8').split('=')[-1]
+    verf_token = request.query_string.decode("utf8").split("=")[-1]
     try:
         jwt, jwt_refresh, user = user_controller.verify_email(verf_token)
 
         resp = make_response_(
             "success",
             "User logged in successfully",
-            { "role": user.role, 'name': user.name, 'jwt': jwt},
+            {"role": user.role, "name": user.name, "jwt": jwt},
         )
 
         set_refresh_cookies(resp, jwt_refresh)
@@ -83,6 +84,7 @@ def verify_email():
 
 
 @user_views.route("/login", methods=["POST"])
+@swag_from("docs/user_views/login_user.yaml")
 def login_user():
     """
     Logs in a user.
@@ -99,12 +101,12 @@ def login_user():
         response_data = make_response_(
             "success",
             "User logged in successfully",
-            { "role": user.role, 'jwt': access_token},
+            {"role": user.role, "jwt": access_token},
         )
     except ValueError as e:
         return make_response_("error", str(e)), 401
     except UnauthorizedError as e:
-        return make_response_('error', str(e)), 200
+        return make_response_("error", str(e)), 200
 
     response = response_data
     set_refresh_cookies(response, refresh_token)
@@ -112,8 +114,19 @@ def login_user():
 
 
 @user_views.route("/refresh", methods=["POST"])
-@jwt_required(refresh=True, locations='cookies')
+@jwt_required(refresh=True, locations="cookies")
+@swag_from("docs/user_views/refresh_token.yaml")
 def refresh_token():
+    """
+    Route to refresh the JWT token for a user.
+
+    This route requires a valid refresh token in the cookies. It creates a new
+    access token for the user and returns it in the response. The user ID is
+    extracted from the current identity in the JWT.
+
+    Returns:
+        Response: A response object with a success message and the new JWT.
+    """
     user_id = get_jwt_identity()
     jwt = create_access_token(identity=user_id)
     return (
@@ -129,6 +142,7 @@ def refresh_token():
 @user_views.route("/logout", methods=["POST"])
 @jwt_required()
 @verified_required
+@swag_from("docs/user_views/logout_user.yaml")
 def logout_user():
     """
     Logs out a user.
@@ -142,6 +156,7 @@ def logout_user():
 @user_views.route("/@me")
 @jwt_required()
 @verified_required
+@swag_from("docs/user_views/get_current_user.yaml")
 def get_current_user():
     """
     Fetches the current user's details.
@@ -153,11 +168,11 @@ def get_current_user():
     """
     user_id = get_jwt_identity()
     try:
-        user = user_controller.get_current_user(user_id)
+        user_data = user_controller.get_current_user(user_id)
         return make_response_(
             "success",
             "User details fetched successfully",
-            {"id": user.id, "role": user.role},
+            user_data,
         )
     except ValueError as e:
         return make_response_("error", str(e)), 401
@@ -166,6 +181,7 @@ def get_current_user():
 @user_views.route("/@me", methods=["PUT"])
 @jwt_required()
 @verified_required
+@swag_from("docs/user_views/update_current_user.yaml")
 def update_current_user():
     """
     Updates the current user's details.
@@ -190,6 +206,7 @@ def update_current_user():
 @user_views.route("/@me", methods=["DELETE"])
 @jwt_required()
 @verified_required
+@swag_from("docs/user_views/delete_current_user.yaml")
 def delete_current_user():
     """
     Deletes the current user.
@@ -204,3 +221,30 @@ def delete_current_user():
         return make_response_("success", "User deleted successfully")
     except ValueError as e:
         return make_response_("error", str(e)), 401
+
+
+@user_views.route("/@me/password", methods=["PUT"])
+@jwt_required()
+@verified_required
+@swag_from("docs/user_views/update_password.yaml")
+def update_password():
+    """
+    Updates the current user's password.
+
+    Returns:
+        A response object containing the status and message.
+        Otherwise, it returns an error message.
+    """
+    user_id = get_jwt_identity()
+    current_password = request.json.get("current_password")
+    new_password = request.json.get("new_password")
+
+    try:
+        user_controller.update_password(
+                user_id,
+                current_password,
+                new_password
+                )
+        return make_response_("success", "Password updated successfully")
+    except ValueError as e:
+        return make_response_("error", str(e)), 400

@@ -1,0 +1,23 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Languages
+security:
+  - bearerAuth: []
+parameters:
+  - name: language_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the language to delete
+responses:
+  200:
+    description: Language deleted successfully
+  401:
+    description: Unauthorized access
+  404:
+    description: Language not found
