@@ -3,8 +3,9 @@ This module provides views for the Job model in the Job-linker application.
 """
 
 from flasgger.utils import swag_from
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
+
 from server.api.utils import make_response_
 from server.controllers.job_controller import JobController
 from server.controllers.schemas import job_schema
@@ -192,7 +193,7 @@ def get_jobs():
     try:
         jobs = job_controller.get_jobs(user_id)
         jobs_data = [job_schema.dump(job) for job in jobs]
-        return jsonify(jobs_data), 200
+        return make_response_("success", "Fetched all jobs", jobs_data), 200
     except UnauthorizedError as e:
         return make_response_("error", str(e)), 403
     except ValueError as e:
@@ -215,7 +216,7 @@ def get_my_jobs():
     try:
         jobs = job_controller.get_my_jobs(user_id)
         jobs_data = [job_schema.dump(job) for job in jobs]
-        return jsonify(jobs_data), 200
+        return make_response_("success", "Fetched my jobs", jobs_data), 200
     except UnauthorizedError as e:
         return make_response_("error", str(e)), 403
     except ValueError as e:
@@ -243,7 +244,10 @@ def get_recommended_candidates(job_id):
     user_id = get_jwt_identity()
     try:
         # Fetch the recommended candidates
-        rec_candidates = job_controller.recommend_candidates(job_id, user_id)
+        rec_candidates = job_controller.recommend_candidates(
+                job_id,
+                user_id
+                )
 
         # Convert the recommended candidates to JSON and return them
         return make_response_(

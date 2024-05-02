@@ -15,8 +15,13 @@ from server.controllers.schemas import (
         )
 from server.exception import UnauthorizedError
 from server.models import storage
+from server.models.candidate import Candidate
+from server.models.recruiter import Recruiter
 from server.models.user import User
+from server.models.job import Job
 from server.services.mail import MailService
+
+ALLOWED_UPDATE_FIELDS = ["name", "contact_info", "bio", "image_url"]
 
 
 class UserController:
@@ -78,10 +83,10 @@ class UserController:
         #         )
         "localhost:5173/verify?token={token}"
         html = (
-                f"<p>Click the following link to verify your email:"
-                f"<a href='http://localhost:5173/verify?token={token}'>"
-                "Verify Email</a></p>"
-                )
+            f"<p>Click the following link to verify your email:"
+            f"<a href='http://localhost:5173/verify?token={token}'>"
+            "Verify Email</a></p>"
+        )
 
         self.email_service.send_mail(html, email, name)
 
@@ -216,9 +221,55 @@ class UserController:
         """
         user = storage.get(User, user_id)
         if not user:
-            raise ValueError("Unauthorized")
+            raise ValueError("User not found")
 
-        return user
+        user_data = user.to_dict
+
+        if user.role == "candidate":
+            candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+            if candidate:
+                user_data["candidate"] = {
+                    "major": candidate.major.to_dict
+                    if candidate.major
+                    else "No major information",
+                    "skills": [skill.to_dict for skill in candidate.skills]
+                    if candidate.skills
+                    else "No skills information",
+                    "languages": [
+                        language.to_dict for language in candidate.languages
+                        ]
+                    if candidate.languages
+                    else "No languages information",
+                    "applications": [
+                        application.to_dict
+                        for application in candidate.applications
+                    ]
+                    if candidate.applications
+                    else "No applications information",
+                    "experiences": [
+                        experience.to_dict
+                        for experience in candidate.experiences
+                    ]
+                    if candidate.experiences
+                    else "No experiences information",
+                }
+        elif user.role == "recruiter":
+            recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
+            jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
+            if recruiter:
+                user_data["recruiter"] = {
+                    "company_name": recruiter.company_name
+                    if recruiter.company_name
+                    else "No company name information",
+                    "company_info": recruiter.company_info
+                    if recruiter.company_info
+                    else "No company info",
+                    "jobs": [job.to_dict for job in jobs]
+                    if jobs
+                    else "No jobs information",
+                }
+
+        return user_data
 
     def update_current_user(self, user_id, data):
         """
@@ -247,7 +298,10 @@ class UserController:
             raise ValueError("Unauthorized")
 
         for key, value in data.items():
-            setattr(user, key, value)
+            if key in ALLOWED_UPDATE_FIELDS:
+                setattr(user, key, value)
+            else:
+                raise ValueError(f"Cannot update field: {key}")
 
         storage.save()
         return user
@@ -268,3 +322,41 @@ class UserController:
 
         storage.delete(user)
         storage.save()
+
+    def update_password(self, user_id, current_password, new_password):
+        """
+        Updates the password of the user.
+
+        Args:
+            user_id: The ID of the user.
+            current_password: The current password of the user.
+            new_password: The new password of the user.
+
+        Returns:
+            The updated user.
+
+        Raises:
+            ValueError: If there is a validation error or the user is
+            unauthorized.
+        """
+        # Get user
+        user = storage.get(User, user_id)
+        if not user:
+            raise ValueError("Unauthorized")
+
+        # Check current password
+        if not self.bcrypt.check_password_hash(
+                user.password,
+                current_password
+                ):
+            raise ValueError("Current password is incorrect")
+
+        # Validate new password
+        if not new_password or len(new_password) < 8:
+            raise ValueError("New password is invalid")
+
+        # Update password
+        user.password = self.bcrypt.generate_password_hash(new_password)
+        storage.save()
+
+        return user

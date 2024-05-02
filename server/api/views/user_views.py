@@ -9,6 +9,7 @@ from flask_jwt_extended import (
     jwt_required,
     set_refresh_cookies,
 )
+
 from server.api.utils import make_response_
 from server.decorators import verified_required
 from server.exception import UnauthorizedError
@@ -167,11 +168,11 @@ def get_current_user():
     """
     user_id = get_jwt_identity()
     try:
-        user = user_controller.get_current_user(user_id)
+        user_data = user_controller.get_current_user(user_id)
         return make_response_(
             "success",
             "User details fetched successfully",
-            {"id": user.id, "role": user.role},
+            user_data,
         )
     except ValueError as e:
         return make_response_("error", str(e)), 401
@@ -220,3 +221,30 @@ def delete_current_user():
         return make_response_("success", "User deleted successfully")
     except ValueError as e:
         return make_response_("error", str(e)), 401
+
+
+@user_views.route("/@me/password", methods=["PUT"])
+@jwt_required()
+@verified_required
+@swag_from("docs/user_views/update_password.yaml")
+def update_password():
+    """
+    Updates the current user's password.
+
+    Returns:
+        A response object containing the status and message.
+        Otherwise, it returns an error message.
+    """
+    user_id = get_jwt_identity()
+    current_password = request.json.get("current_password")
+    new_password = request.json.get("new_password")
+
+    try:
+        user_controller.update_password(
+                user_id,
+                current_password,
+                new_password
+                )
+        return make_response_("success", "Password updated successfully")
+    except ValueError as e:
+        return make_response_("error", str(e)), 400
