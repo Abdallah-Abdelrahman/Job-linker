@@ -1,0 +1,31 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Majors
+security:
+  - bearerAuth: []
+parameters:
+  - name: major_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the major to update
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The new name of the major
+responses:
+  200:
+    description: Major details updated successfully
+  401:
+    description: Unauthorized access
+  400:
+    description: Invalid major ID or input

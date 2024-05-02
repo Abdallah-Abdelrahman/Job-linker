@@ -1,0 +1,42 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - WorkExperiences
+security:
+  - bearerAuth: []
+parameters:
+  - name: work_experience_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the work experience to update
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The new title of the work experience
+        description:
+          type: string
+          description: The new description of the work experience
+        start_date:
+          type: string
+          format: date-time
+          description: The new start date of the work experience
+        end_date:
+          type: string
+          format: date-time
+          description: The new end date of the work experience
+responses:
+  200:
+    description: Work experience details updated successfully
+  401:
+    description: Unauthorized access (user is not a candidate)
+  400:
+    description: Invalid work experience ID, input, or work experience not found

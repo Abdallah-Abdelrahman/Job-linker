@@ -1,0 +1,19 @@
+tags:
+  - Users
+parameters:
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        email:
+          type: string
+          description: The email of the user
+        password:
+          type: string
+          description: The password of the user
+responses:
+  200:
+    description: User logged in successfully
+  401:
+    description: Invalid email or password

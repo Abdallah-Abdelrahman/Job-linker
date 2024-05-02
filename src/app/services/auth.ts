@@ -26,7 +26,7 @@ export interface RegisterRequest {
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: '/api',
+    baseUrl: '/api/v1',
     prepareHeaders: (headers, { getState }) => {
       // By default, if we have a token in the store, let's use that for authenticated requests
       const token = (getState() as RootState).auth.jwt;

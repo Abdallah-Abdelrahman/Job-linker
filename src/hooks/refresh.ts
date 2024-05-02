@@ -9,7 +9,7 @@ function useRefresh() {
     const reloadHandler = (evt) => {
       evt.preventDefault();
       // refresh token
-      fetch('/api/refresh', {
+      fetch('/api/v1/refresh', {
         method: 'POST',
         credentials: 'include',
         headers: { 'X-CSRF-TOKEN': document.cookie.split('=')[1] }

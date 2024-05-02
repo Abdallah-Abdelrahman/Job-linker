@@ -1,0 +1,23 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Majors
+security:
+  - bearerAuth: []
+parameters:
+  - name: major_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the major to delete
+responses:
+  200:
+    description: Major deleted successfully
+  401:
+    description: Unauthorized access
+  404:
+    description: Major not found

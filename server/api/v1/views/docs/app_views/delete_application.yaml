@@ -1,0 +1,23 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Applications
+security:
+  - bearerAuth: []
+parameters:
+  - name: application_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the application to delete
+responses:
+  200:
+    description: Application deleted successfully
+  401:
+    description: Unauthorized access
+  400:
+    description: Invalid application ID or application not found

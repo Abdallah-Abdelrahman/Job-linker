@@ -1,0 +1,26 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Applications
+security:
+  - bearerAuth: []
+parameters:
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        job_id:
+          type: string
+          description: The ID of the job to apply for
+responses:
+  201:
+    description: Application created successfully
+  401:
+    description: Unauthorized access
+  400:
+    description: Invalid input or job not found or already applied
