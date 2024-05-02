@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Jobs
+summary: Fetch recommended candidates for a specific job, Recruiters Only.
+description: Endpoint to fetch recommended candidates for a specific job based on the job's required skills and major. The user must be authenticated and have the role of a recruiter. Returns a JSON response containing the recommended candidates, or an error message if the candidates could not be fetched. Only accessible by recruiters.
+operationId: getRecommendedCandidates
 security:
   - bearerAuth: []
 parameters:

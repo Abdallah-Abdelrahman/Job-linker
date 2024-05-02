@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Applications
+summary: Fetch one or all job applications
+description: Endpoint to fetch the details of one or all job applications. The user must be authenticated. If an application ID is provided, the details of that specific application are returned. If no application ID is provided, the details of all applications are returned. Returns a JSON response containing the details of the fetched application(s), or an error message if the application(s) could not be fetched.
+operationId: getApplication
 security:
   - bearerAuth: []
 parameters:

@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Jobs
+summary: Remove a skill from a job, Recruiters Only.
+description: Endpoint to remove a skill from a job. The job ID and skill ID should be provided as path parameters. Returns a success message and the updated list of skill IDs for the job. Only accessible by recruiters.
+operationId: removeSkillFromJob
 security:
   - bearerAuth: []
 parameters:

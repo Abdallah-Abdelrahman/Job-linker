@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Skills
+summary: Delete a specific skill
+description: Endpoint to delete a specific skill. Returns a response object containing the status and message if successful. Otherwise, it returns an error message.
+operationId: deleteSkill
 security:
   - bearerAuth: []
 parameters:

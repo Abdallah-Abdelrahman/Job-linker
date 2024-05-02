@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Candidates
+summary: Delete the current candidate
+description: Endpoint to delete the current candidate. Returns a response object containing the status and message if successful. Otherwise, it returns an error message.
+operationId: deleteCurrentCandidate
 security:
   - bearerAuth: []
 responses:
