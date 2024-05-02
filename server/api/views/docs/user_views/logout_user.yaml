@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Users
+summary: Log out a user
+description: Endpoint to log out a user. Returns a response object containing the status and message.
+operationId: logoutUser
 security:
   - bearerAuth: []
 responses:

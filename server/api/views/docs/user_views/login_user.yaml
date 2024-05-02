@@ -1,5 +1,8 @@
 tags:
   - Users
+summary: Log in a user
+description: Endpoint to log in a user. Returns a response object containing the status, message, and user data if successful. Otherwise, it returns an error message.
+operationId: loginUser
 parameters:
   - in: body
     name: body

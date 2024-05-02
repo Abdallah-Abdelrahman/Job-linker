@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Skills
+summary: Fetch all skills
+description: Endpoint to fetch all skills. Returns a list of all skills in JSON format if successful. Otherwise, it returns an error message.
+operationId: getSkills
 security:
   - bearerAuth: []
 responses:

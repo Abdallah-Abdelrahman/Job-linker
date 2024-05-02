@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Jobs
+summary: Fetch all jobs
+description: Endpoint to fetch all jobs. Returns a list of all jobs in JSON format if successful. Otherwise, it returns an error message.
+operationId: getJobs
 security:
   - bearerAuth: []
 responses:

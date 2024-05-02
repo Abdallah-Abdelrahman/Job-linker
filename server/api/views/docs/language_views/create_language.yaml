@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Languages
+summary: Create a new language
+description: Endpoint to create a new language. Returns a response object containing the status, message, and language data if successful. Otherwise, it returns an error message.
+operationId: createLanguage
 security:
   - bearerAuth: []
 parameters:

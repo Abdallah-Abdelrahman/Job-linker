@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Candidates
+summary: Get recommended jobs for the authenticated candidate
+description: Endpoint to get recommended jobs for the authenticated candidate based on their skills and major. Returns a JSON response containing the recommended jobs, or an error message if the jobs could not be fetched.
+operationId: getRecommendedJobs
 security:
   - bearerAuth: []
 responses:

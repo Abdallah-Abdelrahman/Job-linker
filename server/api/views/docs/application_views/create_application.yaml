@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Applications
+summary: Create a new job application, Candidates Only.
+description: Endpoint to create a new job application. The user must be authenticated, and the request data must contain the details of the application. Returns a JSON response containing the details of the created application, or an error message if the application could not be created.
+operationId: createApplication
 security:
   - bearerAuth: []
 parameters:

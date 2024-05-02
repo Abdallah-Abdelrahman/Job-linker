@@ -200,7 +200,7 @@ def get_jobs():
         return make_response_("error", str(e)), 404
 
 
-@job_views.route("/my_jobs", methods=["GET"])
+@job_views.route("/jobs/my_jobs", methods=["GET"])
 @jwt_required()
 @swag_from("docs/job_views/get_my_jobs.yaml")
 def get_my_jobs():

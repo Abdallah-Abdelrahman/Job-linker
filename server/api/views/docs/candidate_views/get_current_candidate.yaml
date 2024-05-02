@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Candidates
+summary: Fetch the current candidate's details
+description: Endpoint to fetch the current candidate's details. Returns a response object containing the status, message, and candidate data if successful. Otherwise, it returns an error message.
+operationId: getCurrentCandidate
 security:
   - bearerAuth: []
 responses:
