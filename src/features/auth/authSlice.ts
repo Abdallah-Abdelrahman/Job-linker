@@ -4,28 +4,33 @@ import type { User } from '../../app/services/auth';
 import type { RootState } from '../../app/store';
 
 type AuthState = {
-  user: User | null
-  token: string | null
+  data: {
+    name: string,
+    role: 'recruiter' | 'candidate'
+    jwt: string
+  },
+  message: string,
+  status: string
 }
 
 const slice = createSlice({
   name: 'auth',
-  initialState: { user: null, token: null } as AuthState,
+  initialState: {} as AuthState['data'],
   reducers: {
     setCredentials: (
       state,
       {
-        payload: { user, token },
-      }: PayloadAction<{ user: User; token: string }>,
+        payload,
+      }: PayloadAction<AuthState>,
     ) => {
-      state.user = user;
-      state.token = token;
+      const { message, status, ...rest } = payload;
+      return { ...state, ...rest.data };
     },
   },
 });
 
 export const { setCredentials } = slice.actions;
 
-export const selectCurrentUser = (state: RootState) => state.auth.user;
+export const selectCurrentUser = (state: RootState) => state.auth;
 
 export default slice.reducer;

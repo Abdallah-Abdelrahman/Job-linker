@@ -5,6 +5,7 @@ import { RootState } from '../store'
 export interface User {
   role: string
   name: string
+  email: string
 }
 
 export interface UserResponse {
@@ -28,13 +29,15 @@ export const api = createApi({
     baseUrl: '/api',
     prepareHeaders: (headers, { getState }) => {
       // By default, if we have a token in the store, let's use that for authenticated requests
-      const token = (getState() as RootState).auth.token;
+      const token = (getState() as RootState).auth.jwt;
       if (token) {
-        headers.set('Authorization', `Bearer ${token}`)
+        console.log({ token });
+        headers.set('Authorization', `Bearer ${token}`);
       }
-      return headers
+      return headers;
     },
   }),
+  tagTypes: ['refresh'],
   endpoints: (builder) => ({
     login: builder.mutation<UserResponse, LoginRequest>({
       query: (credentials) => ({
@@ -50,14 +53,44 @@ export const api = createApi({
         body: credentials,
       }),
     }),
-    verfiy: builder.mutation<UserResponse, {token: string}>({
+    verfiy: builder.query<UserResponse, { token: string }>({
       query: (param) => ({
-        url: 'verfiy',
-        method: 'POST',
+        url: 'verify',
         params: param
       }),
     }),
+    me: builder.query<UserResponse, void>({
+      query: () => ({
+        url: '@me',
+        //headers: {'Authorization': `Bearer ${token}`},
+      }),
+      providesTags: ['refresh'],
+    }),
+    upload: builder.mutation<UserResponse, File>({
+      query: (file) => ({
+        url: 'upload',
+        method: 'POST',
+        body: file
+      }),
+    }),
+    refresh: builder.mutation<UserResponse, { token: string }>({
+      query: ({ token }) => ({
+        url: 'refresh',
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': token },
+        credentials: 'include',
+      }),
+      invalidatesTags: ['refresh'],
+    })
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useVerfiyMutation } = api;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useVerfiyQuery,
+  useMeQuery,
+  useUploadMutation,
+  useRefreshMutation,
+  useLazyMeQuery
+} = api;

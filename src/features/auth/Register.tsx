@@ -8,10 +8,10 @@ function Register() {
     evt.preventDefault();
     const form = new FormData(evt.currentTarget);
     console.log(Object.fromEntries(form))
-    //signup(Object.fromEntries(form))
-    //  .unwrap()
-    //  .then(data => console.log({ data }))
-    //  .catch(err => console.error({ err }))
+    signup(Object.fromEntries(form))
+      .unwrap()
+      .then(data => console.log({ data }))
+      .catch(err => console.error({ err }))
 
   }
 
