@@ -40,7 +40,7 @@ a:hover {
     overflow: hidden;
 }
 .nav a.active {
-    @apply relative shadow-inner bg-gray-100 rounded-t-xl;
+    @apply relative shadow-inner bg-teal-100 rounded-t-xl text-teal-700;
 }
 
 .nav a.active::before {
@@ -52,7 +52,7 @@ a:hover {
     left: -20px;
     background-color: white;
     border-bottom-right-radius: 20px;
-    box-shadow: 5px 5px 0 5px rgb(243 244 246 / var(--tw-bg-opacity));
+    box-shadow: 5px 5px 0 5px rgb(204 251 241 / var(--tw-bg-opacity));
 }
 
 .nav a.active::after {
@@ -64,7 +64,7 @@ a:hover {
     right: -20px;
     background-color: white;
     border-bottom-left-radius: 20px;
-    box-shadow: -5px 5px 0 5px rgb(243 244 246 / var(--tw-bg-opacity));
+    box-shadow: -5px 5px 0 5px rgb(204 251 241 / var(--tw-bg-opacity));
 
 }
 
