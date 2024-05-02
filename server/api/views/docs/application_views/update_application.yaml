@@ -19,7 +19,7 @@ parameters:
     schema:
       type: object
       properties:
-        status:
+        application_status:
           type: string
           description: The new status of the application
 responses:
