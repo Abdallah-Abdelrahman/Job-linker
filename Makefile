@@ -1,20 +1,49 @@
 .PHONY: run setup stop
-.SILENT:
 
-TMUX := $(shell command -v tmux 2> /dev/null) # ensure tmux is installed first
+TMUX := $(shell command -v tmux 2> /dev/null)
+YARN := $(shell command -v yarn 2> /dev/null)
+NPM := $(shell command -v npm 2> /dev/null)
+VENV := $(shell command -v python3-venv 2> /dev/null)
+PIP := $(shell command -v pip 2> /dev/null)
+PYTHON := python3.10
+VENV_DIR := server/venv
 
-setup:
-	python3 -m venv server/venv
-	source server/venv/bin/activate
-	pip install -r rquirements.txt
+setup: check-dependencies create-venv install-dependencies
+
+check-dependencies:
+ifndef TMUX
+	sudo apt install -y tmux
+endif
+
+ifndef YARN
+	sudo apt install -y yarn
+endif
+
+ifndef NPM
+	sudo apt install -y npm
+endif
+
+ifndef VENV
+	sudo apt install -y python3-venv
+endif
+
+ifndef PIP
+	sudo apt install -y python3-pip
+endif
+
+create-venv:
+	$(PYTHON) -m venv $(VENV_DIR)
+
+install-dependencies:
+	$(VENV_DIR)/bin/pip install -r server/requirements.txt
+	$(NPM) install -g yarn
+	$(YARN) install
+
 run:
-	if [ ! "$(TMUX)" ]; then \
-        	echo 'Error: tmux is not installed. Please install tmux to run this target.'; \
-    	else \
-	    . server/venv/bin/activate; \
-	    tmux new-session -d -s api 'yarn api'; \
-	    tmux new-session -d -s client 'yarn dev'; \
-    	fi
+	@. server/venv/bin/activate && \
+	$(TMUX) new-session -d -s api 'yarn api' && echo 'api is running...' && \
+	$(TMUX) new-session -d -s client 'yarn dev' && echo 'client is running...'
+
 stop:
-	tmux send-keys -t api C-c
-	tmux send-keys -t client C-c
+	@$(TMUX) send-keys -t api C-c
+	@$(TMUX) send-keys -t client C-c
