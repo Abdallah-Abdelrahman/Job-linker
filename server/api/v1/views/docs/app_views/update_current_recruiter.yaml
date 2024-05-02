@@ -1,0 +1,29 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Recruiters
+security:
+  - bearerAuth: []
+parameters:
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        company_name:
+          type: string
+          description: The new name of the company
+        company_info:
+          type: string
+          description: The new information about the company
+responses:
+  200:
+    description: Recruiter details updated successfully
+  401:
+    description: Unauthorized access
+  400:
+    description: Invalid input

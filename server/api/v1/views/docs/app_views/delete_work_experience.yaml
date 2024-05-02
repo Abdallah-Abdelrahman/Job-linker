@@ -1,0 +1,23 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - WorkExperiences
+security:
+  - bearerAuth: []
+parameters:
+  - name: work_experience_id
+    in: path
+    type: string
+    required: true
+    description: The ID of the work experience to delete
+responses:
+  200:
+    description: Work experience deleted successfully
+  401:
+    description: Unauthorized access (user is not a candidate)
+  404:
+    description: Work experience not found

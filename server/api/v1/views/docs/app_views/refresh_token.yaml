@@ -1,0 +1,15 @@
+securitySchemes:
+  refreshAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Users
+security:
+  - refreshAuth: []
+responses:
+  200:
+    description: Token refreshed successfully
+  401:
+    description: Unauthorized access

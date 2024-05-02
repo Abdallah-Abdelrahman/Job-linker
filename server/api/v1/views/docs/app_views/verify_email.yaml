@@ -1,0 +1,13 @@
+tags:
+  - Users
+parameters:
+  - in: query
+    name: token
+    type: string
+    required: true
+    description: The verification token
+responses:
+  200:
+    description: User logged in successfully
+  400:
+    description: Invalid verification token

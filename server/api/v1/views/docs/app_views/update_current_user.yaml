@@ -1,0 +1,29 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Users
+security:
+  - bearerAuth: []
+parameters:
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The new name of the user
+        email:
+          type: string
+          description: The new email of the user
+responses:
+  200:
+    description: User details updated successfully
+  401:
+    description: Unauthorized access
+  400:
+    description: Invalid input

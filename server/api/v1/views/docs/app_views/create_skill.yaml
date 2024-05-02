@@ -1,0 +1,24 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Skills
+security:
+  - bearerAuth: []
+parameters:
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the skill to create
+responses:
+  201:
+    description: Skill created successfully
+  400:
+    description: Invalid input
