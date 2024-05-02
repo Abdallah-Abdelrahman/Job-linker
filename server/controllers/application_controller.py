@@ -56,8 +56,13 @@ class ApplicationsController:
             # If user is a recruiter, return all applications for their jobs
             if user.role == "recruiter":
                 recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
+                jobs = storage.get_all_by_attr(
+                        Job,
+                        "recruiter_id",
+                        recruiter.id
+                        )
                 applications = [
-                    app for job in recruiter.jobs for app in job.applications
+                    app for job in jobs for app in job.applications
                 ]
             # If user is a candidate, return all their applications
             elif user.role == "candidate":
@@ -75,12 +80,12 @@ class ApplicationsController:
             # recruiter for the job
             if (
                     user.role == "candidate" and
-                    application.candidate_id != user_id
+                    application.candidate_id != user.candidate.id
                     ):
                 raise UnauthorizedError("Unauthorized")
             elif (
                     user.role == "recruiter" and
-                    application.job.recruiter_id != user_id
+                    application.job.recruiter_id != user.recruiter.id
                     ):
                 raise UnauthorizedError("Unauthorized")
 
@@ -90,18 +95,27 @@ class ApplicationsController:
         response = []
         for application in applications:
             if user.role == "candidate":
+                job_id = application.job.id
+                app_job = storage.get(Job, job_id)
+                recruiter_id = app_job.to_dict['recruiter_id']
+                recruiter = storage.get(Recruiter, recruiter_id)
                 response.append(
                     {
+                        "application_id": application.id,
+                        "job_id": application.job.id,
                         "job_title": application.job.job_title,
                         "application_status": application.application_status,
-                        "company_name": application.job.recruiter.company_name,
+                        "company_name": recruiter.company_name,
+                        "salary": application.job.salary,
                     }
                 )
             elif user.role == "recruiter":
                 response.append(
                     {
+                        "application_id": application.id,
                         "job_title": application.job.job_title,
                         "candidate_name": application.candidate.user.name,
+                        "candidate_email": application.candidate.user.email,
                         "candidate_experience": [
                             exp.title for exp in
                             application.candidate.experiences

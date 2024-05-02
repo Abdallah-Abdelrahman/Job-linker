@@ -40,11 +40,6 @@ class UpdateUserSchema(Schema):
     """
 
     name = fields.Str(required=False)
-    email = fields.Email(required=False)
-    password = fields.Str(required=False)
-    role = fields.Str(
-        required=False, validate=validate.OneOf(["candidate", "recruiter"])
-    )
     contact_info = fields.Str(required=False)
     bio = fields.Str(required=False)
     image_url = fields.Str(required=False)

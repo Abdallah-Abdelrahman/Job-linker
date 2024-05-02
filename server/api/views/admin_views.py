@@ -16,7 +16,7 @@ admin_views = Blueprint("admin_views", __name__)
 admin_controller = AdminController()
 
 
-@admin_views.route("/admin/users", methods=["GET"])
+@admin_views.route("/admins/users", methods=["GET"])
 @jwt_required()
 @swag_from("docs/admin_views/get_all_users.yaml")
 def get_all_users():
@@ -38,7 +38,7 @@ def get_all_users():
         return make_response_("error", "Unauthorized"), 401
 
 
-@admin_views.route("/admin/users/<user_id>", methods=["DELETE"])
+@admin_views.route("/admins/users/<user_id>", methods=["DELETE"])
 @jwt_required()
 @swag_from("docs/admin_views/delete_user.yaml")
 def delete_user(user_id):
@@ -55,7 +55,7 @@ def delete_user(user_id):
         return make_response_("error", str(e)), 400
 
 
-@admin_views.route("/admin/users/<user_id>/disable", methods=["PUT"])
+@admin_views.route("/admins/users/<user_id>/disable", methods=["PUT"])
 @jwt_required()
 @swag_from("docs/admin_views/disable_user.yaml")
 def disable_user(user_id):
@@ -72,7 +72,7 @@ def disable_user(user_id):
         return make_response_("error", str(e)), 400
 
 
-@admin_views.route("/admin/users/<user_id>/enable", methods=["PUT"])
+@admin_views.route("/admins/users/<user_id>/enable", methods=["PUT"])
 @jwt_required()
 @swag_from("docs/admin_views/enable_user.yaml")
 def enable_user(user_id):
@@ -89,7 +89,7 @@ def enable_user(user_id):
         return make_response_("error", str(e)), 400
 
 
-@admin_views.route("/admin/users/<user_id>/role", methods=["PUT"])
+@admin_views.route("/admins/users/<user_id>/role", methods=["PUT"])
 @jwt_required()
 @swag_from("docs/admin_views/change_user_role.yaml")
 def change_user_role(user_id):
@@ -107,7 +107,7 @@ def change_user_role(user_id):
         return make_response_("error", str(e)), 400
 
 
-@admin_views.route("/admin/stats", methods=["GET"])
+@admin_views.route("/admins/stats", methods=["GET"])
 @jwt_required()
 @swag_from("docs/admin_views/get_sys_statistics.yaml")
 def get_sys_statistics():
