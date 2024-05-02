@@ -4,8 +4,9 @@ Job-linker application.
 """
 
 from flasgger.utils import swag_from
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
+
 from server.api.utils import make_response_
 from server.controllers.language_controller import LanguageController
 from server.controllers.schemas import language_schema
@@ -32,7 +33,11 @@ def get_languages():
         languages_data = [
                 language_schema.dump(language) for language in languages
                 ]
-        return jsonify(languages_data), 200
+        return make_response_(
+                "success",
+                "Fetched all languages",
+                languages_data
+                ), 200
     except ValueError as e:
         return make_response_("error", str(e)), 404
 

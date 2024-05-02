@@ -4,8 +4,9 @@ Job-linker application.
 """
 
 from flasgger.utils import swag_from
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
+
 from server.api.utils import make_response_
 from server.controllers.admin_controller import AdminController
 from server.exception import UnauthorizedError
@@ -25,7 +26,14 @@ def get_all_users():
     """
     try:
         users = admin_controller.get_all_users()
-        return jsonify([user.to_dict for user in users]), 200
+        return (
+            make_response_(
+                "success", "Fetched all users", [
+                    user.to_dict for user in users
+                    ]
+            ),
+            200,
+        )
     except UnauthorizedError:
         return make_response_("error", "Unauthorized"), 401
 
@@ -109,6 +117,10 @@ def get_sys_statistics():
     """
     try:
         stats = admin_controller.get_sys_statistics()
-        return jsonify(stats), 200
+        return make_response_(
+                "success",
+                "Fetched system statistics",
+                stats
+                ), 200
     except UnauthorizedError:
         return make_response_("error", "Unauthorized"), 401

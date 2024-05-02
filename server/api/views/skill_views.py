@@ -3,8 +3,9 @@ This module provides views for the Skill model in the Job-linker application.
 """
 
 from flasgger.utils import swag_from
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
+
 from server.api.utils import make_response_
 from server.controllers.schemas import skill_schema
 from server.controllers.skill_controller import SkillController
@@ -28,7 +29,11 @@ def get_skills():
     try:
         skills = skill_controller.get_skills()
         skills_data = [skill_schema.dump(skill) for skill in skills]
-        return jsonify(skills_data), 200
+        return make_response_(
+                "success",
+                "Fetched all skills",
+                skills_data
+                ), 200
     except ValueError as e:
         return make_response_("error", str(e)), 404
 

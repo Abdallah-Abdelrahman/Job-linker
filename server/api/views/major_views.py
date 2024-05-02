@@ -3,8 +3,9 @@ This module provides views for the Major model in the Job-linker application.
 """
 
 from flasgger.utils import swag_from
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
+
 from server.api.utils import make_response_
 from server.controllers.major_controller import MajorController
 from server.controllers.schemas import major_schema
@@ -29,7 +30,11 @@ def get_majors():
     try:
         majors = major_controller.get_majors()
         majors_data = [major_schema.dump(major) for major in majors]
-        return jsonify(majors_data), 200
+        return make_response_(
+                "success",
+                "Fetched all majors",
+                majors_data
+                ), 200
     except ValueError as e:
         return make_response_("error", str(e)), 404
 

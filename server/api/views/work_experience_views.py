@@ -4,8 +4,9 @@ Job-linker application.
 """
 
 from flasgger.utils import swag_from
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
+
 from server.api.utils import make_response_
 from server.controllers.schemas import work_experience_schema
 from server.controllers.work_experience_controller import WorkExperienceController
@@ -166,7 +167,14 @@ def get_work_experiences(major_id=None):
             work_experience_schema.dump(work_experience)
             for work_experience in work_experiences
         ]
-        return jsonify(work_experiences_data), 200
+        return (
+            make_response_(
+                "success",
+                "Fetched all work experiences",
+                work_experiences_data
+            ),
+            200,
+        )
     except UnauthorizedError as e:
         return make_response_("error", str(e)), 403
     except ValueError as e:
