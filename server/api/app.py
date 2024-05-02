@@ -117,17 +117,17 @@ def register_blueprints():
     from server.api.views.user_views import user_views
     from server.api.views.work_experience_views import work_experience_views
 
-    app.register_blueprint(user_views, url_prefix="/api")
-    app.register_blueprint(candidate_views, url_prefix="/api")
-    app.register_blueprint(recruiter_views, url_prefix="/api")
-    app.register_blueprint(job_views, url_prefix="/api")
-    app.register_blueprint(major_views, url_prefix="/api")
-    app.register_blueprint(skill_views, url_prefix="/api")
-    app.register_blueprint(work_experience_views, url_prefix="/api")
-    app.register_blueprint(language_views, url_prefix="/api")
-    app.register_blueprint(application_views, url_prefix="/api")
-    app.register_blueprint(file_views, url_prefix="/api")
-    app.register_blueprint(admin_views, url_prefix="/api")
+    app.register_blueprint(user_views)
+    app.register_blueprint(candidate_views)
+    app.register_blueprint(recruiter_views)
+    app.register_blueprint(job_views)
+    app.register_blueprint(major_views)
+    app.register_blueprint(skill_views)
+    app.register_blueprint(work_experience_views)
+    app.register_blueprint(language_views)
+    app.register_blueprint(application_views)
+    app.register_blueprint(file_views)
+    app.register_blueprint(admin_views)
 
 
 if __name__ == "__main__":

@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Candidates
+summary: Create a new candidate
+description: Endpoint to create a new candidate. Returns a response object containing the status, message, and candidate data if successful. Otherwise, it returns an error message.
+operationId: createCandidate
 security:
   - bearerAuth: []
 parameters:

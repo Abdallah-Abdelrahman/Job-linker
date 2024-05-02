@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Users
+summary: Delete the current user
+description: Endpoint to delete the current user. Returns a response object containing the status and message if successful. Otherwise, it returns an error message.
+operationId: deleteCurrentUser
 security:
   - bearerAuth: []
 responses:

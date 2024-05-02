@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Languages
+summary: Delete a specific language
+description: Endpoint to delete a specific language. Returns a response object containing the status and message if successful. Otherwise, it returns an error message.
+operationId: deleteLanguage
 security:
   - bearerAuth: []
 parameters:

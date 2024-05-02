@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Majors
+summary: Delete a specific major
+description: Endpoint to delete a specific major. Returns a response object containing the status and message if successful. Otherwise, it returns an error message.
+operationId: deleteMajor
 security:
   - bearerAuth: []
 parameters:

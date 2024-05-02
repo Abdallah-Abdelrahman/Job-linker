@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 file_views = Blueprint("file", __name__)
 
 
-@file_views.route("/upload", methods=["POST"])
+@file_views.route("/files/upload", methods=["POST"])
 @swag_from("docs/file_views/upload.yaml")
 def upload():
     """save file into server"""

@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - WorkExperiences
+summary: Fetch all work experiences or work experiences related to a specific major, Recruiter Only.
+description: Endpoint to fetch all work experiences or work experiences related to a specific major. Returns a list of all work experiences or work experiences related to a specific major in JSON format if successful. Otherwise, it returns an error message.
+operationId: getWorkExperiences
 security:
   - bearerAuth: []
 parameters:

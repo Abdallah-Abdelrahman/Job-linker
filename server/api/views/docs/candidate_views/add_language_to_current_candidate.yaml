@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Candidates
+summary: Add a language to the current candidate's profile
+description: Endpoint to add a language to the current candidate's profile. The language ID should be provided in the request body. Returns a success message and the updated list of language IDs for the candidate.
+operationId: addLanguageToCurrentCandidate
 security:
   - bearerAuth: []
 parameters:

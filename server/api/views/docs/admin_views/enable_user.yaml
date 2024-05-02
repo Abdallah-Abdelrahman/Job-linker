@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Admins
+summary: Enable a specific user
+description: Endpoint to enable a specific user. Only accessible by admin users.
+operationId: enableUser
 security:
   - bearerAuth: []
 parameters:

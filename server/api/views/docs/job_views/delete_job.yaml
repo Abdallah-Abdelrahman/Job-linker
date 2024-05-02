@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Jobs
+summary: Delete a specific job, Recruiters Only.
+description: Endpoint to delete a specific job. Returns a response object containing the status and message if successful. Otherwise, it returns an error message. Only accessible by recruiters.
+operationId: deleteJob
 security:
   - bearerAuth: []
 parameters:
