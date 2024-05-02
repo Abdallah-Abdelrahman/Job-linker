@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Candidates
+summary: Add a skill to the current candidate's profile
+description: Endpoint to add a skill to the current candidate's profile. The skill ID should be provided in the request body. Returns a success message and the updated list of skill IDs for the candidate.
+operationId: addSkillToCurrentCandidate
 security:
   - bearerAuth: []
 parameters:

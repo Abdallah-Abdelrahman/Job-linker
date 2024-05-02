@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Applications
+summary: Delete a job application
+description: Endpoint to delete a job application. The user must be authenticated, and the ID of the application to delete must be provided. Returns a JSON response containing a success message if the application was deleted successfully, or an error message if the application could not be deleted.
+operationId: deleteApplication
 security:
   - bearerAuth: []
 parameters:

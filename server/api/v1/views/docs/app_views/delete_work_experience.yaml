@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - WorkExperiences
+summary: Delete a specific work experience
+description: Endpoint to delete a specific work experience. Returns a response object containing the status and message if successful. Otherwise, it returns an error message.
+operationId: deleteWorkExperience
 security:
   - bearerAuth: []
 parameters:

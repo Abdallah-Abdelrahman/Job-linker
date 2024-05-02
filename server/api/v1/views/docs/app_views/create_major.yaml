@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Majors
+summary: Create a new major
+description: Endpoint to create a new major. Returns a response object containing the status, message, and major data if successful. Otherwise, it returns an error message.
+operationId: createMajor
 security:
   - bearerAuth: []
 parameters:

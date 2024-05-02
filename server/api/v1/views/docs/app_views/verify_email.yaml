@@ -1,5 +1,8 @@
 tags:
   - Users
+summary: Verify a user's email
+description: Endpoint to verify a user's email. The verification token should be provided. Returns a response object containing the status and message.
+operationId: verifyEmail
 parameters:
   - in: query
     name: token

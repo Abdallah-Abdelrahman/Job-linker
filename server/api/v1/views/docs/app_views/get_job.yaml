@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Jobs
+summary: Fetch the details of a specific job
+description: Endpoint to fetch the details of a specific job. Returns a response object containing the status, message, and job data if successful. Otherwise, it returns an error message.
+operationId: getJob
 security:
   - bearerAuth: []
 parameters:

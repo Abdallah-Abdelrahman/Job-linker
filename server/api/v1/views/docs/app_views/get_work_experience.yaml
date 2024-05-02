@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - WorkExperiences
+summary: Fetch the details of a specific work experience
+description: Endpoint to fetch the details of a specific work experience. Returns a response object containing the status, message, and work experience data if successful. Otherwise, it returns an error message.
+operationId: getWorkExperience
 security:
   - bearerAuth: []
 parameters:

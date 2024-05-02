@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Recruiters
+summary: Fetch the current recruiter's details
+description: Endpoint to fetch the current recruiter's details. Returns a response object containing the status, message, and recruiter data if successful. Otherwise, it returns an error message.
+operationId: getCurrentRecruiter
 security:
   - bearerAuth: []
 responses:

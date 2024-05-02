@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Jobs
+summary: Fetch all jobs created by the current user, Recruiters Only.
+description: Endpoint to fetch all jobs created by the current user. Returns a list of all jobs created by the current user in JSON format if successful. Otherwise, it returns an error message. Only accessible by recruiters.
+operationId: getMyJobs
 security:
   - bearerAuth: []
 responses:

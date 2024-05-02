@@ -1,5 +1,8 @@
 tags:
   - Files
+summary: Upload a file
+description: Endpoint to upload a file. The file is saved on the server.
+operationId: uploadFile
 consumes:
   - multipart/form-data
 parameters:

@@ -6,6 +6,9 @@ securitySchemes:
 
 tags:
   - Admins
+summary: Get system statistics
+description: Endpoint to get system statistics. Only accessible by admin users.
+operationId: getSysStatistics
 security:
   - bearerAuth: []
 responses:
