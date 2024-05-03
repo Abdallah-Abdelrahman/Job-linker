@@ -44,7 +44,7 @@ def register_user():
 @swag_from("docs/app_views/verify_email.yaml")
 def verify_email():
     """
-    Verifies a user's email.
+    Verifies a user"s email.
 
     Args:
         token (str): The verification token.
@@ -113,12 +113,13 @@ def refresh_token():
         Response: A response object with a success message and the new JWT.
     """
     user_id = get_jwt_identity()
+    user = user_controller.get_current_user(user_id)
     jwt = create_access_token(identity=user_id)
     return (
         make_response_(
             "success",
             "Token refreshed successfully",
-            {"jwt": jwt},
+            {"jwt": jwt, "role": user.get("role")},
         ),
         200,
     )
@@ -144,7 +145,7 @@ def logout_user():
 @swag_from("docs/app_views/get_current_user.yaml")
 def get_current_user():
     """
-    Fetches the current user's details.
+    Fetches the current user"s details.
 
     Returns:
         A response object containing the status, message, and user
@@ -169,7 +170,7 @@ def get_current_user():
 @swag_from("docs/app_views/update_current_user.yaml")
 def update_current_user():
     """
-    Updates the current user's details.
+    Updates the current user"s details.
 
     Returns:
         A response object containing the status, message, and user
@@ -214,7 +215,7 @@ def delete_current_user():
 @swag_from("docs/app_views/update_password.yaml")
 def update_password():
     """
-    Updates the current user's password.
+    Updates the current user"s password.
 
     Returns:
         A response object containing the status and message.

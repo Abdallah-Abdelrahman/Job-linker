@@ -66,12 +66,16 @@ export const api = createApi({
       }),
       providesTags: ['refresh'],
     }),
-    upload: builder.mutation<UserResponse, File>({
-      query: (file) => ({
-        url: 'upload',
-        method: 'POST',
-        body: file
-      }),
+    upload: builder.mutation<UserResponse, { file: FormData, role: string }>({
+      query: ({ role, file }) => {
+        console.log({ role, file });
+        return ({
+          url: 'upload',
+          method: 'POST',
+          body: file,
+          params: { role },
+        })
+      },
     }),
     refresh: builder.mutation<UserResponse, { token: string }>({
       query: ({ token }) => ({
