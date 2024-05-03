@@ -4,10 +4,10 @@ Job-linker application.
 """
 
 from flask import current_app, url_for
+from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from marshmallow import ValidationError
-from flask_bcrypt import Bcrypt
 
 from server.controllers.schemas import (
         login_schema,
@@ -17,9 +17,9 @@ from server.controllers.schemas import (
 from server.exception import UnauthorizedError
 from server.models import storage
 from server.models.candidate import Candidate
+from server.models.job import Job
 from server.models.recruiter import Recruiter
 from server.models.user import User
-from server.models.job import Job
 from server.services.mail import MailService
 
 ALLOWED_UPDATE_FIELDS = ["name", "contact_info", "bio", "image_url"]
@@ -40,11 +40,12 @@ class UserController:
 
     @classmethod
     def with_encrypt(cls):
-        '''Generate a new instance of UserController with encryption.
+        """Generate a new instance of UserController with encryption.
 
         Returns: new instance of UserController
-        '''
+        """
         from server.api.v1.app import app
+
         return UserController(Bcrypt(app))
 
     def get_user(self, user_id):
@@ -237,6 +238,8 @@ class UserController:
 
         if user.role == "candidate":
             candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+            if not candidate:
+                raise ValueError("User doesn't have a candidate profile")
             if candidate:
                 user_data["candidate"] = {
                     "major": candidate.major.to_dict
@@ -265,6 +268,8 @@ class UserController:
                 }
         elif user.role == "recruiter":
             recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
+            if not recruiter:
+                raise ValueError("User doesn't have a recruiter profile")
             jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
             if recruiter:
                 user_data["recruiter"] = {
