@@ -13,22 +13,7 @@ from flask_jwt_extended import (
 from server.api.utils import make_response_
 from server.decorators import verified_required
 from server.exception import UnauthorizedError
-from server.api.v1.views import app_views
-
-
-bcrypt = None
-user_controller = None
-
-
-def setup(controller):
-    """
-    Sets the bcrypt instance for password hashing.
-
-    Args:
-        bcrypt_instance: The bcrypt instance.
-    """
-    global user_controller
-    user_controller = controller
+from server.api.v1.views import app_views, user_controller
 
 
 @app_views.route("/register", methods=["POST"])

@@ -32,25 +32,8 @@ def create_app():
     """
     Initializes the Flask application.
 
-    Sets up the bcrypt instance, user controller, registers
-    error handlers, and blueprints.
-    Also sets up the user views.
+    it sets up error handlers, and blueprints.
     """
-    # TODO: why global
-    global user_controller
-    bcrypt = Bcrypt(app)
-    user_controller = UserController(bcrypt)
-
-    # TODO: wt's this do
-    @app.before_request
-    @jwt_required(optional=True)
-    def before_request():
-        g.user_controller = user_controller
-        user_id = get_jwt_identity()
-        if user_id is not None:
-            g.user = storage.get(User, user_id)
-        else:
-            g.user = None
 
     register_error_handlers()
     app.register_blueprint(app_views)

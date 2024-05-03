@@ -7,6 +7,7 @@ from flask import current_app, url_for
 from flask_jwt_extended import create_access_token, create_refresh_token
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from marshmallow import ValidationError
+from flask_bcrypt import Bcrypt
 
 from server.controllers.schemas import (
         login_schema,
@@ -36,6 +37,15 @@ class UserController:
         """
         self.bcrypt = bcrypt_instance
         self.email_service = MailService()
+
+    @classmethod
+    def with_encrypt(cls):
+        '''Generate a new instance of UserController with encryption.
+
+        Returns: new instance of UserController
+        '''
+        from server.api.v1.app import app
+        return UserController(Bcrypt(app))
 
     def get_user(self, user_id):
         """
