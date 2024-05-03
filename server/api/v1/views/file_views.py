@@ -14,9 +14,9 @@ from server.api.v1.views import app_views
 @swag_from("docs/app_views/upload.yaml")
 def upload():
     """save file into server"""
-    # check if the post request has the file part
     role = request.query_string.decode("utf8").split("=")[-1]
 
+    # check if the post request has the file part
     if "file" not in request.files:
         return make_response_("No file part", "erro"), 400
 

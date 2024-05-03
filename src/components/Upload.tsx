@@ -1,9 +1,12 @@
-import { useRef, useState } from "react";
-import { useUploadMutation } from "../app/services/auth";
-import { Text, FormControl, Input } from "@chakra-ui/react";
-import MyIcon from "./Icon";
+import { useRef, useState } from 'react';
+import { useUploadMutation } from '../app/services/auth';
+import { Text, FormControl, Input } from '@chakra-ui/react';
+import MyIcon from './Icon';
+import { useAppSelector } from '../hooks/store';
+import { selectCurrentUser } from '../features/auth/authSlice';
 
 function Upload() {
+  const user = useAppSelector(selectCurrentUser);
   const [upload, { isSuccess, isLoading, isError }] = useUploadMutation();
   const inputRef = useRef(null);
   const [isUploaded, setIsUploaded] = useState(false);
@@ -12,7 +15,8 @@ function Upload() {
   const handleSubmit = (evt) => {
     const formData = new FormData(evt.currentTarget);
     evt.preventDefault();
-    upload(formData)
+    console.log({user})
+    upload({file: formData, role: user.role})
       .unwrap()
       .then(data => {
         console.log({ data })
