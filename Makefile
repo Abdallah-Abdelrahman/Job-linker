@@ -43,7 +43,8 @@ run:
 	@. server/venv/bin/activate && \
 	$(TMUX) new-session -d -s api 'yarn api' && echo 'api is running...' && \
 	$(TMUX) new-session -d -s client 'yarn dev' && echo 'client is running...'
-
+list:
+	@$(TMUX) ls # list running processes
 stop:
 	@$(TMUX) send-keys -t api C-c
 	@$(TMUX) send-keys -t client C-c
