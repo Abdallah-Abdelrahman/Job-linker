@@ -1,4 +1,4 @@
-.PHONY: run setup stop
+.PHONY: run setup stop restart
 
 TMUX := $(shell command -v tmux 2> /dev/null)
 YARN := $(shell command -v yarn 2> /dev/null)
@@ -46,5 +46,6 @@ run:
 list:
 	@$(TMUX) ls # list running processes
 stop:
-	@$(TMUX) send-keys -t api C-c
-	@$(TMUX) send-keys -t client C-c
+	@$(TMUX) send-keys -t api C-c && sleep 1
+	@$(TMUX) send-keys -t client C-c && sleep 1
+restart: stop run

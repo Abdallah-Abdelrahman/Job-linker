@@ -15,7 +15,7 @@ function Verify() {
   useEffect(() => {
     if (isSuccess) {
       dispatch(setCredentials(data));
-      navigate('/me');
+      navigate('/@me');
     }
   }, [token, isSuccess, dispatch, data, navigate]);
 
