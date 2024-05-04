@@ -56,8 +56,8 @@ def handle_errors(f):
     def decorated_function(*args, **kwargs):
         try:
             return f(*args, **kwargs)
-        except UnauthorizedError:
-            return make_response_("error", "Unauthorized"), 401
+        except UnauthorizedError as e:
+            return make_response_("error", str(e)), 401
         except ValueError as e:
             return make_response_("error", str(e)), 400
 

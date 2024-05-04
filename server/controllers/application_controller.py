@@ -62,8 +62,8 @@ class ApplicationsController:
                         recruiter.id
                         )
                 applications = [
-                    app for job in jobs for app in job.applications
-                ]
+                        app for job in jobs for app in job.applications
+                        ]
             # If user is a candidate, return all their applications
             elif user.role == "candidate":
                 candidate = storage.get_by_attr(Candidate, "user_id", user_id)
@@ -79,14 +79,14 @@ class ApplicationsController:
             # Check if user is the candidate who applied or the
             # recruiter for the job
             if (
-                    user.role == "candidate" and
-                    application.candidate_id != user.candidate.id
-                    ):
+                user.role == "candidate"
+                and application.candidate_id != user.candidate.id
+            ):
                 raise UnauthorizedError("Unauthorized")
             elif (
-                    user.role == "recruiter" and
-                    application.job.recruiter_id != user.recruiter.id
-                    ):
+                user.role == "recruiter"
+                and application.job.recruiter_id != user.recruiter.id
+            ):
                 raise UnauthorizedError("Unauthorized")
 
             applications = [application]
@@ -97,7 +97,7 @@ class ApplicationsController:
             if user.role == "candidate":
                 job_id = application.job.id
                 app_job = storage.get(Job, job_id)
-                recruiter_id = app_job.to_dict['recruiter_id']
+                recruiter_id = app_job.to_dict["recruiter_id"]
                 recruiter = storage.get(Recruiter, recruiter_id)
                 response.append(
                     {
@@ -117,8 +117,8 @@ class ApplicationsController:
                         "candidate_name": application.candidate.user.name,
                         "candidate_email": application.candidate.user.email,
                         "candidate_experience": [
-                            exp.title for exp in
-                            application.candidate.experiences
+                            exp.title
+                            for exp in application.candidate.experiences
                         ],
                         "application_status": application.application_status,
                     }
@@ -174,10 +174,9 @@ class ApplicationsController:
 
         # Create new application with default status "applied"
         new_application = Application(
-                candidate_id=candidate.id,
-                job_id=job.id,
-                **data
-                )
+            candidate_id=candidate.id,
+            job_id=job.id,
+        )
         storage.new(new_application)
         storage.save()
 
@@ -262,9 +261,9 @@ class ApplicationsController:
                 ):
             raise UnauthorizedError("Unauthorized")
         elif (
-                user.role == "recruiter" and
-                application.job.recruiter_id != user.recruiter.id
-                ):
+            user.role == "recruiter"
+            and application.job.recruiter_id != user.recruiter.id
+        ):
             raise UnauthorizedError("Unauthorized")
 
         # Delete application

@@ -59,6 +59,16 @@ class JobController:
         if not major:
             raise ValueError("Major not found")
 
+        # Check if a job with the same details already exists
+        existing_job = storage.get_by_attr(Job, "job_title", data["job_title"])
+        if (
+                existing_job and
+                existing_job.job_description == data["job_description"]
+                ):
+            raise ValueError(
+                    "A job with the same title and description already exists"
+                    )
+
         # Create new job
         new_job = Job(
             recruiter_id=recruiter.id,

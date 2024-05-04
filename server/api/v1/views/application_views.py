@@ -4,21 +4,21 @@ Job-linker application.
 """
 
 from flasgger.utils import swag_from
-from flask import Blueprint, request
+from flask import request
 from flask_jwt_extended import get_jwt_identity, jwt_required
+
 from server.api.utils import make_response_
+from server.api.v1.views import app_views
 from server.controllers.application_controller import ApplicationsController
 from server.controllers.schemas import application_schema
-from server.exception import UnauthorizedError
-from server.api.v1.views import app_views
-
-#application_views = Blueprint("applications_bp", __name__)
+from server.decorators import handle_errors
 
 applications_controller = ApplicationsController()
 
 
 @app_views.route("/applications", methods=["POST"])
 @jwt_required()
+@handle_errors
 @swag_from("docs/app_views/create_application.yaml")
 def create_application():
     """
@@ -34,24 +34,20 @@ def create_application():
     """
     user_id = get_jwt_identity()
     data = request.get_json()
-    try:
-        application = applications_controller.create_application(user_id, data)
-        return (
-            make_response_(
-                "success",
-                "Application created successfully",
-                application_schema.dump(application),
-            ),
-            201,
-        )
-    except UnauthorizedError:
-        return make_response_("error", "Unauthorized"), 401
-    except ValueError as e:
-        return make_response_("error", str(e)), 400
+    application = applications_controller.create_application(user_id, data)
+    return (
+        make_response_(
+            "success",
+            "Application created successfully",
+            application_schema.dump(application),
+        ),
+        201,
+    )
 
 
 @app_views.route("/applications/<application_id>", methods=["PUT"])
 @jwt_required()
+@handle_errors
 @swag_from("docs/app_views/update_application.yaml")
 def update_application(application_id):
     """
@@ -70,29 +66,27 @@ def update_application(application_id):
     """
     user_id = get_jwt_identity()
     data = request.get_json()
-    try:
-        application = applications_controller.update_application(
-            user_id, application_id, data
-        )
-        return (
-            make_response_(
-                "success",
-                "Application updated successfully",
-                application_schema.dump(application),
-            ),
-            200,
-        )
-    except UnauthorizedError:
-        return make_response_("error", "Unauthorized"), 401
-    except ValueError as e:
-        return make_response_("error", str(e)), 400
+    application = applications_controller.update_application(
+        user_id, application_id, data
+    )
+    return (
+        make_response_(
+            "success",
+            "Application updated successfully",
+            application_schema.dump(application),
+        ),
+        200,
+    )
 
 
 @app_views.route(
-    "/applications", defaults={"application_id": None}, methods=["GET"]
-)
+        "/applications",
+        defaults={"application_id": None},
+        methods=["GET"]
+        )
 @app_views.route("/applications/<application_id>", methods=["GET"])
 @jwt_required()
+@handle_errors
 @swag_from("docs/app_views/get_application.yaml")
 def get_application(application_id):
     """
@@ -113,27 +107,23 @@ def get_application(application_id):
         or an error message if the application(s) could not be fetched.
     """
     user_id = get_jwt_identity()
-    try:
-        application = applications_controller.get_application(
-                user_id,
-                application_id
-                )
-        return (
-            make_response_(
-                "success",
-                "Application fetched successfully",
-                application,
-            ),
-            200,
-        )
-    except UnauthorizedError:
-        return make_response_("error", "Unauthorized"), 401
-    except ValueError as e:
-        return make_response_("error", str(e)), 400
+    application = applications_controller.get_application(
+            user_id,
+            application_id
+            )
+    return (
+        make_response_(
+            "success",
+            "Application fetched successfully",
+            application,
+        ),
+        200,
+    )
 
 
 @app_views.route("/applications/<application_id>", methods=["DELETE"])
 @jwt_required()
+@handle_errors
 @swag_from("docs/app_views/delete_application.yaml")
 def delete_application(application_id):
     """
@@ -151,13 +141,5 @@ def delete_application(application_id):
         not be deleted.
     """
     user_id = get_jwt_identity()
-    try:
-        applications_controller.delete_application(user_id, application_id)
-        return make_response_(
-                "success",
-                "Application deleted successfully"
-                ), 200
-    except UnauthorizedError:
-        return make_response_("error", "Unauthorized"), 401
-    except ValueError as e:
-        return make_response_("error", str(e)), 400
+    applications_controller.delete_application(user_id, application_id)
+    return make_response_("success", "Application deleted successfully"), 200
