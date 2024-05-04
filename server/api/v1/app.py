@@ -14,7 +14,7 @@ def create_app():
     Sets up error handlers, JWT handlers, and blueprints.
     """
     register_error_handlers(app)
-    register_jwt_handlers(app, jwt)
+    register_jwt_handlers(jwt)
 
     from server.api.v1.views import app_views
 

@@ -236,54 +236,11 @@ class UserController:
 
         user_data = user.to_dict
 
-        if user.role == "candidate":
-            candidate = storage.get_by_attr(Candidate, "user_id", user_id)
-            if not candidate:
-                raise ValueError("User doesn't have a candidate profile")
-            if candidate:
-                user_data["candidate"] = {
-                    "major": candidate.major.to_dict
-                    if candidate.major
-                    else "No major information",
-                    "skills": [skill.to_dict for skill in candidate.skills]
-                    if candidate.skills
-                    else "No skills information",
-                    "languages": [
-                        language.to_dict for language in candidate.languages
-                        ]
-                    if candidate.languages
-                    else "No languages information",
-                    "applications": [
-                        application.to_dict
-                        for application in candidate.applications
-                    ]
-                    if candidate.applications
-                    else "No applications information",
-                    "experiences": [
-                        experience.to_dict
-                        for experience in candidate.experiences
-                    ]
-                    if candidate.experiences
-                    else "No experiences information",
-                }
-        elif user.role == "recruiter":
-            recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
-            if not recruiter:
-                raise ValueError("User doesn't have a recruiter profile")
-            jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
-            if recruiter:
-                user_data["recruiter"] = {
-                    "company_name": recruiter.company_name
-                    if recruiter.company_name
-                    else "No company name information",
-                    "company_info": recruiter.company_info
-                    if recruiter.company_info
-                    else "No company info",
-                    "jobs": [job.to_dict for job in jobs]
-                    if jobs
-                    else "No jobs information",
-                }
+        user_by_role = {'candidate': Candidate, 'recruiter': Recruiter}
+        instance = storage.get_by_attr(user_by_role.get(user.role), "user_id", user_id)
 
+        if instance:
+            user_data.update(instance.to_dict)
         return user_data
 
     def update_current_user(self, user_id, data):

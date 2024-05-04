@@ -3,7 +3,7 @@ import { Login } from './features/auth';
 import { NavLink, Outlet, Route, createBrowserRouter, createRoutesFromElements } from 'react-router-dom';
 import Verify from './features/auth/Verify';
 import { useMeQuery } from './app/services/auth';
-import {  Upload } from './components';
+import { Upload } from './components';
 import { useAfterRefreshQuery, useRefresh } from './hooks';
 import './App.css';
 
@@ -20,11 +20,11 @@ function Me() {
   // refresh token request
   const { data, isSuccess } = useAfterRefreshQuery(useMeQuery);
 
-
   return (
     <main className='flex flex-col'>
+      {/* TODO: Complete registeration for user (candiate | recruiter)*/}
       <h1>me</h1>
-      <Upload />
+      {/*<Upload />*/}
     </main>
   );
 }

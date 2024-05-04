@@ -5,7 +5,7 @@ Handlers for JWT errors
 from server.api.utils import make_response_
 
 
-def register_jwt_handlers(app, jwt):
+def register_jwt_handlers(jwt):
     """
     Registers JWT error handlers for the Flask application.
 
