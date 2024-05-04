@@ -6,7 +6,12 @@ Attrs:
 """
 
 from os import getenv
+
+from dotenv import load_dotenv
+
 from server.models.engine.db_storage import DBStorage
 
-storage = DBStorage(engine=getenv('ENGINE'))
+load_dotenv()
+
+storage = DBStorage(engine=getenv("ENGINE"))
 storage.reload()

@@ -19,8 +19,8 @@ admin_controller = AdminController()
 
 @app_views.route("/admins/users", methods=["GET"])
 @jwt_required()
-@swag_from("docs/app_views/get_all_users.yaml")
 @handle_errors
+@swag_from("docs/app_views/get_all_users.yaml")
 def get_all_users():
     """
     Endpoint to get all users.
@@ -38,8 +38,8 @@ def get_all_users():
 
 @app_views.route("/admins/users/<target_user_id>", methods=["DELETE"])
 @jwt_required()
-@swag_from("docs/app_views/delete_user.yaml")
 @handle_errors
+@swag_from("docs/app_views/delete_user.yaml")
 def delete_user(target_user_id):
     """
     Endpoint to delete a specific user.
@@ -52,8 +52,8 @@ def delete_user(target_user_id):
 
 @app_views.route("/admins/users/<target_user_id>/disable", methods=["PUT"])
 @jwt_required()
-@swag_from("docs/app_views/disable_user.yaml")
 @handle_errors
+@swag_from("docs/app_views/disable_user.yaml")
 def disable_user(target_user_id):
     """
     Endpoint to disable a specific user.
@@ -66,8 +66,8 @@ def disable_user(target_user_id):
 
 @app_views.route("/admins/users/<target_user_id>/enable", methods=["PUT"])
 @jwt_required()
-@swag_from("docs/app_views/enable_user.yaml")
 @handle_errors
+@swag_from("docs/app_views/enable_user.yaml")
 def enable_user(target_user_id):
     """
     Endpoint to enable a specific user.
@@ -80,8 +80,8 @@ def enable_user(target_user_id):
 
 @app_views.route("/admins/users/<target_user_id>/role", methods=["PUT"])
 @jwt_required()
-@swag_from("docs/app_views/change_user_role.yaml")
 @handle_errors
+@swag_from("docs/app_views/change_user_role.yaml")
 def change_user_role(target_user_id):
     """
     Endpoint to change the role of a specific user.
@@ -95,8 +95,8 @@ def change_user_role(target_user_id):
 
 @app_views.route("/admins/stats", methods=["GET"])
 @jwt_required()
-@swag_from("docs/app_views/get_sys_statistics.yaml")
 @handle_errors
+@swag_from("docs/app_views/get_sys_statistics.yaml")
 def get_sys_statistics():
     """
     Endpoint to get system statistics.

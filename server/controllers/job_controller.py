@@ -252,57 +252,41 @@ class JobController:
 
     def get_jobs(self, user_id):
         """
-        Gets all jobs for a candidate's major.
+        Gets all jobs for a user based on their role.
+
+        If the user is a candidate, it returns all jobs for their major.
+        If the user is a recruiter, it returns all jobs posted by them.
 
         Args:
             user_id: The ID of the user.
 
         Returns:
-            The jobs for the candidate's major.
+            The jobs for the user based on their role.
 
         Raises:
-            ValueError: If no jobs are found for the candidate's major or the
-            user is not a candidate.
-            UnauthorizedError: If the user is not a candidate.
+            ValueError: If no jobs are found for the user's role.
+            UnauthorizedError: If the user is not a candidate or a recruiter.
         """
         # Check if user is a candidate
         candidate = storage.get_by_attr(Candidate, "user_id", user_id)
-        if not candidate:
-            raise UnauthorizedError("You are not a candidate")
+        if candidate:
+            # Get jobs for the candidate's major
+            major_id = candidate.major_id
+            jobs = storage.get_all_by_attr(Job, "major_id", major_id)
+            if not jobs:
+                raise ValueError("No jobs found for your major")
+            return jobs
 
-        # Get jobs for the candidate's major
-        major_id = candidate.major_id
-        jobs = storage.get_all_by_attr(Job, "major_id", major_id)
-        if not jobs:
-            raise ValueError("No jobs found for your major")
-
-        return jobs
-
-    def get_my_jobs(self, user_id):
-        """
-        Gets all jobs posted by a recruiter.
-
-        Args:
-            user_id: The ID of the user.
-
-        Returns:
-            The jobs posted by the recruiter.
-
-        Raises:
-            ValueError: If no jobs are found or the user is not a recruiter.
-            UnauthorizedError: If the user is not a recruiter.
-        """
         # Check if user is a recruiter
         recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
-        if not recruiter:
-            raise UnauthorizedError("You are not a recruiter")
+        if recruiter:
+            # Get jobs posted by the recruiter
+            jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
+            if not jobs:
+                raise ValueError("No jobs found")
+            return jobs
 
-        # Get jobs posted by the recruiter
-        jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
-        if not jobs:
-            raise ValueError("No jobs found")
-
-        return jobs
+        raise UnauthorizedError("You are not a candidate or a recruiter")
 
     def recommend_candidates(self, job_id, user_id):
         """

@@ -7,10 +7,10 @@ from flask import Blueprint, request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 from server.api.utils import make_response_
+from server.api.v1.views import app_views
 from server.controllers.job_controller import JobController
 from server.controllers.schemas import job_schema
 from server.exception import UnauthorizedError
-from server.api.v1.views import app_views
 
 # job_views = Blueprint("job", __name__)
 
@@ -186,6 +186,9 @@ def get_jobs():
     """
     Fetches all jobs.
 
+    If the user is a candidate, it returns all jobs for their major.
+    If the user is a recruiter, it returns all jobs posted by them.
+
     Returns:
         A list of all jobs in JSON format if successful.
         Otherwise, it returns an error message.
@@ -194,30 +197,7 @@ def get_jobs():
     try:
         jobs = job_controller.get_jobs(user_id)
         jobs_data = [job_schema.dump(job) for job in jobs]
-        return make_response_("success", "Fetched all jobs", jobs_data), 200
-    except UnauthorizedError as e:
-        return make_response_("error", str(e)), 403
-    except ValueError as e:
-        return make_response_("error", str(e)), 404
-
-
-@app_views.route("/my_jobs", methods=["GET"])
-@jwt_required()
-@swag_from("docs/app_views/get_my_jobs.yaml")
-def get_my_jobs():
-    """
-    Fetches all jobs created by the current user.
-
-    Returns:
-        A list of all jobs created by the current user in JSON format
-        if successful.
-        Otherwise, it returns an error message.
-    """
-    user_id = get_jwt_identity()
-    try:
-        jobs = job_controller.get_my_jobs(user_id)
-        jobs_data = [job_schema.dump(job) for job in jobs]
-        return make_response_("success", "Fetched my jobs", jobs_data), 200
+        return make_response_("success", "Fetched jobs", jobs_data), 200
     except UnauthorizedError as e:
         return make_response_("error", str(e)), 403
     except ValueError as e:
@@ -245,10 +225,7 @@ def get_recommended_candidates(job_id):
     user_id = get_jwt_identity()
     try:
         # Fetch the recommended candidates
-        rec_candidates = job_controller.recommend_candidates(
-                job_id,
-                user_id
-                )
+        rec_candidates = job_controller.recommend_candidates(job_id, user_id)
 
         # Convert the recommended candidates to JSON and return them
         return make_response_(
