@@ -9,7 +9,14 @@ const majorApi = api.injectEndpoints({
         body
       }),
     }),
+    deleteMajor: build.mutation({
+      query: (body) => ({
+        url: 'majors',
+        method: 'DELETE',
+        body
+      }),
+    }),
   }),
 });
 
-export const { useCreateMajorMutation } = majorApi;
+export const { useCreateMajorMutation, useDeleteMajorMutation } = majorApi;
