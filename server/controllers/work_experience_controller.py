@@ -3,6 +3,9 @@ This module provides a controller for the WorkExperience model in the
 Job-linker application.
 """
 
+from datetime import datetime
+
+from dateutil.parser import parse
 from marshmallow import ValidationError
 
 from server.controllers.schemas import work_experience_schema
@@ -53,7 +56,8 @@ class WorkExperienceController:
 
             candidates = major.candidates
             work_experiences = [
-                exp for candidate in candidates for exp in candidate.experiences
+                exp for candidate in candidates
+                for exp in candidate.experiences
             ]
         else:
             work_experiences = storage.all(WorkExperience).values()
@@ -85,6 +89,28 @@ class WorkExperienceController:
         candidate = storage.get_by_attr(Candidate, "user_id", user_id)
         if not candidate:
             raise UnauthorizedError("You are not a candidate")
+
+        # Parse dates and convert to ISO format
+        for date_field in ["start_date", "end_date"]:
+            if date_field in data:
+                if isinstance(data[date_field], datetime):
+                    data[date_field] = data[date_field].isoformat()
+                else:
+                    data[date_field] = parse(data[date_field]).isoformat()
+
+        # Check if a work experience with the same details already exists
+        existing_work_experience = storage.get_by_attr(
+            WorkExperience, "title", data["title"]
+        )
+        if (
+            existing_work_experience
+            and existing_work_experience.company == data["company"]
+            and existing_work_experience.description == data["description"]
+        ):
+            raise ValueError(
+                "A work experience with the same title, "
+                "company, and description already exists"
+            )
 
         # Create new work experience
         new_work_experience = WorkExperience(candidate_id=candidate.id, **data)

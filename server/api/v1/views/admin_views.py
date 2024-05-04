@@ -12,8 +12,6 @@ from server.api.v1.views import app_views
 from server.controllers.admin_controller import AdminController
 from server.decorators import handle_errors
 
-# admin_views = Blueprint("admin_views", __name__)
-
 admin_controller = AdminController()
 
 
