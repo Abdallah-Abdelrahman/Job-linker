@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   FormControl,
@@ -21,6 +22,8 @@ function Register() {
   const [role, setRole] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const navigate = useNavigate();
+
   const handleSubmit = (evt) => {
     evt.preventDefault();
     if (!email || !password || !name || !role) {
@@ -29,7 +32,10 @@ function Register() {
     }
     signup({ email, password, name, role })
       .unwrap()
-      .then((data) => console.log({ data }))
+      .then((data) => {
+        console.log({ data });
+        navigate("/login");
+      })
       .catch((err) => {
         let actualErrorMessage = err.data?.message || "An error occurred";
         try {
