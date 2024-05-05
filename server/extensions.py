@@ -16,3 +16,9 @@ CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
 swagger = Swagger(app)
 jwt = JWTManager(app)
+
+swagger.config["title"] = "Job Linker API"
+swagger.config["version"] = "0.0.1"
+swagger.config[
+        "description"
+        ] = "API End-points to interact with the application"
