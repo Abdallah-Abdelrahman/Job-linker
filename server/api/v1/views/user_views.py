@@ -89,6 +89,7 @@ def login_user():
 
 @app_views.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True, locations="cookies")
+@handle_errors
 @swag_from("docs/app_views/refresh_token.yaml")
 def refresh_token():
     """

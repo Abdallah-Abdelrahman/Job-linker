@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
   Box,
   Heading,
@@ -8,56 +8,115 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Select,
 } from "@chakra-ui/react";
-import { useMeQuery } from "../../app/services/auth";
+import { useMeQuery, useLazyMeQuery } from "../../app/services/auth";
 import { useCreateCandidateMutation } from "../../app/services/candidate";
 import { useCreateRecruiterMutation } from "../../app/services/recruiter";
 import { RootState } from "../../app/store";
-import { Select } from "@chakra-ui/react";
 import { college_majors } from "../../constants";
 
-function Profile() {
-  const { data: userData, error: userError } = useMeQuery();
-  const [createCandidate, { isLoading: isCreatingCandidate }] =
-    useCreateCandidateMutation();
-  const [createRecruiter, { isLoading: isCreatingRecruiter }] =
-    useCreateRecruiterMutation();
-  const role = useSelector((state: RootState) => state.auth.user?.role);
-  const dispatch = useDispatch();
+// Candidate form component
+const CandidateForm = ({ onSubmit }) => {
+  const [major_id, setMajorId] = useState("");
 
-  // State for the forms
-  const [candidateForm, setCandidateForm] = useState({ major_id: "" });
-  const [recruiterForm, setRecruiterForm] = useState({
-    company_name: "",
-    company_info: "",
-  });
-
-  // Handle form changes
-  const handleCandidateFormChange = (e) =>
-    setCandidateForm({ ...candidateForm, [e.target.name]: e.target.value });
-  const handleRecruiterFormChange = (e) =>
-    setRecruiterForm({ ...recruiterForm, [e.target.name]: e.target.value });
-
-  // Handle form submissions
-  const handleCandidateFormSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    createCandidate({ user_id: userData.id, major_id: candidateForm.major_id });
+    onSubmit(major_id);
   };
-  const handleRecruiterFormSubmit = (e) => {
-    e.preventDefault();
-    createRecruiter({ user_id: userData.id, ...recruiterForm });
-  };
-
-  if (userError) {
-    return <Text>Error: {userError.message}</Text>;
-  }
-
-  if (isCreatingCandidate || isCreatingRecruiter) {
-    return <Text>Creating profile...</Text>;
-  }
 
   return (
-    <Box className="w-full max-w-xl">
+    <form onSubmit={handleSubmit}>
+      <FormControl isRequired>
+        <FormLabel>Major ID:</FormLabel>
+        <Select
+          name="major_id"
+          value={major_id}
+          onChange={(e) => setMajorId(e.target.value)}
+        >
+          {college_majors.map((major) => (
+            <option key={major} value={major}>
+              {major}
+            </option>
+          ))}
+        </Select>
+      </FormControl>
+      <Button type="submit">Create Candidate Profile</Button>
+    </form>
+  );
+};
+
+// Recruiter form component
+const RecruiterForm = ({ onSubmit }) => {
+  const [company_name, setCompanyName] = useState("");
+  const [company_info, setCompanyInfo] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit({ company_name, company_info });
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <FormControl isRequired>
+        <FormLabel>Company Name:</FormLabel>
+        <Input
+          type="text"
+          name="company_name"
+          value={company_name}
+          onChange={(e) => setCompanyName(e.target.value)}
+        />
+      </FormControl>
+      <FormControl isRequired>
+        <FormLabel>Company Info:</FormLabel>
+        <Input
+          type="text"
+          name="company_info"
+          value={company_info}
+          onChange={(e) => setCompanyInfo(e.target.value)}
+        />
+      </FormControl>
+      <Button type="submit">Create Recruiter Profile</Button>
+    </form>
+  );
+};
+
+// Profile component
+const Profile = () => {
+  const [fetchMe, { data: userData, isLoading, error }] = useLazyMeQuery();
+  const [createCandidate] = useCreateCandidateMutation();
+  const [createRecruiter] = useCreateRecruiterMutation();
+  const role = useSelector((state: RootState) => state.auth.user?.role);
+
+  // Refetch user data when the role changes
+  useEffect(() => {
+    fetchMe();
+  }, [fetchMe]);
+
+  // Handle form submissions
+  const handleCandidateFormSubmit = async (major_id) => {
+    try {
+      await createCandidate({ user_id: userData.id, major_id });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleRecruiterFormSubmit = async (formData) => {
+    try {
+      await createRecruiter({ user_id: userData.id, ...formData });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const noProfileError =
+    error &&
+    (error.message === "User doesn't have a candidate profile" ||
+      error.message === "User doesn't have a recruiter profile");
+
+  return (
+    <Box>
       <Heading as="h1" size="3xl" className="mb-8 capitalize">
         Profile
       </Heading>
@@ -65,65 +124,82 @@ function Profile() {
         <>
           <Text>Email: {userData.data.email}</Text>
           <Text>Role: {userData.data.role}</Text>
-          {!userData.candidate && userData.data.role === "candidate" && (
-            <form onSubmit={handleCandidateFormSubmit}>
-              <FormControl isRequired>
-                <FormLabel>Major ID:</FormLabel>
-                <Select
-                  name="major_id"
-                  value={candidateForm.major_id}
-                  onChange={handleCandidateFormChange}
-                >
-                  {college_majors.map((major) => (
-                    <option key={major} value={major}>
-                      {major}
-                    </option>
+          {userData.data.role === "candidate" && (
+            <>
+              {!userData.data.candidate ? (
+                <CandidateForm onSubmit={handleCandidateFormSubmit} />
+              ) : (
+                <>
+                  <Text>Major: {userData.data.candidate.major.name}</Text>
+                  <Text>
+                    Skills:{" "}
+                    {userData.data.candidate.skills
+                      .map((skill) => skill.name)
+                      .join(", ")}
+                  </Text>
+                  <Text>
+                    Languages:{" "}
+                    {userData.data.candidate.languages
+                      .map((language) => language.name)
+                      .join(", ")}
+                  </Text>
+                  <Text>Experiences:</Text>
+                  {userData.data.candidate.experiences.map(
+                    (experience, index) => (
+                      <Box key={index} p={5} shadow="md" borderWidth="1px">
+                        <Text>Company: {experience.company}</Text>
+                        <Text>Title: {experience.title}</Text>
+                        <Text>Description: {experience.description}</Text>
+                        <Text>Location: {experience.location}</Text>
+                        <Text>Start Date: {experience.start_date}</Text>
+                        <Text>End Date: {experience.end_date}</Text>
+                      </Box>
+                    ),
+                  )}
+                </>
+              )}
+            </>
+          )}
+          {userData.data.role === "recruiter" && (
+            <>
+              {!userData.data.recruiter ? (
+                <RecruiterForm onSubmit={handleRecruiterFormSubmit} />
+              ) : (
+                <>
+                  <Text>
+                    Company Name: {userData.data.recruiter.company_name}
+                  </Text>
+                  <Text>
+                    Company Info: {userData.data.recruiter.company_info}
+                  </Text>
+                  <Text>Jobs:</Text>
+                  {userData.data.recruiter.jobs.map((job, index) => (
+                    <Box key={index} p={5} shadow="md" borderWidth="1px">
+                      <Text>Title: {job.job_title}</Text>
+                      <Text>Description: {job.job_description}</Text>
+                      <Text>Location: {job.location}</Text>
+                      <Text>Salary: {job.salary}</Text>
+                      <Text>Skills: {job.skills.join(", ")}</Text>
+                    </Box>
                   ))}
-                </Select>
-              </FormControl>
-              <Button type="submit">Create Candidate Profile</Button>
-            </form>
-          )}
-          {!userData.recruiter && userData.data.role === "recruiter" && (
-            <form onSubmit={handleRecruiterFormSubmit}>
-              <FormControl isRequired>
-                <FormLabel>Company Name:</FormLabel>
-                <Input
-                  type="text"
-                  name="company_name"
-                  value={recruiterForm.company_name}
-                  onChange={handleRecruiterFormChange}
-                />
-              </FormControl>
-              <FormControl isRequired>
-                <FormLabel>Company Info:</FormLabel>
-                <Input
-                  type="text"
-                  name="company_info"
-                  value={recruiterForm.company_info}
-                  onChange={handleRecruiterFormChange}
-                />
-              </FormControl>
-              <Button type="submit">Create Recruiter Profile</Button>
-            </form>
-          )}
-          {userData.candidate && (
-            <>
-              <Text>Major: {userData.candidate.major}</Text>
-              <Text>Skills: {userData.candidate.skills.join(", ")}</Text>
-              <Text>Languages: {userData.candidate.languages.join(", ")}</Text>
+                </>
+              )}
             </>
           )}
-          {userData.recruiter && (
-            <>
-              <Text>Company Name: {userData.recruiter.company_name}</Text>
-              <Text>Company Info: {userData.recruiter.company_info}</Text>
-            </>
+        </>
+      )}
+      {!userData && noProfileError && (
+        <>
+          {role === "candidate" && (
+            <CandidateForm onSubmit={handleCandidateFormSubmit} />
+          )}
+          {role === "recruiter" && (
+            <RecruiterForm onSubmit={handleRecruiterFormSubmit} />
           )}
         </>
       )}
     </Box>
   );
-}
+};
 
 export default Profile;
