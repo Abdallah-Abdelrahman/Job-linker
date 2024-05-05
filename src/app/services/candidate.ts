@@ -8,5 +8,5 @@ const candidApi = api.injectEndpoints({
   }),
 });
 
-export const { useExampleQuery } = candidApi;
+export const {} = candidApi;
 
