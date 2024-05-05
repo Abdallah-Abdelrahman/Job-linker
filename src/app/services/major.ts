@@ -1,22 +1,44 @@
 import { api } from './auth';
 
-const majorApi = api.injectEndpoints({
-  endpoints: (build) => ({
-    createMajor: build.mutation({
+export interface Major {
+  id: string;
+  name: string;
+}
+
+export const majorApi = api.injectEndpoints({
+  endpoints: (builder) => ({
+    getMajors: builder.query<Major[], void>({
+      query: () => 'majors',
+    }),
+    createMajor: builder.mutation<Major, Partial<Major>>({
       query: (body) => ({
         url: 'majors',
         method: 'POST',
-        body
+        body,
       }),
     }),
-    deleteMajor: build.mutation({
-      query: (body) => ({
-        url: 'majors',
+    updateMajor: builder.mutation<
+      Major,
+      { major_id: string; updates: Partial<Major> }
+    >({
+      query: ({ major_id, updates }) => ({
+        url: `majors/${major_id}`,
+        method: 'PUT',
+        body: updates,
+      }),
+    }),
+    deleteMajor: builder.mutation<void, string>({
+      query: (major_id) => ({
+        url: `majors/${major_id}`,
         method: 'DELETE',
-        body
       }),
     }),
   }),
 });
 
-export const { useCreateMajorMutation, useDeleteMajorMutation } = majorApi;
+export const {
+  useGetMajorsQuery,
+  useCreateMajorMutation,
+  useUpdateMajorMutation,
+  useDeleteMajorMutation,
+} = majorApi;

@@ -236,11 +236,48 @@ class UserController:
 
         user_data = user.to_dict
 
-        user_by_role = {'candidate': Candidate, 'recruiter': Recruiter}
-        instance = storage.get_by_attr(user_by_role.get(user.role), "user_id", user_id)
+        if user.role == "candidate":
+            candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+            if not candidate:
+                return user_data
+            if candidate:
+                user_data["candidate"] = {
+                    "major": candidate.major.to_dict,
+                    "skills": [skill.to_dict for skill in candidate.skills],
+                    "languages": [
+                        language.to_dict
+                        for language in candidate.languages
+                        ],
+                    "applications": [
+                        application.to_dict
+                        for application in candidate.applications
+                    ],
+                    "experiences": [
+                        experience.to_dict
+                        for experience in candidate.experiences
+                    ]
+                }
+        elif user.role == "recruiter":
+            recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
+            if not recruiter:
+                return user_data
+            jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
+            if recruiter:
+                user_data["recruiter"] = {
+                    "company_name": recruiter.company_name,
+                    "company_info": recruiter.company_info,
+                    "jobs": [job.to_dict for job in jobs]
+                }
 
-        if instance:
-            user_data.update(instance.to_dict)
+        # user_by_role = {'candidate': Candidate, 'recruiter': Recruiter}
+        # instance = storage.get_by_attr(
+        #               user_by_role.get(user.role),
+        #               "user_id",
+        #               user_id
+        #               )
+
+        # if instance:
+        #     user_data.update(instance.to_dict)
         return user_data
 
     def update_current_user(self, user_id, data):

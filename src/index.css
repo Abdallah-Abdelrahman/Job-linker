@@ -100,6 +100,9 @@ button:focus-visible {
 li > a {
     height: 100%;
 }
+.footer {
+    width: calc(100% + 2rem);
+}
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

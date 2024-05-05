@@ -44,7 +44,7 @@ class DBStorage:
         #        JOBS_MYSQL_HOST = getenv("JOBS_MYSQL_HOST")
         #        JOBS_MYSQL_DB = getenv("JOBS_MYSQL_DB")
         #        JOBS_ENV = getenv("JOBS_ENV")
-        self.__engine = create_engine(engine)
+        self.__engine = create_engine(engine, pool_size=10)
         # .format(
         #    JOBS_MYSQL_USER, JOBS_MYSQL_PWD, JOBS_MYSQL_HOST, JOBS_MYSQL_DB
         # )

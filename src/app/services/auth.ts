@@ -1,34 +1,32 @@
-
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { RootState } from '../store'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { RootState } from '../store';
 
 export interface User {
-  role: string
-  name: string
-  email: string
+  role: string;
+  name: string;
+  email: string;
 }
 
 export interface UserResponse {
-  user: User
+  user: User;
 }
 
 export interface LoginRequest {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 export interface RegisterRequest {
-  email: string
-  name: string
-  password: string
-  role: 'candidate' | 'recruiter'
+  email: string;
+  name: string;
+  password: string;
+  role: 'candidate' | 'recruiter';
 }
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: '/api/v1',
     prepareHeaders: (headers, { getState }) => {
-      // By default, if we have a token in the store, let's use that for authenticated requests
       const token = (getState() as RootState).auth.jwt;
       if (token) {
         console.log({ token });
@@ -37,7 +35,7 @@ export const api = createApi({
       return headers;
     },
   }),
-  tagTypes: ['refresh'],
+  tagTypes: ['refresh', 'candidates', 'recruiters'],
   endpoints: (builder) => ({
     login: builder.mutation<UserResponse, LoginRequest>({
       query: (credentials) => ({
@@ -56,7 +54,7 @@ export const api = createApi({
     verfiy: builder.query<UserResponse, { token: string }>({
       query: (param) => ({
         url: 'verify',
-        params: param
+        params: param,
       }),
     }),
     me: builder.query<UserResponse, void>({
@@ -64,17 +62,17 @@ export const api = createApi({
         url: '@me',
         //headers: {'Authorization': `Bearer ${token}`},
       }),
-      providesTags: ['refresh'],
+      providesTags: ['refresh', 'recruiters', 'candidates'],
     }),
-    upload: builder.mutation<UserResponse, { file: FormData, role: string }>({
+    upload: builder.mutation<UserResponse, { file: FormData; role: string }>({
       query: ({ role, file }) => {
         console.log({ role, file });
-        return ({
+        return {
           url: 'upload',
           method: 'POST',
           body: file,
           params: { role },
-        })
+        };
       },
     }),
     refresh: builder.mutation<UserResponse, { token: string }>({
@@ -85,7 +83,36 @@ export const api = createApi({
         credentials: 'include',
       }),
       invalidatesTags: ['refresh'],
-    })
+    }),
+    updateMe: builder.mutation<UserResponse, Partial<User>>({
+      query: (updates) => ({
+        url: '@me',
+        method: 'PUT',
+        body: updates,
+      }),
+    }),
+    deleteMe: builder.mutation<void, void>({
+      query: () => ({
+        url: '@me',
+        method: 'DELETE',
+      }),
+    }),
+    updatePassword: builder.mutation<
+      void,
+      { current_password: string; new_password: string }
+    >({
+      query: ({ current_password, new_password }) => ({
+        url: '@me/password',
+        method: 'PUT',
+        body: { current_password, new_password },
+      }),
+    }),
+    logout: builder.mutation<void, void>({
+      query: () => ({
+        url: 'logout',
+        method: 'POST',
+      }),
+    }),
   }),
 });
 
@@ -96,5 +123,9 @@ export const {
   useMeQuery,
   useUploadMutation,
   useRefreshMutation,
-  useLazyMeQuery
+  useLazyMeQuery,
+  useUpdateMeMutation,
+  useDeleteMeMutation,
+  useUpdatePasswordMutation,
+  useLogoutMutation,
 } = api;
