@@ -6,7 +6,7 @@ function useRefresh() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const reloadHandler = (evt) => {
+    const reloadHandler = (evt: Event) => {
       evt.preventDefault();
       // refresh token
       fetch('/api/v1/refresh', {
@@ -14,12 +14,16 @@ function useRefresh() {
         credentials: 'include',
         headers: { 'X-CSRF-TOKEN': document.cookie.split('=')[1] }
       })
-        .then(resp => resp.json())
-        .then(data => {
-          console.log({ data });
-          dispatch(setCredentials(data));
+        .then(resp => {
+          dispatch(setCredentials({ isRefreshing: true, isRefreshed: resp.ok }));
+          return resp.json();
         })
-        .catch(err => console.error({ err }));
+        .then(({ data }) => {
+          console.log('----refresh---->', { data });
+          dispatch(setCredentials({ ...data, isRefreshing: false }));
+        })
+        .catch(err => console.error({ err }))
+        .finally(() => dispatch(setCredentials({ isRefreshing: false })));
     };
 
     window.addEventListener('load', reloadHandler);
