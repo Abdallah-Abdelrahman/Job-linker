@@ -24,5 +24,15 @@ parameters:
 responses:
   201:
     description: User registered successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "User registered successfully",
+          "data": { "role": "candidate" },
+        }
   400:
     description: Invalid input
+    examples:
+      application/json:
+        { "status": "error", "message": "User already exists", "data": {} }

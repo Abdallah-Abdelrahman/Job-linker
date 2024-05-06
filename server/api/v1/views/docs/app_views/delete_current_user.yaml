@@ -14,5 +14,15 @@ security:
 responses:
   200:
     description: User deleted successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "User deleted successfully",
+          "data": {},
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }

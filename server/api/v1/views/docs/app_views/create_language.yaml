@@ -23,7 +23,20 @@ parameters:
 responses:
   201:
     description: Language created successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Language created successfully",
+          "data": { "id": "language1" },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid input
+    examples:
+      application/json:
+        { "status": "error", "message": "Invalid input", "data": {} }

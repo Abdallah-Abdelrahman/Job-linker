@@ -33,7 +33,20 @@ parameters:
 responses:
   201:
     description: Candidate created successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Candidate created successfully",
+          "data": { "id": "candidate1" },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid input
+    examples:
+      application/json:
+        { "status": "error", "message": "Invalid input", "data": {} }

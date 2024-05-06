@@ -39,7 +39,29 @@ parameters:
 responses:
   200:
     description: Work experience details updated successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "WorkExperience details updated successfully",
+          "data":
+            {
+              "id": "work_experience1",
+              "title": "Data Scientist",
+              "description": "Analyzed and interpreted complex data.",
+            },
+        }
   401:
     description: Unauthorized access (user is not a candidate)
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid work experience ID, input, or work experience not found
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Invalid work experience ID, input, or work experience not found",
+          "data": {},
+        }

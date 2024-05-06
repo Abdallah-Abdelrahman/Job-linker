@@ -20,7 +20,35 @@ parameters:
 responses:
   200:
     description: All work experiences or work experiences related to a specific major fetched successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Fetched all work experiences",
+          "data":
+            [
+              {
+                "company": "Tech Corp",
+                "description": "Developed and maintained web applications using Flask and React.",
+                "end_date": "2024-05-04T03:48:03.920066",
+                "id": "94b8c8ea-fe49-41a8-8912-df7368f0ef58",
+                "location": "San Francisco, CA",
+                "start_date": "2024-05-04T03:48:03.920011",
+                "title": "Software Engineer",
+              },
+            ],
+        }
   403:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   404:
     description: Work experiences not found
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Work experiences not found",
+          "data": {},
+        }

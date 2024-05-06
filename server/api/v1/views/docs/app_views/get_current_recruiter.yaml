@@ -14,7 +14,25 @@ security:
 responses:
   200:
     description: Recruiter details fetched successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Recruiter details fetched successfully",
+          "data":
+            {
+              "id": "634774a1-7778-466b-89b4-dd5bebea5c8e",
+              "company_name": "AIO",
+              "company_info": "Bahry",
+            },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   404:
     description: Recruiter not found
+    examples:
+      application/json:
+        { "status": "error", "message": "Recruiter not found", "data": {} }

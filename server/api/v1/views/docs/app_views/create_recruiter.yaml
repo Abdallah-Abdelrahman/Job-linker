@@ -26,7 +26,20 @@ parameters:
 responses:
   201:
     description: Recruiter created successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Recruiter created successfully",
+          "data": { "id": "634774a1-7778-466b-89b4-dd5bebea5c8e" },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid input
+    examples:
+      application/json:
+        { "status": "error", "message": "Invalid input", "data": {} }

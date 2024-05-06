@@ -28,5 +28,20 @@ parameters:
 responses:
   200:
     description: Skill details updated successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Skill details updated successfully",
+          "data":
+            { "id": "27459a10-78e5-4af0-998e-f089e02ff7eb", "name": "C#" },
+        }
   400:
     description: Invalid skill ID or input
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Invalid skill ID or input",
+          "data": {},
+        }
