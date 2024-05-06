@@ -1,21 +1,22 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { User } from '../../app/services/auth';
 import type { RootState } from '../../app/store';
 
 type AuthState = {
   data: {
-    name: string,
-    role: 'recruiter' | 'candidate'
-    jwt: string
+    name: string | null,
+    role: 'recruiter' | 'candidate' | null
+    jwt: string | null
+    isRefreshing: boolean,
+    isRefreshed: boolean
   },
   message: string,
-  status: string
+  status: string,
 }
 
 const slice = createSlice({
   name: 'auth',
-  initialState: {} as AuthState['data'],
+  initialState: { isRefreshed: false, isRefreshing: true } as AuthState['data'],
   reducers: {
     setCredentials: (
       state,
@@ -24,7 +25,10 @@ const slice = createSlice({
       }: PayloadAction<AuthState>,
     ) => {
       const { message, status, ...rest } = payload;
-      return { ...state, ...rest.data };
+      return {
+        ...state,
+        ...rest,
+      };
     },
   },
 });

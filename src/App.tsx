@@ -11,7 +11,9 @@ import {
 import Verify from './features/auth/Verify';
 import './App.css';
 import { useRefresh } from './hooks';
-import { MyIcon } from './components';
+import { MyIcon, ErrorPage, Private } from './components';
+import { useAppSelector } from './hooks/store';
+import { selectCurrentUser } from './features/auth/authSlice';
 
 const App = () => {
   return (
@@ -22,6 +24,8 @@ const App = () => {
 };
 
 function Layout() {
+  const user = useAppSelector(selectCurrentUser);
+  const isAuthenticated = user.jwt || user.isRefreshed;
   // token refresher
   useRefresh();
 
@@ -30,18 +34,22 @@ function Layout() {
       <header className='w-full pt-4 shadow-md rounded-md'>
         <nav className='nav flex justify-center gap-4 md:gap-10'>
           <NavLink className='py-3 px-4 md:px-5' to='/'>
-            {' '}
-            home{' '}
+            home
           </NavLink>
-          <NavLink className='py-3 px-4 md:px-5' to='login'>
-            login
-          </NavLink>
-          <NavLink className='py-3 px-4 md:px-5' to='signup'>
-            signup
-          </NavLink>
-          {/* TODO: private route*/}
-          <NavLink className='py-3 px-5' to='@me'>
+          {isAuthenticated && <NavLink className='py-3 px-5' to='@me'>
             profile
+          </NavLink>
+          }
+          <NavLink
+            className='py-3 px-4 md:px-5'
+            to={isAuthenticated ? 'logout' : 'login'}
+            onClick={() => {
+              if (isAuthenticated) {
+                // TODO: logout request
+              }
+            }}
+          >
+            {user.jwt || user.isRefreshed ? 'logout' : 'login'}
           </NavLink>
         </nav>
       </header>
@@ -62,13 +70,15 @@ function Layout() {
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path='/' element={<Layout />}>
+    <Route path='/' element={<Layout />} errorElement={<ErrorPage />}>
       <Route index element={<App />} />
       <Route path='signup' element={<Register />} />
       <Route path='login' element={<Login />} />
       <Route path='verify' element={<Verify />} />
-      <Route path='@me' element={<Profile />} />
-    </Route>,
+      <Route element={<Private />}>
+        <Route path='@me' element={<Profile />} />
+      </Route>
+    </Route>
   ),
 );
 

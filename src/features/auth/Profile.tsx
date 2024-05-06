@@ -10,10 +10,9 @@ import {
   Input,
   Select,
 } from '@chakra-ui/react';
-import { useMeQuery, useLazyMeQuery } from '../../app/services/auth';
+import { useMeQuery } from '../../app/services/auth';
 import { useCreateCandidateMutation } from '../../app/services/candidate';
-import { Recruiter, RecruiterResponse, useCreateRecruiterMutation } from '../../app/services/recruiter';
-import { RootState } from '../../app/store';
+import { Recruiter, useCreateRecruiterMutation } from '../../app/services/recruiter';
 import { college_majors } from '../../constants';
 import { useAppSelector } from '../../hooks/store';
 import { selectCurrentUser } from './authSlice';
@@ -21,7 +20,7 @@ import { useAfterRefreshQuery } from '../../hooks';
 import { useCreateMajorMutation } from '../../app/services/major';
 
 function MyForm({ onSubmit, role }) {
-  const candidateJSX = (
+  const candidateJSX = 
     <FormControl isRequired>
       <FormLabel>Major ID:</FormLabel>
       <Select
@@ -79,7 +78,6 @@ const Profile = () => {
   const { role } = useAppSelector(selectCurrentUser);
 
 
-  console.log({ userData })
   // Handle form submissions
   const handleCandidateFormSubmit = async ({ name }) => {
     try {
