@@ -7,17 +7,17 @@ import {
   Heading,
   Alert,
   AlertIcon,
-  Spinner,
+  Text
 } from "@chakra-ui/react";
-import { useLoginMutation } from "../../app/services/auth";
-import { selectCurrentUser, setCredentials } from "./authSlice";
-import { useNavigate } from "react-router-dom";
+import { useLoginMutation } from "../app/services/auth";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
-import { useAppSelector } from "../../hooks/store";
+import { useAppSelector } from "../hooks/store";
+import { selectCurrentUser, setCredentials } from "../features/auth";
 
 function Login() {
-  const [login, { isLoading, isError, isSuccess }] = useLoginMutation();
+  const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useAppSelector(selectCurrentUser);
@@ -96,6 +96,10 @@ function Login() {
             {errorMessage}
           </Alert>
         )}
+          <Text>
+            Dont't have an acount?
+            <NavLink to='/signup' className='text-teal-500 mx-2'>register</NavLink>
+            </Text>
         <Button
           width="full"
           mt={4}

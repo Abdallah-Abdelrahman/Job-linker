@@ -10,12 +10,11 @@ import {
   Heading,
   Alert,
   AlertIcon,
-  Spinner,
 } from "@chakra-ui/react";
-import { useRegisterMutation } from "../../app/services/auth";
+import { useRegisterMutation } from "../app/services/auth";
 
 function Register() {
-  const [signup, { isLoading, isError }] = useRegisterMutation();
+  const [signup, { isLoading }] = useRegisterMutation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");

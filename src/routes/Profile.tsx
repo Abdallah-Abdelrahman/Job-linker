@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useState } from "react";
 import {
   Box,
   Heading,
@@ -13,19 +12,17 @@ import {
   Alert,
   AlertIcon,
 } from "@chakra-ui/react";
-import { useMeQuery, useLazyMeQuery } from "../../app/services/auth";
-import { useCreateCandidateMutation } from "../../app/services/candidate";
+import { useMeQuery } from "../app/services/auth";
+import { useCreateCandidateMutation } from "../app/services/candidate";
 import {
   Recruiter,
-  RecruiterResponse,
   useCreateRecruiterMutation,
-} from "../../app/services/recruiter";
-import { RootState } from "../../app/store";
-import { college_majors } from "../../constants";
-import { useAppSelector } from "../../hooks/store";
-import { selectCurrentUser } from "./authSlice";
-import { useAfterRefreshQuery } from "../../hooks";
-import { useCreateMajorMutation } from "../../app/services/major";
+} from "../app/services/recruiter";
+import { college_majors } from "../constants";
+import { useAppSelector } from "../hooks/store";
+import { useAfterRefreshQuery } from "../hooks";
+import { useCreateMajorMutation } from "../app/services/major";
+import { selectCurrentUser } from "../features/auth";
 
 function MyForm({ onSubmit, role }) {
   const [formData, setFormData] = useState({
