@@ -20,13 +20,40 @@ parameters:
         name:
           type: string
           description: The new name of the user
-        email:
+        bio:
           type: string
-          description: The new email of the user
+          description: The new bio of the user
+        contact_info:
+          type: string
+          description: The new contact info of the user
+        image_url:
+          type: string
+          description: The new image URL of the user
 responses:
   200:
     description: User details updated successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "User details updated successfully",
+          "data":
+            {
+              "id": "86f7c39a-3ce9-413f-b2ef-3120cee3574a",
+              "role": "candidate",
+            },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid input
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "{'email': ['Unknown field.']}",
+          "data": {},
+        }

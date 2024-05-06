@@ -52,6 +52,11 @@ class SkillController:
         except ValidationError as err:
             raise ValueError(err.messages)
 
+        # Check if skill already exists
+        existing_skill = storage.get_by_attr(Skill, "name", data["name"])
+        if existing_skill:
+            return existing_skill
+
         # Create new skill
         new_skill = Skill(name=data["name"])
         storage.new(new_skill)

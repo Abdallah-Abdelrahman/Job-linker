@@ -14,3 +14,10 @@ security:
 responses:
   200:
     description: Logged out successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Logged out successfully",
+          "data": {},
+        }

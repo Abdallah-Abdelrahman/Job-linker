@@ -40,7 +40,24 @@ parameters:
 responses:
   201:
     description: Work experience created successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "WorkExperience created successfully",
+          "data": { "id": "work_experience1" },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid input or user is not a candidate
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Invalid input or user is not a candidate",
+          "data": {},
+        }

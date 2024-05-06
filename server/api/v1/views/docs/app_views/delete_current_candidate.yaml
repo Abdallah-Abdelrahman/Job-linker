@@ -14,7 +14,20 @@ security:
 responses:
   200:
     description: Candidate profile deleted successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Candidate profile deleted successfully",
+          "data": {},
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   404:
     description: Candidate not found
+    examples:
+      application/json:
+        { "status": "error", "message": "Candidate not found", "data": {} }

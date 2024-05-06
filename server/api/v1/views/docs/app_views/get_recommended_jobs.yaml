@@ -14,7 +14,43 @@ security:
 responses:
   200:
     description: Recommended jobs fetched successfully
+    examples:
+      application/json:
+        {
+          "data":
+            {
+              "jobs":
+                [
+                  {
+                    "has_applied": true,
+                    "job":
+                      {
+                        "created_at": "2024-05-02T04:10:22.850126",
+                        "exper_years": "2",
+                        "id": "eb60800d-ecd6-4da7-9cd6-05ffd775ea0e",
+                        "job_description": "We are looking for a Software Engineer to join our team. The ideal candidate will have experience in Python, Java, and JavaScript. They will also have a strong understanding of data structures and algorithms.",
+                        "job_title": "Software Engineer",
+                        "location": null,
+                        "major": "Computer Science",
+                        "major_id": "6bce5369-6dd3-40fd-a32e-774213ea137d",
+                        "recruiter_id": "634774a1-7778-466b-89b4-dd5bebea5c8e",
+                        "salary": 80000,
+                        "skills": ["Python"],
+                        "updated_at": "2024-05-02T04:10:22.850136",
+                      },
+                  },
+                ],
+            },
+          "message": "Recommended Jobs based on Major & Skills",
+          "status": "success",
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
-    description: Error occurred while fetching recommended jobs
+    description: Error occurred
+    examples:
+      application/json:
+        { "status": "error", "message": "Error occurred", "data": {} }

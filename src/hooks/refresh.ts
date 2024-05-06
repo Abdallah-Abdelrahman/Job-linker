@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import { setCredentials } from '../features/auth/authSlice';
+import { useAppDispatch } from './store';
 
 function useRefresh() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const reloadHandler = (evt: Event) => {

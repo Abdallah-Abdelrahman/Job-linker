@@ -8,8 +8,11 @@ from flask_jwt_extended import (
     get_jwt_identity,
     jwt_required,
     set_refresh_cookies,
+    get_jwt,
+    unset_jwt_cookies
 )
 
+from server.config import ApplicationConfig
 from server.api.utils import make_response_
 from server.api.v1.views import app_views, user_controller
 from server.decorators import handle_errors, verified_required
@@ -115,18 +118,30 @@ def refresh_token():
     )
 
 
-@app_views.route("/logout", methods=["POST"])
-@jwt_required()
+@app_views.route("/logout", methods=["DELETE"])
+@jwt_required(verify_type=False)
 @verified_required
 @swag_from("docs/app_views/logout_user.yaml")
 def logout_user():
     """
-    Logs out a user.
+    Endpoint for revoking the current users access token. Save the JWTs unique
+    identifier (jti) in redis. Also set a Time to Live (TTL)  when storing the JWT
+    so that it will automatically be cleared out of redis after the token expires.
 
     Returns:
         A response object containing the status and message.
     """
-    return make_response_("success", "Logged out successfully")
+    from server.api.v1.app import jwt_redis_blocklist
+
+    token = get_jwt()
+    jti = token.get('jti')
+    ttype = token.get("type")
+    jwt_redis_blocklist.set(jti, "",
+                            ex=ApplicationConfig.JWT_ACCESS_TOKEN_EXPIRES)
+    print(f"--------> {ttype.capitalize()} token successfully revoked")
+    resp = make_response_("success", "Access token revoked successfully")
+    unset_jwt_cookies(resp)
+    return resp
 
 
 @app_views.route("/@me")

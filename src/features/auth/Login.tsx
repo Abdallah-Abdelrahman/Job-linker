@@ -5,14 +5,16 @@ import {
   Input,
   Box,
   Heading,
-  Text
-} from '@chakra-ui/react';
-import { useLoginMutation } from '../../app/services/auth';
-import { selectCurrentUser, setCredentials } from './authSlice';
-import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { useEffect } from 'react';
-import { useAppSelector } from '../../hooks/store';
+  Alert,
+  AlertIcon,
+  Spinner,
+} from "@chakra-ui/react";
+import { useLoginMutation } from "../../app/services/auth";
+import { selectCurrentUser, setCredentials } from "./authSlice";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useState, useEffect } from "react";
+import { useAppSelector } from "../../hooks/store";
 
 function Login() {
   const [login, { isLoading, isError, isSuccess }] = useLoginMutation();
@@ -20,20 +22,37 @@ function Login() {
   const dispatch = useDispatch();
   const user = useAppSelector(selectCurrentUser);
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
   const handleSubmit = (evt) => {
     evt.preventDefault();
-    const form = new FormData(evt.currentTarget);
-    login(Object.fromEntries(form))
+    if (!email || !password) {
+      setErrorMessage("Please fill in all fields");
+      return;
+    }
+    login({ email, password })
       .unwrap()
       .then(({ data }) => {
         if (data.jwt) {
           dispatch(setCredentials({ ...data, isRefreshed: true }));
-          navigate('/@me');
+          navigate("/@me");
         } else {
-          console.log(data.message);
+          setErrorMessage(data.message);
         }
       })
-      .catch((err) => console.error({ err }));
+      .catch((err) => {
+        let actualErrorMessage = err.data?.message || "An error occurred";
+        try {
+          // Attempt to parse the error message
+          const errorData = JSON.parse(err.data.message.replace(/'/g, '"'));
+          actualErrorMessage = Object.values(errorData)[0][0];
+        } catch (error) {
+          // If parsing fails, do nothing and use the original error message
+        }
+        setErrorMessage(actualErrorMessage);
+      });
   };
 
   // redirect the user to thier profile if logged-in
@@ -53,20 +72,37 @@ function Login() {
       <form className='w-full flex flex-col gap-4' onSubmit={handleSubmit}>
         <FormControl isRequired>
           <FormLabel> Email </FormLabel>
-          <Input type='email' name='email' placeholder='Enter your email' />
+          <Input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </FormControl>
         <FormControl isRequired>
           <FormLabel> Password </FormLabel>
           <Input
-            type='password'
-            name='password'
-            placeholder='Enter your password'
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </FormControl>
-        <Text as='p'>don't have an acount ?
-          <Link to='/signup' className='mx-2 text-teal-500'>signup</Link>
-        </Text>
-        <Button width='full' mt={4} colorScheme='teal' type='submit'>
+        {errorMessage && (
+          <Alert status="error">
+            <AlertIcon />
+            {errorMessage}
+          </Alert>
+        )}
+        <Button
+          width="full"
+          mt={4}
+          colorScheme="teal"
+          type="submit"
+          isLoading={isLoading}
+        >
           Login
         </Button>
       </form>

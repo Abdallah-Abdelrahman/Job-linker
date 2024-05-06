@@ -14,7 +14,26 @@ security:
 responses:
   200:
     description: Candidate details fetched successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Candidate details fetched successfully",
+          "data":
+            {
+              "id": "candidate1",
+              "major_id": "major1",
+              "skills": ["skill1", "skill2"],
+              "languages": ["language1", "language2"],
+            },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   404:
     description: Candidate not found
+    examples:
+      application/json:
+        { "status": "error", "message": "Candidate not found", "data": {} }

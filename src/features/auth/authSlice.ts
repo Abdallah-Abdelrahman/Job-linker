@@ -3,26 +3,31 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from '../../app/store';
 
 type AuthState = {
-  data: {
-    name: string | null,
-    role: 'recruiter' | 'candidate' | null
-    jwt: string | null
-    isRefreshing: boolean,
-    isRefreshed: boolean
-  },
+  role: 'recruiter' | 'candidate' | null,
+  jwt: string | null,
+  isRefreshing: boolean,
+  isRefreshed: boolean
   message: string,
   status: string,
 }
+const initialState: AuthState = {
+  role: null,
+  jwt: null,
+  message: '',
+  status: '',
+  isRefreshing: true,
+  isRefreshed: false
+};
 
 const slice = createSlice({
   name: 'auth',
-  initialState: { isRefreshed: false, isRefreshing: true } as AuthState['data'],
+  initialState,
   reducers: {
     setCredentials: (
       state,
       {
         payload,
-      }: PayloadAction<AuthState>,
+      }: PayloadAction<Partial<AuthState>>,
     ) => {
       const { message, status, ...rest } = payload;
       return {

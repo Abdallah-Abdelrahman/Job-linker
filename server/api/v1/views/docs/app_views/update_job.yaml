@@ -43,7 +43,34 @@ parameters:
 responses:
   200:
     description: Job details updated successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Job details updated successfully",
+          "data":
+            {
+              "exper_years": "2",
+              "id": "eb60800d-ecd6-4da7-9cd6-05ffd775ea0e",
+              "job_description": "We are looking for a Software Engineer to join our team. The ideal candidate will have experience in Python, Java, and JavaScript. They will also have a strong understanding of data structures and algorithms.",
+              "job_title": "Software Engineer",
+              "location": null,
+              "major_id": "6bce5369-6dd3-40fd-a32e-774213ea137d",
+              "recruiter_id": "634774a1-7778-466b-89b4-dd5bebea5c8e",
+              "salary": 80000.0,
+            },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid job ID, input, or job not found
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Invalid job ID, input, or job not found",
+          "data": {},
+        }

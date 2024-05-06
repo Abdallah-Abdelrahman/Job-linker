@@ -57,7 +57,11 @@ class ApplicationConfig:
     JWT_SECRET_KEY = os.environ["SECRET_KEY"]
 
     # Set the lifespan of access tokens to 30 minutes
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=60)
+
+    # Here you can globally configure all the ways you want to allow JWTs to
+    # be sent to your web application. By default, this will be only headers.
+    JWT_TOKEN_LOCATION = ["headers", "cookies", "json", "query_string"]
 
     # Set the lifespan of refresh tokens to 1 day
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)

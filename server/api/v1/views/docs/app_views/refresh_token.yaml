@@ -14,5 +14,15 @@ security:
 responses:
   200:
     description: Token refreshed successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Token refreshed successfully",
+          "data": { "jwt": "<JWT_Token>" },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }

@@ -20,7 +20,34 @@ parameters:
 responses:
   200:
     description: Application(s) fetched successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Application fetched successfully",
+          "data":
+            [
+              {
+                "id": "application1",
+                "job_id": "job1",
+                "candidate_id": "candidate1",
+                "status": "applied",
+              },
+              {
+                "id": "application2",
+                "job_id": "job2",
+                "candidate_id": "candidate2",
+                "status": "rejected",
+              },
+            ],
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid application ID
+    examples:
+      application/json:
+        { "status": "error", "message": "Invalid application ID", "data": {} }

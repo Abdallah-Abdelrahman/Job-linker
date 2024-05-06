@@ -33,7 +33,20 @@ parameters:
 responses:
   200:
     description: Candidate details updated successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Candidate details updated successfully",
+          "data": { "id": "candidate1", "major_id": "major1" },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid input
+    examples:
+      application/json:
+        { "status": "error", "message": "Invalid input", "data": {} }
