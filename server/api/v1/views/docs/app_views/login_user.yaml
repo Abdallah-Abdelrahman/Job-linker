@@ -18,5 +18,15 @@ parameters:
 responses:
   200:
     description: User logged in successfully
-  401:
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "User logged in successfully",
+          "data": { "jwt": "<JWT_Token>", "role": "recruiter" },
+        }
+  400:
     description: Invalid email or password
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }

@@ -20,7 +20,20 @@ parameters:
 responses:
   200:
     description: Language removed successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Language removed successfully",
+          "data": { "id": "candidate1", "languages": ["language1"] },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid language ID
+    examples:
+      application/json:
+        { "status": "error", "message": "Invalid language ID", "data": {} }

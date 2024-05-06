@@ -20,7 +20,24 @@ parameters:
 responses:
   200:
     description: Work experience deleted successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "WorkExperience deleted successfully",
+          "data": {},
+        }
   401:
     description: Unauthorized access (user is not a candidate)
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   404:
     description: Work experience not found
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Work experience not found",
+          "data": {},
+        }

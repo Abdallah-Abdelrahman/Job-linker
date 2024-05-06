@@ -16,6 +16,37 @@ from server.decorators import handle_errors
 work_experience_controller = WorkExperienceController()
 
 
+@app_views.route("/work_experiences", methods=["GET"])
+@app_views.route("/work_experiences/<major_id>", methods=["GET"])
+@jwt_required()
+@handle_errors
+@swag_from("docs/app_views/get_work_experiences.yaml")
+def get_work_experiences(major_id=None):
+    """
+    Fetches all work experiences or work experiences related to a
+    specific major.
+
+    Returns:
+        A list of all work experiences or work experiences related to a
+        specific major in JSON format if successful.
+        Otherwise, it returns an error message.
+    """
+    user_id = get_jwt_identity()
+    work_experiences = work_experience_controller.get_work_experiences(
+        user_id, major_id
+    )
+    work_experiences_data = [
+        work_experience_schema.dump(work_experience)
+        for work_experience in work_experiences
+    ]
+    return (
+        make_response_(
+            "success", "Fetched all work experiences", work_experiences_data
+        ),
+        200,
+    )
+
+
 @app_views.route("/work_experiences", methods=["POST"])
 @jwt_required()
 @handle_errors
@@ -40,34 +71,6 @@ def create_work_experience():
             {"id": new_work_exp.id},
         ),
         201,
-    )
-
-
-@app_views.route("/work_experiences/<work_experience_id>", methods=["GET"])
-@jwt_required()
-@handle_errors
-@swag_from("docs/app_views/get_work_experience.yaml")
-def get_work_experience(work_experience_id):
-    """
-    Fetches the details of a specific work experience.
-
-    Returns:
-        A response object containing the status, message, and work experience
-        data if successful.
-        Otherwise, it returns an error message.
-    """
-    user_id = get_jwt_identity()
-    work_experience = work_experience_controller.get_work_experiences(
-        user_id, work_experience_id
-    )
-    return make_response_(
-        "success",
-        "WorkExperience details fetched successfully",
-        {
-            "id": work_experience.id,
-            "title": work_experience.title,
-            "description": work_experience.description,
-        },
     )
 
 
@@ -117,34 +120,3 @@ def delete_work_experience(work_experience_id):
             work_experience_id
             )
     return make_response_("success", "WorkExperience deleted successfully")
-
-
-@app_views.route("/work_experiences", methods=["GET"])
-@app_views.route("/work_experiences/<major_id>", methods=["GET"])
-@jwt_required()
-@handle_errors
-@swag_from("docs/app_views/get_work_experiences.yaml")
-def get_work_experiences(major_id=None):
-    """
-    Fetches all work experiences or work experiences related to a
-    specific major.
-
-    Returns:
-        A list of all work experiences or work experiences related to a
-        specific major in JSON format if successful.
-        Otherwise, it returns an error message.
-    """
-    user_id = get_jwt_identity()
-    work_experiences = work_experience_controller.get_work_experiences(
-        user_id, major_id
-    )
-    work_experiences_data = [
-        work_experience_schema.dump(work_experience)
-        for work_experience in work_experiences
-    ]
-    return (
-        make_response_(
-            "success", "Fetched all work experiences", work_experiences_data
-        ),
-        200,
-    )

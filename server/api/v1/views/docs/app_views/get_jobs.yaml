@@ -14,7 +14,32 @@ security:
 responses:
   200:
     description: All jobs fetched successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Fetched jobs",
+          "data":
+            [
+              {
+                "id": "job1",
+                "job_title": "Software Engineer",
+                "job_description": "Develop and maintain software applications.",
+              },
+              {
+                "id": "job2",
+                "job_title": "Data Scientist",
+                "job_description": "Analyze and interpret complex data.",
+              },
+            ],
+        }
   403:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   404:
     description: Jobs not found
+    examples:
+      application/json:
+        { "status": "error", "message": "Jobs not found", "data": {} }

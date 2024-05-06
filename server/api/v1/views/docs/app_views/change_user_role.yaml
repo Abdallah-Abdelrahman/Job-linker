@@ -30,7 +30,20 @@ parameters:
 responses:
   200:
     description: User role changed successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "User role changed successfully",
+          "data": {},
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid user ID or role
+    examples:
+      application/json:
+        { "status": "error", "message": "Invalid user ID or role", "data": {} }

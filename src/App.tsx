@@ -12,8 +12,9 @@ import Verify from './features/auth/Verify';
 import './App.css';
 import { useRefresh } from './hooks';
 import { MyIcon, ErrorPage, Private } from './components';
-import { useAppSelector } from './hooks/store';
-import { selectCurrentUser } from './features/auth/authSlice';
+import { useAppDispatch, useAppSelector } from './hooks/store';
+import { selectCurrentUser, setCredentials } from './features/auth/authSlice';
+import { useLogoutMutation } from './app/services/auth';
 
 const App = () => {
   return (
@@ -25,9 +26,12 @@ const App = () => {
 
 function Layout() {
   const user = useAppSelector(selectCurrentUser);
+  const dispatch = useAppDispatch();
+  const [logout] = useLogoutMutation();
   const isAuthenticated = user.jwt || user.isRefreshed;
   // token refresher
   useRefresh();
+  console.log({user})
 
   return (
     <div className='w-full h-full p-4 flex flex-col items-center'>
@@ -46,6 +50,12 @@ function Layout() {
             onClick={() => {
               if (isAuthenticated) {
                 // TODO: logout request
+                logout()
+                  .unwrap()
+                  .then(_ => {
+                    dispatch(setCredentials({isRefreshed: false, jwt: ''}))
+                  })
+                  .catch(err => console.error({ err }))
               }
             }}
           >

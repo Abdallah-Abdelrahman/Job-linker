@@ -57,9 +57,14 @@ class MajorController:
             raise ValueError(err.messages)
 
         # Check if user is a recruiter
-        user = storage.get(User, user_id)
+        # user = storage.get(User, user_id)
         # if not user or user.role != "recruiter":
         #     raise UnauthorizedError("Unauthorized")
+
+        # Check if major already exists
+        existing_major = storage.get_by_attr(Major, "name", data["name"])
+        if existing_major:
+            return existing_major
 
         # Create new major
         new_major = Major(name=data["name"])

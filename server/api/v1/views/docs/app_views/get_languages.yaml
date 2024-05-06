@@ -14,5 +14,19 @@ security:
 responses:
   200:
     description: All languages fetched successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Fetched all languages",
+          "data":
+            [
+              { "id": "language1", "name": "English" },
+              { "id": "language2", "name": "Spanish" },
+            ],
+        }
   404:
     description: Languages not found
+    examples:
+      application/json:
+        { "status": "error", "message": "Languages not found", "data": {} }
