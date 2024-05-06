@@ -61,7 +61,7 @@ class LanguageController:
         if not user:
             raise UnauthorizedError("Unauthorized")
 
-        # Check if major already exists
+        # Check if language already exists
         existing_language = storage.get_by_attr(Language, "name", data["name"])
         if existing_language:
             return existing_language
