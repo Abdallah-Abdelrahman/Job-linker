@@ -28,7 +28,24 @@ parameters:
 responses:
   200:
     description: Major details updated successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Major details updated successfully",
+          "data": { "id": "major1", "name": "Software Engineering" },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid major ID or input
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Invalid major ID or input",
+          "data": {},
+        }

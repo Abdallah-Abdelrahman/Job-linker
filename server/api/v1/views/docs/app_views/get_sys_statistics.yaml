@@ -14,5 +14,16 @@ security:
 responses:
   200:
     description: Returns system statistics
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Fetched system statistics",
+          "data":
+            { "total_users": 100, "total_jobs": 50, "total_applications": 200 },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }

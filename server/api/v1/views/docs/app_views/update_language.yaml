@@ -28,7 +28,24 @@ parameters:
 responses:
   200:
     description: Language details updated successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Language details updated successfully",
+          "data": { "id": "language1", "name": "English" },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid language ID or input
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Invalid language ID or input",
+          "data": {},
+        }

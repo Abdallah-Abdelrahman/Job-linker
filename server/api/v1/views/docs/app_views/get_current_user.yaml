@@ -14,5 +14,31 @@ security:
 responses:
   200:
     description: User details fetched successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "User details fetched successfully",
+          "data":
+            {
+              "bio": null,
+              "contact_info": null,
+              "created_at": "2024-05-05T20:53:12.436713",
+              "email": "mohannadabdo21@zoho.com",
+              "id": "86f7c39a-3ce9-413f-b2ef-3120cee3574a",
+              "image_url": null,
+              "name": "Abdallah",
+              "role": "candidate",
+              "updated_at": "2024-05-05T21:01:07.182579",
+              "verified": true,
+            },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "The token is invalid: Invalid header string: 'utf-8' codec can't decode byte 0xa2 in position 6: invalid start byte",
+          "data": {},
+        }

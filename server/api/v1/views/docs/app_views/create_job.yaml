@@ -38,7 +38,24 @@ parameters:
 responses:
   201:
     description: Job created successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Job created successfully",
+          "data": { "id": "eb60800d-ecd6-4da7-9cd6-05ffd775ea0e" },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid input or major not found
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Invalid input or major not found",
+          "data": {},
+        }

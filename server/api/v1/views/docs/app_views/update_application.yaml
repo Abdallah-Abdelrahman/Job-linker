@@ -28,7 +28,30 @@ parameters:
 responses:
   200:
     description: Application updated successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Application updated successfully",
+          "data":
+            {
+              "id": "application1",
+              "job_id": "job1",
+              "candidate_id": "candidate1",
+              "status": "accepted",
+            },
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid application ID or status
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Invalid application ID or status",
+          "data": {},
+        }

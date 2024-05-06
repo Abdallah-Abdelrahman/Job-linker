@@ -13,6 +13,7 @@ from server.exception import UnauthorizedError
 from server.models import storage
 from server.models.candidate import Candidate
 from server.models.major import Major
+from server.models.recruiter import Recruiter
 from server.models.work_experience import WorkExperience
 
 
@@ -45,11 +46,14 @@ class WorkExperienceController:
         """
         # Check if user is a candidate
         candidate = storage.get_by_attr(Candidate, "user_id", user_id)
-        if not candidate:
-            raise UnauthorizedError("You are not a candidate")
+        recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
 
-        # Work experiences for the candidate's major or all work experiences
-        if major_id is not None:
+        if candidate:
+            # Return all work experiences that belong to the candidate
+            work_experiences = candidate.experiences
+        elif recruiter and major_id is not None:
+            # Return all work experiences related to the candidates
+            # of a specific major
             major = storage.get(Major, major_id)
             if not major:
                 raise ValueError("Major not found")
@@ -60,7 +64,7 @@ class WorkExperienceController:
                 for exp in candidate.experiences
             ]
         else:
-            work_experiences = storage.all(WorkExperience).values()
+            raise UnauthorizedError()
 
         return work_experiences
 

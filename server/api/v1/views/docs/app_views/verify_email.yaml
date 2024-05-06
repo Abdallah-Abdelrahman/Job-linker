@@ -12,5 +12,20 @@ parameters:
 responses:
   200:
     description: User logged in successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "User logged in successfully",
+          "data":
+            { "jwt": "<JWT_Token>", "name": "Abdallah", "role": "candidate" },
+        }
   400:
     description: Invalid verification token
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "The verification link is invalid or has expired.",
+          "data": {},
+        }

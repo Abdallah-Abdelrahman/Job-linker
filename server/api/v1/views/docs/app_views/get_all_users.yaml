@@ -14,5 +14,19 @@ security:
 responses:
   200:
     description: Returns a list of all users
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Fetched all users",
+          "data":
+            [
+              { "id": "user1", "name": "User One", "role": "candidate" },
+              { "id": "user2", "name": "User Two", "role": "recruiter" },
+            ],
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }

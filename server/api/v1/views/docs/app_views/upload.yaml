@@ -19,7 +19,20 @@ parameters:
 responses:
   201:
     description: File uploaded successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "uploaded successfully",
+          "data": { "size": 1024 },
+        }
   400:
     description: No file part or unsupported file type
+    examples:
+      application/json:
+        { "status": "error", "message": "No file part", "data": {} }
   415:
     description: Unsupported file type
+    examples:
+      application/json:
+        { "status": "error", "message": "Unsupported file type", "data": {} }

@@ -20,5 +20,15 @@ parameters:
 responses:
   200:
     description: Skill deleted successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Skill deleted successfully",
+          "data": {},
+        }
   404:
     description: Skill not found
+    examples:
+      application/json:
+        { "status": "error", "message": "Skill not found", "data": {} }

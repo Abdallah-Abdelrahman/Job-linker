@@ -20,7 +20,20 @@ parameters:
 responses:
   200:
     description: User disabled successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "User disabled successfully",
+          "data": {},
+        }
   401:
     description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
   400:
     description: Invalid user ID
+    examples:
+      application/json:
+        { "status": "error", "message": "Invalid user ID", "data": {} }

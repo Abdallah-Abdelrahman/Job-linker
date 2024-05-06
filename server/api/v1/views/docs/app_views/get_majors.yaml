@@ -14,5 +14,19 @@ security:
 responses:
   200:
     description: All majors fetched successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Fetched all majors",
+          "data":
+            [
+              { "id": "major1", "name": "Computer Science" },
+              { "id": "major2", "name": "Data Science" },
+            ],
+        }
   404:
     description: Majors not found
+    examples:
+      application/json:
+        { "status": "error", "message": "Majors not found", "data": {} }

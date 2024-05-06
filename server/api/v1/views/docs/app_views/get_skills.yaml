@@ -14,5 +14,26 @@ security:
 responses:
   200:
     description: All skills fetched successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Fetched all skills",
+          "data":
+            [
+              { "id": "27459a10-78e5-4af0-998e-f089e02ff7eb", "name": "C++" },
+              {
+                "id": "a9c4a319-4ed6-414c-be33-0161e3724840",
+                "name": "MakeFile",
+              },
+              {
+                "id": "a6d73f7b-7823-467e-ac7b-09e8fe619c43",
+                "name": "Data Mining",
+              },
+            ],
+        }
   404:
     description: Skills not found
+    examples:
+      application/json:
+        { "status": "error", "message": "Skills not found", "data": {} }
