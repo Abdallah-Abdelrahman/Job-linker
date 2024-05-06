@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../hooks/store';
-import { selectCurrentUser } from '../features/auth/authSlice';
+import { selectCurrentUser } from '../features/auth';
 
 function Private() {
   const user = useAppSelector(selectCurrentUser);
   const navigate = useNavigate();
+  const isAuthenticated = user.isRefreshing || user.isRefreshed;
 
   useEffect(() => {
     if (!user.isRefreshing && !user.isRefreshed) {
@@ -13,7 +14,7 @@ function Private() {
     }
   }, [user, navigate]);
 
-  if (user.jwt) {
+  if (isAuthenticated) {
     return <Outlet />;
   }
   if (user.isRefreshing)

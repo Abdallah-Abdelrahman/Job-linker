@@ -35,10 +35,17 @@ const slice = createSlice({
         ...rest,
       };
     },
+    unsetCredentials: (state) => {
+      state.jwt = null;
+      state.role = null;
+      state.isRefreshed = false;
+      state.isRefreshing = false;
+
+    }
   },
 });
 
-export const { setCredentials } = slice.actions;
+export const { setCredentials, unsetCredentials } = slice.actions;
 
 export const selectCurrentUser = (state: RootState) => state.auth;
 
