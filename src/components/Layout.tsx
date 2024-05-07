@@ -5,7 +5,7 @@ import {
 import { useRefresh } from '../hooks';
 import { MyIcon } from '../components';
 import { useAppDispatch, useAppSelector } from '../hooks/store';
-import { selectCurrentUser, setCredentials, unsetCredentials } from '../features/auth/authSlice';
+import { selectCurrentUser, unsetCredentials } from '../features/auth/authSlice';
 import { useLogoutMutation } from '../app/services/auth';
 
 function Layout() {
@@ -17,7 +17,7 @@ function Layout() {
   useRefresh();
 
   return (
-    <div className='w-full h-full p-4 flex flex-col items-center'>
+    <>
       <header className='w-full pt-4 shadow-md rounded-md'>
         <nav className='nav flex justify-center gap-4 md:gap-10'>
           <NavLink className='py-3 px-4 md:px-5' to='/'>
@@ -45,7 +45,7 @@ function Layout() {
           </NavLink>
         </nav>
       </header>
-      <main className='w-full m-auto flex justify-center'>
+      <main className='w-full flex justify-center'>
         <Outlet />
       </main>
       <footer className='footer relative z-10 w-full flex justify-center items-end mt-auto'>
@@ -56,7 +56,7 @@ function Layout() {
         />
         Joblinker &copy; 2024
       </footer>
-    </div>
+    </>
   );
 }
 

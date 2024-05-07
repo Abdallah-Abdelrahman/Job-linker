@@ -47,5 +47,5 @@ list:
 	@$(TMUX) ls # list running processes
 stop:
 	@$(TMUX) send-keys -t api C-c && sleep 1
-	@$(TMUX) send-keys -t client C-c && sleep 1
+	@$(TMUX) send-keys -t client C-c
 restart: stop run
