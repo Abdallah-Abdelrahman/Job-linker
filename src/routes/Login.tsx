@@ -96,10 +96,10 @@ function Login() {
             {errorMessage}
           </Alert>
         )}
-          <Text>
-            Dont't have an acount?
-            <NavLink to='/signup' className='text-teal-500 mx-2'>register</NavLink>
-            </Text>
+        <Text>
+          Dont't have an acount?
+          <NavLink to='/signup' className='text-teal-500 mx-2'>register</NavLink>
+        </Text>
         <Button
           width="full"
           mt={4}

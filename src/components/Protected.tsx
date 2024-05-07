@@ -6,7 +6,7 @@ import { selectCurrentUser } from '../features/auth';
 function Private() {
   const user = useAppSelector(selectCurrentUser);
   const navigate = useNavigate();
-  const isAuthenticated = user.isRefreshing || user.isRefreshed;
+  const isAuthenticated = user.jwt || user.isRefreshed;
 
   useEffect(() => {
     if (!user.isRefreshing && !user.isRefreshed) {

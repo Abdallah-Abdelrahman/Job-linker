@@ -20,9 +20,9 @@ function Verify() {
   }, [token, isSuccess, dispatch, data, navigate]);
 
   if (isUninitialized || isLoading) {
-    return <h1>loading...</h1>
+    return (<h1>loading...</h1>);
   }
-  return <></>
+  return (null);
 }
 
 export default Verify;

@@ -20,9 +20,11 @@ import {
 } from "../app/services/recruiter";
 import { college_majors } from "../constants";
 import { useAppSelector } from "../hooks/store";
+
 import { useAfterRefreshQuery } from "../hooks";
 import { useCreateMajorMutation } from "../app/services/major";
 import { selectCurrentUser } from "../features/auth";
+import { Candidate } from "../components/profile";
 
 function MyForm({ onSubmit, role }) {
   const [formData, setFormData] = useState({
@@ -114,7 +116,7 @@ const Profile = () => {
   // network request
   const {
     data: userData = { data: {} },
-    isLoading,
+    isLoading, isSuccess,
     error,
   } = useAfterRefreshQuery(useMeQuery);
   const [createCandidate, { isSuccess: candidateSuccess }] =
@@ -152,6 +154,7 @@ const Profile = () => {
     (error.message === "User doesn't have a candidate profile" ||
       error.message === "User doesn't have a recruiter profile");
 
+  
   return (
     <Box>
       <Heading as="h1" size="3xl" className="mb-8 capitalize">
