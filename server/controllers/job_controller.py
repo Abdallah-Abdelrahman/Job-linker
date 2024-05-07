@@ -8,6 +8,7 @@ from marshmallow import ValidationError
 from server.controllers.schemas import job_schema
 from server.exception import UnauthorizedError
 from server.models import storage
+from server.models.application import Application
 from server.models.candidate import Candidate
 from server.models.job import Job
 from server.models.major import Major
@@ -61,10 +62,9 @@ class JobController:
 
         # Check if a job with the same details already exists
         existing_job = storage.get_by_attr(Job, "job_title", data["job_title"])
-        if (
-                existing_job and
-                existing_job.job_description == data["job_description"]
-                ):
+        if existing_job and existing_job.job_description == data[
+                "job_description"
+                ]:
             raise ValueError(
                     "A job with the same title and description already exists"
                     )
@@ -101,15 +101,51 @@ class JobController:
         """
         # Check if user is a recruiter
         recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
-        if not recruiter:
-            raise UnauthorizedError()
+        # if not recruiter:
+        #    raise UnauthorizedError()
 
         # Get job
         job = storage.get(Job, job_id)
-        if not job or job.recruiter_id != recruiter.id:
-            raise ValueError("Job not found")
+        if recruiter:
+            if not job or job.recruiter_id != recruiter.id:
+                raise ValueError("Job not found")
 
-        return job
+        # Get applications for the job
+        applications = storage.get_all_by_attr(Application, "job_id", job.id)
+
+        if recruiter:
+            # If the user is a recruiter, provide a list of the applied
+            # candidates names and emails
+            applied_candidates = [
+                {
+                    "name": app.candidate.user.name,
+                    "email": app.candidate.user.email
+                    }
+                for app in applications
+            ]
+            return {
+                "id": job.id,
+                "job_title": job.job_title,
+                "job_description": job.job_description,
+                "applied_candidates": applied_candidates,
+                "created_at": job.created_at,
+            }
+
+        # If the user is a candidate, add a count displays the number
+        # of the candidates who applied for this job
+        rec_user = storage.get_by_attr(Recruiter, "id", job.recruiter_id)
+        return {
+            "id": job.id,
+            "job_title": job.job_title,
+            "created_at": job.created_at,
+            "job_description": job.job_description,
+            "applications_count": len(applications),
+            "company_name": rec_user.company_name,
+            "location": job.location,
+            "salary": job.salary,
+            "exper_years": job.exper_years,
+            "skills": [skill.name for skill in job.skills],
+        }
 
     def update_job(self, user_id, job_id, data):
         """
@@ -285,7 +321,36 @@ class JobController:
             jobs = storage.get_all_by_attr(Job, "major_id", major_id)
             if not jobs:
                 raise ValueError("No jobs found for your major")
-            return jobs
+
+            # For every job add a count displays the number for
+            # the candidates who applied for the job
+            jobs_data = []
+            for job in jobs:
+                applications = storage.get_all_by_attr(
+                        Application,
+                        "job_id",
+                        job.id
+                        )
+                rec_user = storage.get_by_attr(
+                        Recruiter,
+                        "id",
+                        job.recruiter_id
+                        )
+                jobs_data.append(
+                    {
+                        "id": job.id,
+                        "job_title": job.job_title,
+                        "created_at": job.created_at,
+                        "job_description": job.job_description,
+                        "applications_count": len(applications),
+                        "company_name": rec_user.company_name,
+                        "location": job.location,
+                        "salary": job.salary,
+                        "exper_years": job.exper_years,
+                        "skills": [skill.name for skill in job.skills],
+                    }
+                )
+            return jobs_data
 
         # Check if user is a recruiter
         recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
@@ -294,7 +359,24 @@ class JobController:
             jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
             if not jobs:
                 raise ValueError("No jobs found")
-            return jobs
+
+            jobs_data = []
+            for job in jobs:
+                applications = storage.get_all_by_attr(
+                        Application,
+                        "job_id",
+                        job.id
+                        )
+                jobs_data.append(
+                    {
+                        "id": job.id,
+                        "job_title": job.job_title,
+                        "created_at": job.created_at,
+                        "job_description": job.job_description,
+                        "applications_count": len(applications),
+                    }
+                )
+            return jobs_data
 
         raise UnauthorizedError("You are not a candidate or a recruiter")
 
