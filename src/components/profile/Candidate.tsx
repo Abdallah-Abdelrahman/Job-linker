@@ -1,6 +1,12 @@
-import { Text, Heading, Box } from "@chakra-ui/react";
+import { Text, Heading, Box } from '@chakra-ui/react';
 type Experience = {}
-type Application = {}
+type Application = {
+  title: string,
+  company: string,
+  start_date: Date,
+  end_date: Date,
+  description: string
+}
 type Data = {
   name: string,
   email: string,

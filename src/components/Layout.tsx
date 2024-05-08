@@ -49,11 +49,11 @@ function Layout() {
         <Outlet />
       </main>
       <footer className='footer relative z-10 w-full flex justify-center items-end mt-auto'>
-        <MyIcon
+      {/*<MyIcon
           href='sprite.svg#wave-down'
           viewBox='0 0 1440 320'
           className='absolute left-0 right-0 -bottom-4 -z-10'
-        />
+        />*/}
         Joblinker &copy; 2024
       </footer>
     </>

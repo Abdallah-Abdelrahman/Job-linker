@@ -10,8 +10,11 @@ import {
   Heading,
   Alert,
   AlertIcon,
+  InputGroup,
+  InputLeftElement,
 } from "@chakra-ui/react";
 import { useRegisterMutation } from "../app/services/auth";
+import { MyIcon } from "../components";
 
 function Register() {
   const [signup, { isLoading }] = useRegisterMutation();
@@ -49,44 +52,57 @@ function Register() {
   };
 
   return (
-    <Box className="w-full max-w-xl">
-      <Heading as="h1" size="3xl" className="mb-8">
-        {" "}
-        Signup{" "}
+    <Box className="containter mx-auto mt-8 flex-1">
+      <Heading as="h1" size="3xl" className="mb-8 max-w-md w-full mx-auto capitalize">
+        Register
       </Heading>
-      <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
-        <FormControl isRequired>
-          <FormLabel> Name </FormLabel>
+      <form className="max-w-md w-full mx-auto p-6 flex flex-col gap-4 bg-white shadow-lg rounded-lg" onSubmit={handleSubmit}>
+        <InputGroup>
+          <InputLeftElement>
+            <MyIcon
+              href='/sprite.svg#username'
+              className='w-6 h-6 fill-sky-500'
+            />
+          </InputLeftElement>
           <Input
+            required
             type="text"
             name="name"
             placeholder="Enter your username"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-        </FormControl>
-        <FormControl isRequired>
-          <FormLabel> Email </FormLabel>
+        </InputGroup>
+        <InputGroup>
+          <InputLeftElement>
+            <MyIcon
+              href='/sprite.svg#email-address'
+              className='w-6 h-6 fill-sky-500'
+            />
+          </InputLeftElement>
           <Input
+            required
             type="email"
             name="email"
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-        </FormControl>
-        <FormControl isRequired>
-          <FormLabel> Password </FormLabel>
+        </InputGroup>
+        <InputGroup>
+          <InputLeftElement>
+            <MyIcon href='/sprite.svg#password' className='w-6 h-6 fill-sky-500' />
+          </InputLeftElement>
           <Input
+            required
             type="password"
             name="password"
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-        </FormControl>
+        </InputGroup>
         <FormControl isRequired>
-          <FormLabel> Role </FormLabel>
           <Select
             name="role"
             placeholder="Select role"
@@ -104,10 +120,8 @@ function Register() {
           </Alert>
         )}
         <Button
-          width="full"
-          mt={4}
-          colorScheme="teal"
           type="submit"
+          className='w-max !bg-sky-500 !text-sky-50'
           isLoading={isLoading}
         >
           Register
