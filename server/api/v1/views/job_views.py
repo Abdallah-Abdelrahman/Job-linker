@@ -58,11 +58,7 @@ def get_job(job_id):
     return make_response_(
         "success",
         "Job details fetched successfully",
-        {
-            "id": job.id,
-            "job_title": job.job_title,
-            "job_description": job.job_description,
-        },
+        job,
     )
 
 
@@ -170,8 +166,7 @@ def get_jobs():
     """
     user_id = get_jwt_identity()
     jobs = job_controller.get_jobs(user_id)
-    jobs_data = [job_schema.dump(job) for job in jobs]
-    return make_response_("success", "Fetched jobs", jobs_data), 200
+    return make_response_("success", "Fetched jobs", jobs), 200
 
 
 @app_views.route("/jobs/<job_id>/recommended_candidates", methods=["GET"])
