@@ -154,7 +154,7 @@ const Profile = () => {
     (error.message === "User doesn't have a candidate profile" ||
       error.message === "User doesn't have a recruiter profile");
 
-  
+
   return (
     <Box>
       <Heading as="h1" size="3xl" className="mb-8 capitalize">
@@ -254,6 +254,7 @@ const Profile = () => {
       )}
     </Box>
   );
+
 };
 
 export default Profile;

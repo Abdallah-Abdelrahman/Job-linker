@@ -7,7 +7,10 @@ import {
   Heading,
   Alert,
   AlertIcon,
-  Text
+  Text,
+  InputLeftElement,
+  Icon,
+  InputGroup
 } from "@chakra-ui/react";
 import { useLoginMutation } from "../app/services/auth";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -15,13 +18,13 @@ import { useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
 import { useAppSelector } from "../hooks/store";
 import { selectCurrentUser, setCredentials } from "../features/auth";
+import { MyIcon } from "../components";
 
 function Login() {
   const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useAppSelector(selectCurrentUser);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -55,7 +58,7 @@ function Login() {
       });
   };
 
-  // redirect the user to thier profile if logged-in
+  // redirect the user to thier profile if already logged-in
   useEffect(() => {
     if (user.jwt || user.isRefreshed) {
       navigate('/@me');
@@ -64,32 +67,44 @@ function Login() {
   }, [user, navigate]);
 
   return (
-    <Box className='w-full max-w-xl'>
-      <Heading as='h1' size='3xl' className='mb-8 capitalize'>
-        {' '}
-        login{' '}
+    <Box className='containter grid mx-auto mt-8 flex-1'>
+      <Heading as='h1' size='3xl' className='mb-8 max-w-md w-full mx-auto capitalize'>
+        login
       </Heading>
-      <form className='w-full flex flex-col gap-4' onSubmit={handleSubmit}>
-        <FormControl isRequired>
-          <FormLabel> Email </FormLabel>
+
+      <form
+        className='max-w-md w-full mx-auto p-6 flex flex-col gap-4 bg-white shadow-lg rounded-lg'
+        onSubmit={handleSubmit}
+      >
+        <InputGroup>
+          <InputLeftElement pointerEvents='none'>
+            <MyIcon
+              href='/sprite.svg#email-address'
+              className='w-6 h-6 fill-sky-600'
+            />
+          </InputLeftElement>
           <Input
+            required
             type="email"
             name="email"
             placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-        </FormControl>
-        <FormControl isRequired>
-          <FormLabel> Password </FormLabel>
+        </InputGroup>
+        <InputGroup>
+          <InputLeftElement pointerEvents='none'>
+            <MyIcon href='/sprite.svg#password' className='w-6 h-6 fill-sky-600' />
+          </InputLeftElement>
           <Input
+            required
             type="password"
             name="password"
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-        </FormControl>
+        </InputGroup>
         {errorMessage && (
           <Alert status="error">
             <AlertIcon />
@@ -98,12 +113,10 @@ function Login() {
         )}
         <Text>
           Dont't have an acount?
-          <NavLink to='/signup' className='text-teal-500 mx-2'>register</NavLink>
+          <NavLink to='/signup' className='text-sky-600 mx-2'>register</NavLink>
         </Text>
         <Button
-          width="full"
-          mt={4}
-          colorScheme="teal"
+          className='w-max !bg-sky-500 !text-sky-50'
           type="submit"
           isLoading={isLoading}
         >
