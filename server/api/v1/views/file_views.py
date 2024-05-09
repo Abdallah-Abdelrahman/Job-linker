@@ -41,10 +41,13 @@ def upload():
         "candidate": ApplicationConfig.UPLOAD_CV,
         "recruiter": ApplicationConfig.UPLOAD_JOB,
     }
-    file_path = os.path.join(dir_.get(
-        role,
-        ApplicationConfig.UPLOAD_CV
-        ), filename)
+    file_path = os.path.join(
+            dir_.get(
+                role,
+                ApplicationConfig.UPLOAD_CV
+                ),
+            filename
+            )
     file.save(file_path)
     size = os.stat(file_path).st_size
 
@@ -89,4 +92,44 @@ def upload():
             {"size": size, "ai_data": ai_data}
         ),
         201,
+    )
+
+
+@app_views.route("/count/cv", methods=["GET"])
+def count_cv_files():
+    """Return the count of uploaded CV files"""
+    cv_dir = ApplicationConfig.UPLOAD_CV
+    num_files = len(
+        [
+            f for f in os.listdir(cv_dir) if os.path.isfile(
+                os.path.join(cv_dir, f)
+                )
+            ]
+    )
+    return (
+        make_response_(
+            "Count retrieved successfully",
+            "success",
+            {"count": num_files}),
+        200,
+    )
+
+
+@app_views.route("/count/job", methods=["GET"])
+def count_job_files():
+    """Return the count of uploaded job description files"""
+    job_dir = ApplicationConfig.UPLOAD_JOB
+    num_files = len(
+        [
+            f for f in os.listdir(job_dir) if os.path.isfile(
+                os.path.join(job_dir, f)
+                )
+            ]
+    )
+    return (
+        make_response_(
+            "Count retrieved successfully",
+            "success",
+            {"count": num_files}),
+        200,
     )

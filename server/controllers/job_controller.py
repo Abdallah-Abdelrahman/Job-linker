@@ -380,6 +380,116 @@ class JobController:
 
         raise UnauthorizedError("You are not a candidate or a recruiter")
 
+    def get_all_jobs_sorted_by_major(self):
+        """
+        Gets all jobs sorted by their major.
+
+        Returns:
+            The jobs sorted by their major.
+        """
+        jobs_dict = storage.all(Job)
+
+        jobs = list(jobs_dict.values())
+
+        # Sort jobs by major
+        jobs.sort(key=lambda job: job.major_id)
+
+        jobs_data = []
+        for job in jobs:
+            applications = storage.get_all_by_attr(
+                    Application,
+                    "job_id",
+                    job.id
+                    )
+            rec_user = storage.get_by_attr(Recruiter, "id", job.recruiter_id)
+            jobs_data.append(
+                {
+                    "id": job.id,
+                    "job_title": job.job_title,
+                    "created_at": job.created_at,
+                    "job_description": job.job_description,
+                    "applications_count": len(applications),
+                    "company_name": rec_user.company_name,
+                    "location": job.location,
+                    "salary": job.salary,
+                    "exper_years": job.exper_years,
+                    "skills": [skill.name for skill in job.skills],
+                }
+            )
+        return jobs_data
+
+    def get_job_counts(self):
+        """
+        Gets the count of all jobs and the count of jobs per major.
+
+        Returns:
+            A dictionary with the total count of jobs and the
+            count of jobs per major.
+        """
+        # Get all jobs
+        jobs_dict = storage.all(Job)
+
+        # Calculate total job count
+        total_count = len(jobs_dict)
+
+        # Calculate job count per major
+        major_counts = {}
+        for job in jobs_dict.values():
+            major = storage.get(Major, job.major_id)
+            if major.name not in major_counts:
+                major_counts[major.name] = 0
+            major_counts[major.name] += 1
+
+        return {"total_count": total_count, "major_counts": major_counts}
+
+    def search_jobs(self, location=None, title=None):
+        """
+        Search for jobs by location and title.
+
+        Args:
+            location (str): The location to search for.
+            title (str): The title to search for.
+
+        Returns:
+            A list of jobs that match the search criteria.
+        """
+        jobs_dict = storage.all(Job)
+
+        # Filter jobs by location and title
+        if location is not None:
+            jobs_dict = {
+                    k: v for k, v in jobs_dict.items()
+                    if v.location == location
+                    }
+        if title is not None:
+            jobs_dict = {
+                k: v
+                for k, v in jobs_dict.items()
+                if title.lower() in v.job_title.lower()
+            }
+
+        jobs = [job.to_dict for job in jobs_dict.values()]
+
+        return jobs
+
+    def get_all_jobs_sorted_by_date(self):
+        """
+        Gets all jobs sorted by created_at, the newest first.
+
+        Returns:
+            The jobs sorted by created_at.
+        """
+        jobs_dict = storage.all(Job)
+
+        jobs = list(jobs_dict.values())
+
+        # Sort jobs by created_at
+        jobs.sort(key=lambda job: job.created_at, reverse=True)
+
+        jobs = [job.to_dict for job in jobs]
+
+        return jobs
+
     def recommend_candidates(self, job_id, user_id):
         """
         Recommend candidates for a specific job.
