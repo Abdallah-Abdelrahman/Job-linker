@@ -84,6 +84,10 @@ class DBStorage:
         Session = scoped_session(sess_factory)
         self.__session = Session
 
+    def rollback(self):
+        """Rollback the current transaction."""
+        self.__session.rollback()
+
     def close(self):
         """call remove() method on the private session attribute"""
         self.__session.remove()

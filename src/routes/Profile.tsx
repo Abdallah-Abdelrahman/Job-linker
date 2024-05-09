@@ -25,6 +25,7 @@ import { useAfterRefreshQuery } from "../hooks";
 import { useCreateMajorMutation } from "../app/services/major";
 import { selectCurrentUser } from "../features/auth";
 import { Candidate } from "../components/profile";
+import { Upload } from "../components";
 
 function MyForm({ onSubmit, role }) {
   const [formData, setFormData] = useState({
@@ -116,7 +117,8 @@ const Profile = () => {
   // network request
   const {
     data: userData = { data: {} },
-    isLoading, isSuccess,
+    isLoading,
+    isSuccess,
     error,
   } = useAfterRefreshQuery(useMeQuery);
   const [createCandidate, { isSuccess: candidateSuccess }] =
@@ -154,7 +156,6 @@ const Profile = () => {
     (error.message === "User doesn't have a candidate profile" ||
       error.message === "User doesn't have a recruiter profile");
 
-
   return (
     <Box>
       <Heading as="h1" size="3xl" className="mb-8 capitalize">
@@ -179,6 +180,7 @@ const Profile = () => {
           )}
           {userData.data.role === "candidate" && (
             <>
+              <Upload />
               {!userData.data.candidate ? (
                 <MyForm role="candidate" onSubmit={handleCandidateFormSubmit} />
               ) : (
@@ -254,7 +256,6 @@ const Profile = () => {
       )}
     </Box>
   );
-
 };
 
 export default Profile;
