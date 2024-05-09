@@ -3,6 +3,7 @@
 CANDID_PROMPT = '''\
         give me a dictionary from this cv in the form of:
     {
+      bio,
       name,
       email,
       major,
