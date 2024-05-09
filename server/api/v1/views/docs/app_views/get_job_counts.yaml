@@ -1,0 +1,19 @@
+tags:
+  - Jobs
+summary: Fetch the count of all jobs and the count of jobs per major
+description: Endpoint to fetch the count of all jobs and the count of jobs per major. Returns a response object containing the status, message, and counts if successful.
+operationId: getJobCounts
+responses:
+  200:
+    description: Fetched job counts successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Fetched job counts",
+          "data":
+            {
+              "major_counts": { "Computer Science": 5, "Data Mining": 1 },
+              "total_count": 6,
+            },
+        }

@@ -1,0 +1,41 @@
+tags:
+  - Jobs
+summary: Fetch all jobs sorted by their major
+description: Endpoint to fetch all jobs sorted by their major. Returns a response object containing the status, message, and a list of all jobs if successful.
+operationId: getAllJobs
+responses:
+  200:
+    description: Fetched all jobs successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Fetched all jobs",
+          "data":
+            [
+              {
+                "applications_count": 1,
+                "company_name": "AIO",
+                "created_at": "Thu, 02 May 2024 04:10:22 GMT",
+                "exper_years": "2",
+                "id": "eb60800d-ecd6-4da7-9cd6-05ffd775ea0e",
+                "job_description": "We are looking for a Software Engineer to join our team. The ideal candidate will have experience in Python, Java, and JavaScript. They will also have a strong understanding of data structures and algorithms.",
+                "job_title": "Software Engineer",
+                "location": null,
+                "salary": 80000,
+                "skills": ["Python"],
+              },
+              {
+                "applications_count": 1,
+                "company_name": "AIO",
+                "created_at": "Thu, 02 May 2024 07:28:08 GMT",
+                "exper_years": "5",
+                "id": "673e122a-b772-4e0a-bbf9-d79df6662bed",
+                "job_description": "We are looking for a Senior Software Engineer with experience in C++, Java, and system design. The ideal candidate will have a strong understanding of software architecture and design patterns.",
+                "job_title": "Senior Software Engineer",
+                "location": "San Francisco, CA",
+                "salary": 120000,
+                "skills": ["System design"],
+              },
+            ],
+        }
