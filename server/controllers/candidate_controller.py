@@ -4,6 +4,7 @@ Job-linker application.
 """
 
 from marshmallow import ValidationError
+from sqlalchemy.exc import IntegrityError
 
 from server.controllers.schemas import candidate_schema
 from server.exception import UnauthorizedError
@@ -206,9 +207,11 @@ class CandidateController:
         if skill in candidate.skills:
             raise ValueError("Skill already added")
 
-        # Add skill to candidate
-        candidate.skills.append(skill)
-        storage.save()
+        try:
+            candidate.skills.append(skill)
+            storage.save()
+        except IntegrityError:
+            storage.rollback()
 
         return candidate
 
@@ -288,9 +291,11 @@ class CandidateController:
         if language in candidate.languages:
             raise ValueError("Language already added")
 
-        # Add language to candidate
-        candidate.languages.append(language)
-        storage.save()
+        try:
+            candidate.languages.append(language)
+            storage.save()
+        except IntegrityError:
+            storage.rollback()
 
         return candidate
 
@@ -378,12 +383,11 @@ class CandidateController:
             ):
                 # Check if the candidate has applied for this job before
                 has_applied = any(
-                        application.job_id == job.id
-                        for application in candidate.applications
+                    application.job_id == job.id
+                    for application in candidate.applications
+                )
+                recommended_jobs.append(
+                        {"job": job, "has_applied": has_applied}
                         )
-                recommended_jobs.append({
-                    "job": job,
-                    "has_applied": has_applied
-                    })
 
         return recommended_jobs
