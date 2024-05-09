@@ -1,7 +1,7 @@
 tags:
   - Files
 summary: Upload a file
-description: Endpoint to upload a file. The file is saved on the server.
+description: Endpoint to upload a file. The file is saved on the server. If the user is authorized and a candidate, a new profile is created using AI service.
 operationId: uploadFile
 consumes:
   - multipart/form-data
@@ -24,10 +24,16 @@ responses:
         {
           "status": "success",
           "message": "uploaded successfully",
-          "data": { "size": 1024 },
+          "data": { "size": 1024, "ai_data": "<AI Data>" }
+        }
+      application/json:
+        {
+          "status": "success",
+          "message": "File uploaded and profile created successfully",
+          "data": { "size": 1024, "candidate_id": "<Candidate ID>" }
         }
   400:
-    description: No file part or unsupported file type
+    description: No file part
     examples:
       application/json:
         { "status": "error", "message": "No file part", "data": {} }
@@ -36,3 +42,4 @@ responses:
     examples:
       application/json:
         { "status": "error", "message": "Unsupported file type", "data": {} }
+

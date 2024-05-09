@@ -1,0 +1,41 @@
+tags:
+  - Jobs
+summary: Search for jobs by location and title
+description: Endpoint to search for jobs by location and title. Returns a response object containing the status, message, and a list of jobs that match the search criteria if successful.
+operationId: searchJobs
+parameters:
+  - in: query
+    name: location
+    type: string
+    description: The location to search for
+  - in: query
+    name: title
+    type: string
+    description: The title to search for
+responses:
+  200:
+    description: Fetched jobs successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Fetched jobs",
+          "data":
+            [
+              {
+                "__class__": "Job",
+                "created_at": "2024-05-02T07:28:08.612982",
+                "exper_years": "5",
+                "id": "673e122a-b772-4e0a-bbf9-d79df6662bed",
+                "job_description": "We are looking for a Senior Software Engineer with experience in C++, Java, and system design. The ideal candidate will have a strong understanding of software architecture and design patterns.",
+                "job_title": "Senior Software Engineer",
+                "location": "San Francisco, CA",
+                "major": "Computer Science",
+                "major_id": "6bce5369-6dd3-40fd-a32e-774213ea137d",
+                "recruiter_id": "634774a1-7778-466b-89b4-dd5bebea5c8e",
+                "salary": 120000,
+                "skills": ["System design"],
+                "updated_at": "2024-05-02T07:28:08.612988",
+              },
+            ],
+        }

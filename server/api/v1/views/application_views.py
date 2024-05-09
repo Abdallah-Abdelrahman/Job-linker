@@ -146,7 +146,7 @@ def delete_application(application_id):
 
 
 @app_views.route("/applications/hired_count", methods=["GET"])
-# @swag_from("docs/app_views/get_hired_count.yaml")
+@swag_from("docs/app_views/get_hired_count.yaml")
 def get_hired_count():
     """
     Fetches the count of hired candidates.

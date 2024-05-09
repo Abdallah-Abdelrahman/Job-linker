@@ -1,0 +1,32 @@
+tags:
+  - Jobs
+summary: Fetch all jobs sorted by created_at, the newest first
+description: Endpoint to fetch all jobs sorted by created_at, the newest first. Returns a response object containing the status, message, and a list of all jobs if successful.
+operationId: getAllJobsSorted
+responses:
+  200:
+    description: Fetched all jobs successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Fetched all jobs",
+          "data":
+            [
+              {
+                "__class__": "Job",
+                "created_at": "2024-05-02T04:10:22.850126",
+                "exper_years": "2",
+                "id": "eb60800d-ecd6-4da7-9cd6-05ffd775ea0e",
+                "job_description": "We are looking for a Software Engineer to join our team. The ideal candidate will have experience in Python, Java, and JavaScript. They will also have a strong understanding of data structures and algorithms.",
+                "job_title": "Software Engineer",
+                "location": null,
+                "major": "Computer Science",
+                "major_id": "6bce5369-6dd3-40fd-a32e-774213ea137d",
+                "recruiter_id": "634774a1-7778-466b-89b4-dd5bebea5c8e",
+                "salary": 80000,
+                "skills": ["Python"],
+                "updated_at": "2024-05-02T04:10:22.850136",
+              },
+            ],
+        }

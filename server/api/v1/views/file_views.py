@@ -96,14 +96,14 @@ def upload():
 
 
 @app_views.route("/count/cv", methods=["GET"])
+@swag_from("docs/app_views/count_cv_files.yaml")
 def count_cv_files():
     """Return the count of uploaded CV files"""
     cv_dir = ApplicationConfig.UPLOAD_CV
     num_files = len(
         [
-            f for f in os.listdir(cv_dir) if os.path.isfile(
-                os.path.join(cv_dir, f)
-                )
+            f for f in os.listdir(cv_dir)
+            if os.path.isfile(os.path.join(cv_dir, f))
             ]
     )
     return (
@@ -116,14 +116,14 @@ def count_cv_files():
 
 
 @app_views.route("/count/job", methods=["GET"])
+@swag_from("docs/app_views/count_job_files.yaml")
 def count_job_files():
     """Return the count of uploaded job description files"""
     job_dir = ApplicationConfig.UPLOAD_JOB
     num_files = len(
         [
-            f for f in os.listdir(job_dir) if os.path.isfile(
-                os.path.join(job_dir, f)
-                )
+            f for f in os.listdir(job_dir)
+            if os.path.isfile(os.path.join(job_dir, f))
             ]
     )
     return (

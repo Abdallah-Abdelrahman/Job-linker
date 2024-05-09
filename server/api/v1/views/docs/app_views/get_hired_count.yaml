@@ -1,0 +1,15 @@
+tags:
+  - Applications
+summary: Fetch the count of hired candidates
+description: Endpoint to fetch the count of hired candidates. Returns a response object containing the status, message, and count of hired candidates if successful.
+operationId: getHiredCount
+responses:
+  200:
+    description: Fetched count of hired candidates successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Fetched count of hired candidates",
+          "data": { "count": 1 },
+        }

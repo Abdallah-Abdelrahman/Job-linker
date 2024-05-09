@@ -199,7 +199,7 @@ def get_recommended_candidates(job_id):
 
 
 @app_views.route("/jobs/all", methods=["GET"])
-# @swag_from("docs/app_views/get_all_jobs.yaml")
+@swag_from("docs/app_views/get_all_jobs.yaml")
 def get_all_jobs():
     """
     Fetches all jobs sorted by their major.
@@ -213,7 +213,7 @@ def get_all_jobs():
 
 
 @app_views.route("/jobs/counts", methods=["GET"])
-# @swag_from("docs/app_views/get_job_counts.yaml")
+@swag_from("docs/app_views/get_job_counts.yaml")
 def get_job_counts():
     """
     Fetches the count of all jobs and the count of jobs per major.
@@ -227,7 +227,7 @@ def get_job_counts():
 
 
 @app_views.route("/jobs/search", methods=["GET"])
-# @swag_from("docs/app_views/search_jobs.yaml")
+@swag_from("docs/app_views/search_jobs.yaml")
 def search_jobs():
     """
     Search for jobs by location and title.
@@ -246,7 +246,7 @@ def search_jobs():
 
 
 @app_views.route("/jobs/all/sorted", methods=["GET"])
-# @swag_from("docs/app_views/get_all_jobs_sorted.yaml")
+@swag_from("docs/app_views/get_all_jobs_sorted.yaml")
 def get_all_jobs_sorted():
     """
     Fetches all jobs sorted by created_at, the newest first.
