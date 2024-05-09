@@ -12,7 +12,7 @@ import {
   Alert,
   AlertIcon,
 } from "@chakra-ui/react";
-import { useMeQuery } from "../app/services/auth";
+import { User, useMeQuery } from "../app/services/auth";
 import { useCreateCandidateMutation } from "../app/services/candidate";
 import {
   Recruiter,
@@ -118,7 +118,8 @@ const Profile = () => {
     data: userData = { data: {} },
     isLoading, isSuccess,
     error,
-  } = useAfterRefreshQuery(useMeQuery);
+  } = useAfterRefreshQuery<{ data: User }>(useMeQuery);
+
   const [createCandidate, { isSuccess: candidateSuccess }] =
     useCreateCandidateMutation();
   const [addMajor] = useCreateMajorMutation();
@@ -156,102 +157,10 @@ const Profile = () => {
 
 
   return (
-    <Box>
-      <Heading as="h1" size="3xl" className="mb-8 capitalize">
-        Profile
+    <Box className='flex-1 mt-8 containter mx-atuo border-2 border-red-500'>
+      <Heading as="h2" size="xl" className="mb-8 capitalize">
+        complete your Profile
       </Heading>
-      {isLoading && <Spinner />}
-      {userData && (
-        <>
-          <Text>Email: {userData.data.email}</Text>
-          <Text>Role: {userData.data.role}</Text>
-          {candidateSuccess && (
-            <Alert status="success">
-              <AlertIcon />
-              Profile created successfully!
-            </Alert>
-          )}
-          {recruiterSuccess && (
-            <Alert status="success">
-              <AlertIcon />
-              Profile created successfully!
-            </Alert>
-          )}
-          {userData.data.role === "candidate" && (
-            <>
-              {!userData.data.candidate ? (
-                <MyForm role="candidate" onSubmit={handleCandidateFormSubmit} />
-              ) : (
-                <>
-                  <Text>Major: {userData.data.candidate.major.name}</Text>
-                  <Text>
-                    Skills:{" "}
-                    {userData.data.candidate.skills
-                      .map((skill) => skill.name)
-                      .join(", ")}
-                  </Text>
-                  <Text>
-                    Languages:{" "}
-                    {userData.data.candidate.languages
-                      .map((language) => language.name)
-                      .join(", ")}
-                  </Text>
-                  <Text>Experiences:</Text>
-                  {userData.data.candidate.experiences.map(
-                    (experience, index) => (
-                      <Box key={index} p={5} shadow="md" borderWidth="1px">
-                        <Text>Company: {experience.company}</Text>
-                        <Text>Title: {experience.title}</Text>
-                        <Text>Description: {experience.description}</Text>
-                        <Text>Location: {experience.location}</Text>
-                        <Text>Start Date: {experience.start_date}</Text>
-                        <Text>End Date: {experience.end_date}</Text>
-                      </Box>
-                    ),
-                  )}
-                </>
-              )}
-            </>
-          )}
-          {userData.data.role === "recruiter" && (
-            <>
-              {!userData.data.recruiter ? (
-                <MyForm role="recruiter" onSubmit={handleRecruiterFormSubmit} />
-              ) : (
-                <>
-                  <Text>
-                    Company Name: {userData.data.recruiter.company_name}
-                  </Text>
-                  <Text>
-                    Company Info: {userData.data.recruiter.company_info}
-                  </Text>
-                  <Text>Jobs:</Text>
-                  {!isLoading &&
-                    userData.data.recruiter.jobs.map((job, index) => (
-                      <Box key={index} p={5} shadow="md" borderWidth="1px">
-                        <Text>Title: {job.job_title}</Text>
-                        <Text>Description: {job.job_description}</Text>
-                        <Text>Location: {job.location}</Text>
-                        <Text>Salary: {job.salary}</Text>
-                        <Text>Skills: {job.skills.join(", ")}</Text>
-                      </Box>
-                    ))}
-                </>
-              )}
-            </>
-          )}
-        </>
-      )}
-      {!userData && noProfileError && (
-        <MyForm
-          role={role}
-          onSubmit={
-            role == "candidate"
-              ? handleCandidateFormSubmit
-              : handleRecruiterFormSubmit
-          }
-        />
-      )}
     </Box>
   );
 

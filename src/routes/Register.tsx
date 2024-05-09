@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
   FormControl,
-  FormLabel,
   Input,
   Select,
   Box,
@@ -15,6 +14,8 @@ import {
 } from "@chakra-ui/react";
 import { useRegisterMutation } from "../app/services/auth";
 import { MyIcon } from "../components";
+import { useAppSelector } from "../hooks/store";
+import { selectCurrentUser } from "../features/auth";
 
 function Register() {
   const [signup, { isLoading }] = useRegisterMutation();
@@ -23,8 +24,8 @@ function Register() {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
   const navigate = useNavigate();
+  const user = useAppSelector(selectCurrentUser); 
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
@@ -35,7 +36,6 @@ function Register() {
     signup({ email, password, name, role })
       .unwrap()
       .then((data) => {
-        console.log({ data });
         navigate("/login");
       })
       .catch((err) => {
@@ -50,6 +50,14 @@ function Register() {
         setErrorMessage(actualErrorMessage);
       });
   };
+
+  // redirect the user to thier profile if already logged-in
+  useEffect(() => {
+    if (user.jwt || user.isRefreshed) {
+      navigate('/@me');
+    }
+
+  }, [user, navigate]);
 
   return (
     <Box className="containter mx-auto mt-8 flex-1">
