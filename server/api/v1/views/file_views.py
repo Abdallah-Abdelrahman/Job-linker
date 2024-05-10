@@ -40,7 +40,7 @@ def upload():
         file_path, size = handle_upload(
             request.files["file"], dir_.get(role, ApplicationConfig.UPLOAD_CV)
         )
-        filename = os.path.basename(file_path)
+        filename = file_path
         original_filename = request.files["file"].filename
     except ValueError as e:
         return make_response_(str(e), "error"), 415
