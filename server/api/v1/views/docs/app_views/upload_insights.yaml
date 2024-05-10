@@ -1,0 +1,33 @@
+tags:
+  - Files
+summary: Upload a file and get ATS insights
+description: Endpoint to upload a file and get insights about its ATS friendliness. The file is saved on the server and the insights are returned in the response.
+operationId: uploadInsights
+consumes:
+  - multipart/form-data
+parameters:
+  - in: formData
+    name: file
+    type: file
+    required: true
+    description: The file to upload
+responses:
+  201:
+    description: File uploaded and ATS insights generated successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "File uploaded and ATS insights generated successfully",
+          "data": { "size": 1024, "ats_insights": "<ATS Insights>" },
+        }
+  400:
+    description: No file part or unsupported file type
+    examples:
+      application/json:
+        { "status": "error", "message": "No file part", "data": {} }
+  415:
+    description: Unsupported file type
+    examples:
+      application/json:
+        { "status": "error", "message": "Unsupported file type", "data": {} }

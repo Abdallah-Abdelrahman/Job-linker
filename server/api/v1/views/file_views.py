@@ -14,7 +14,7 @@ from server.api.v1.views import app_views
 from server.config import ApplicationConfig
 from server.models import storage
 from server.models.user import User
-from server.prompts import CANDID_PROMPT
+from server.prompts import ATS_FRIENDLY_PROMPT, CANDID_PROMPT
 from server.services.ai import AIService
 from server.services.ai_cand_creator import AICandidateProfileCreator
 
@@ -24,32 +24,21 @@ from server.services.ai_cand_creator import AICandidateProfileCreator
 def upload():
     """save file into server"""
     role = request.query_string.decode("utf8").split("=")[-1]
-
-    # check if the post request has the file part
-    if "file" not in request.files:
-        return make_response_("No file part", "erro"), 400
-
-    file = request.files["file"]
-    extension = file.filename.split(".")[-1].lower()
-
-    if not file or extension not in ApplicationConfig.ALLOWED_EXTENSIONS:
-        return make_response_("Unsupported file type", "error"), 415
-
-    filename = secure_filename(file.filename)
-    filename = datetime.now().strftime("%Y-%m-%d-%H-%M-%S_") + filename
     dir_ = {
         "candidate": ApplicationConfig.UPLOAD_CV,
         "recruiter": ApplicationConfig.UPLOAD_JOB,
     }
-    file_path = os.path.join(
-            dir_.get(
-                role,
-                ApplicationConfig.UPLOAD_CV
-                ),
-            filename
-            )
-    file.save(file_path)
-    size = os.stat(file_path).st_size
+
+    # check if the post request has the file part
+    if "file" not in request.files:
+        return make_response_("No file part", "error"), 400
+
+    try:
+        file_path, size = handle_upload(
+            request.files["file"], dir_.get(role, ApplicationConfig.UPLOAD_CV)
+        )
+    except ValueError as e:
+        return make_response_(str(e), "error"), 415
 
     # Parse the CV using AI service
     ai = AIService(pdf=file_path)
@@ -93,6 +82,51 @@ def upload():
         ),
         201,
     )
+
+
+@app_views.route("/upload/insights", methods=["POST"])
+@swag_from("docs/app_views/upload_insights.yaml")
+def upload_insights():
+    """save file into server and return ATS insights"""
+    # check if the post request has the file part
+    if "file" not in request.files:
+        return make_response_("No file part", "error"), 400
+
+    try:
+        file_path, size = handle_upload(
+            request.files["file"], ApplicationConfig.UPLOAD_CV
+        )
+    except ValueError as e:
+        return make_response_(str(e), "error"), 415
+
+    # Parse the CV using AI service
+    ai = AIService(pdf=file_path)
+    ai_data = ai.get_cv_insights(ATS_FRIENDLY_PROMPT)
+
+    return (
+        make_response_(
+            "File uploaded and ATS insights generated successfully",
+            "success",
+            {"size": size, "ats_insights": ai_data},
+        ),
+        201,
+    )
+
+
+def handle_upload(file, directory):
+    """Handle file upload and return file path and size."""
+    extension = file.filename.split(".")[-1].lower()
+
+    if not file or extension not in ApplicationConfig.ALLOWED_EXTENSIONS:
+        raise ValueError("Unsupported file type")
+
+    filename = secure_filename(file.filename)
+    filename = datetime.now().strftime("%Y-%m-%d-%H-%M-%S_") + filename
+    file_path = os.path.join(directory, filename)
+    file.save(file_path)
+    size = os.stat(file_path).st_size
+
+    return file_path, size
 
 
 @app_views.route("/count/cv", methods=["GET"])
