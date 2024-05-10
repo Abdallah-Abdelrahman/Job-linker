@@ -5,6 +5,8 @@
 :root {
   height: 100%;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --gradient-sky: linear-gradient(45deg, rgba(2, 132, 199, 0.5), rgba(2, 132, 199, 0.5));
+  --gradient-black: linear-gradient(45deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75));
   /*line-height: 1.5;*/
   /*font-weight: 400;*/
 
@@ -20,7 +22,7 @@
 #root {
     width: 100%;
     height: 100%;
-    @apply w-full h-full p-4 flex flex-col items-center;
+    @apply w-full h-full px-4 flex flex-col items-center;
 }
 
 a {
@@ -33,7 +35,7 @@ a:hover {
     overflow: hidden;
 }
 .nav a.active {
-    @apply relative shadow-inner bg-teal-100 rounded-t-xl text-teal-700;
+    @apply relative shadow-inner bg-gray-100 rounded-t-xl text-gray-600;
 }
 
 .nav a.active::before {
@@ -45,7 +47,7 @@ a:hover {
     left: -20px;
     background-color: white;
     border-bottom-right-radius: 20px;
-    box-shadow: 5px 5px 0 5px rgb(204 251 241 / var(--tw-bg-opacity));
+    box-shadow: 5px 5px 0 5px rgb(243 244 246 / var(--tw-bg-opacity));
 }
 
 .nav a.active::after {
@@ -57,7 +59,7 @@ a:hover {
     right: -20px;
     background-color: white;
     border-bottom-left-radius: 20px;
-    box-shadow: -5px 5px 0 5px rgb(204 251 241 / var(--tw-bg-opacity));
+    box-shadow: -5px 5px 0 5px rgb(243 244 246 / var(--tw-bg-opacity));
 
 }
 
@@ -67,13 +69,23 @@ body {
     @apply !bg-gray-100;
 }
 
-.home-bg {
-    position: fixed;
+.home .hero::before {
+    content: '';
+    position: absolute;
     inset: 0;
-    background: url('./assets/job-interview.png') no-repeat;
-    background-size: contain;
-    background-position: 50%;
-    z-index: -1;
+    background-image: 
+    url('./assets/ats-0x05.svg');
+    /* #0284c7*/
+    background-repeat: no-repeat;
+    background-size: 90%;
+    background-position: center 90%;
+     z-index: -1;
+    @apply sm:bg-[length:700px] sm:[background-position:90%_70%] sm:opacity-30 lg:opacity-100;
+}
+
+.home .how-it-work {
+    box-shadow: 0 0 0 100vw white;
+    clip-path: inset(0 -100vw);
 }
 
 h1 {
@@ -105,8 +117,8 @@ li > a {
 }
 
 .footer {
-    width: calc(100% + 2rem);
-    padding-top: 5rem;
+    box-shadow: 0 0 0 100vw white;
+    clip-path: inset(0 -100vw);
 }
 
 @media (prefers-color-scheme: light) {

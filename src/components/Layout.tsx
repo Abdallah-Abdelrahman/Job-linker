@@ -3,10 +3,10 @@ import {
   Outlet,
 } from 'react-router-dom';
 import { useRefresh } from '../hooks';
-import { MyIcon } from '../components';
 import { useAppDispatch, useAppSelector } from '../hooks/store';
 import { selectCurrentUser, unsetCredentials } from '../features/auth/authSlice';
 import { useLogoutMutation } from '../app/services/auth';
+import Footer from './Footer';
 
 function Layout() {
   const user = useAppSelector(selectCurrentUser);
@@ -18,7 +18,7 @@ function Layout() {
 
   return (
     <>
-      <header className='w-full pt-4 shadow-md rounded-md'>
+      <header className='container mt-4 pt-4 border-t border-x bg-white rounded-lg'>
         <nav className='nav flex justify-center gap-4 md:gap-10'>
           <NavLink className='py-3 px-4 md:px-5' to='/'>
             home
@@ -45,17 +45,10 @@ function Layout() {
           </NavLink>
         </nav>
       </header>
-      <main className='w-full flex justify-center'>
+      <main className='w-full'>
         <Outlet />
       </main>
-      <footer className='footer relative z-10 w-full flex justify-center items-end mt-auto'>
-      {/*<MyIcon
-          href='sprite.svg#wave-down'
-          viewBox='0 0 1440 320'
-          className='absolute left-0 right-0 -bottom-4 -z-10'
-        />*/}
-        Joblinker &copy; 2024
-      </footer>
+      <Footer />
     </>
   );
 }
