@@ -113,29 +113,10 @@ class AIService():
             print('---JSON issues------>', self.pdf, e)
             return self.to_dict(prompt_enquiry)
 
-    def get_cv_insights(self, prompt_enquiry=ATS_FRIENDLY_PROMPT, text=''):
-        '''The function translates gemini response to a dictionary
-
-        Args:
-            prompt_enquiry(str): question to feed it to gemini
-        Returns:
-            dictionary of gemini response
-        '''
-        if not text:
-            text = self.prompt(prompt_enquiry)
-        try:
-            # strips out any spaces or new lines or back-slashes
-            txt_cp = ''.join([c for c in text if c not in '\n\\'])
-            return loads(txt_cp)
-        except JSONDecodeError as e:
-            # retry until we get valid json
-            print('---JSON issues------>', self.pdf, e)
-            return self.get_cv_insights(prompt_enquiry)
-
 
 if __name__ == '__main__':
     ai = AIService(pdf=f'{getcwd()}/server/cv/harvey_dent_mle.pdf')
-    dict_ = ai.get_cv_insights(ATS_FRIENDLY_PROMPT)
+    dict_ = ai.to_dict(ATS_FRIENDLY_PROMPT)
     print(dict_)
     '''
     for pdf in listdir('pdf'):
