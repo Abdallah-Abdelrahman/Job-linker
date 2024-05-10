@@ -7,7 +7,8 @@ from json import loads, JSONDecodeError
 from pdfminer.high_level import extract_text
 from pdfminer.pdfparser import PDFSyntaxError
 import google.generativeai as genai
-from server.prompts import CANDID_PROMPT, JOB_PROMPT
+from server.exception import UnreadableCVError
+from server.prompts import CANDID_PROMPT, JOB_PROMPT, ATS_FRIENDLY_PROMPT
 
 
 class AIService():
@@ -62,7 +63,9 @@ class AIService():
         '''extract text from pdf'''
         try:
             txt = extract_text(pdf or self.pdf).strip()
-            return txt if txt else None
+            if not txt:
+                raise UnreadableCVError()
+            return txt
         except FileNotFoundError:
             print('File not found or path is incorrect')
             raise
@@ -83,7 +86,7 @@ class AIService():
         input_ = input_txt or self.parse_pdf()
         if not input_:
             print(self.pdf)
-            raise ValueError('Text is empty')
+            raise UnreadableCVError()
 
         resp = self.model.generate_content([line, input_], stream=True)
         text = ''
@@ -110,10 +113,29 @@ class AIService():
             print('---JSON issues------>', self.pdf, e)
             return self.to_dict(prompt_enquiry)
 
+    def get_cv_insights(self, prompt_enquiry=ATS_FRIENDLY_PROMPT, text=''):
+        '''The function translates gemini response to a dictionary
+
+        Args:
+            prompt_enquiry(str): question to feed it to gemini
+        Returns:
+            dictionary of gemini response
+        '''
+        if not text:
+            text = self.prompt(prompt_enquiry)
+        try:
+            # strips out any spaces or new lines or back-slashes
+            txt_cp = ''.join([c for c in text if c not in '\n\\'])
+            return loads(txt_cp)
+        except JSONDecodeError as e:
+            # retry until we get valid json
+            print('---JSON issues------>', self.pdf, e)
+            return self.get_cv_insights(prompt_enquiry)
+
 
 if __name__ == '__main__':
-    ai = AIService(pdf=f'{getcwd()}/server/cv/Abdallah.pdf')
-    dict_ = ai.to_dict(CANDID_PROMPT)
+    ai = AIService(pdf=f'{getcwd()}/server/cv/harvey_dent_mle.pdf')
+    dict_ = ai.get_cv_insights(ATS_FRIENDLY_PROMPT)
     print(dict_)
     '''
     for pdf in listdir('pdf'):
