@@ -15,6 +15,7 @@ from server.models.major import Major
 from server.models.recruiter import Recruiter
 from server.models.skill import Skill
 from server.models.user import User
+from server.models.user_file import UserFile
 from server.models.work_experience import WorkExperience
 
 classes = {
@@ -27,6 +28,7 @@ classes = {
     "WorkExperience": WorkExperience,
     "Language": Language,
     "Application": Application,
+    "UserFile": UserFile,
 }
 
 

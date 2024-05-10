@@ -12,11 +12,14 @@ from werkzeug.utils import secure_filename
 from server.api.utils import make_response_
 from server.api.v1.views import app_views
 from server.config import ApplicationConfig
+from server.controllers.user_file_controller import UserFileController
 from server.models import storage
 from server.models.user import User
 from server.prompts import ATS_FRIENDLY_PROMPT, CANDID_PROMPT
 from server.services.ai import AIService
 from server.services.ai_cand_creator import AICandidateProfileCreator
+
+user_file = UserFileController()
 
 
 @app_views.route("/upload", methods=["POST"])
@@ -37,6 +40,8 @@ def upload():
         file_path, size = handle_upload(
             request.files["file"], dir_.get(role, ApplicationConfig.UPLOAD_CV)
         )
+        filename = os.path.basename(file_path)
+        original_filename = request.files["file"].filename
     except ValueError as e:
         return make_response_(str(e), "error"), 415
 
@@ -65,6 +70,7 @@ def upload():
                     bcrypt_instance
                     )
             candidate = creator.create_profile()
+            user_file.create_user_file(user_id, filename, original_filename)
             return (
                 make_response_(
                     "File uploaded and profile created successfully",
@@ -73,6 +79,10 @@ def upload():
                 ),
                 201,
             )
+    else:
+        # Delete the file after it has been processed for non-logged in users
+        if os.path.exists(file_path):
+            os.remove(file_path)
 
     return (
         make_response_(
@@ -102,6 +112,10 @@ def upload_insights():
     # Parse the CV using AI service
     ai = AIService(pdf=file_path)
     ai_data = ai.to_dict(ATS_FRIENDLY_PROMPT)
+
+    # Delete the file after it has been processed
+    if os.path.exists(file_path):
+        os.remove(file_path)
 
     return (
         make_response_(
