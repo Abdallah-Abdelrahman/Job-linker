@@ -27,7 +27,7 @@ function Home() {
         <Heading as='h2' className='mb-8 capitalize text-center text-gray-600 sm:mb-14'>
           How it works
         </Heading>
-        <Box className='flex flex-wrap gap-8 lg:justify-center lg:gap-24'>
+        <Box className='flex flex-wrap gap-8 md:justify-between lg:justify-center lg:gap-24'>
           <Box className='space-y-4'>
             <Box className='grid place-content-center flex-shrink-0 w-12 h-12 rounded-lg bg-white shadow-md sm:w-20 sm:h-20'>
               <MyIcon href='/sprite.svg#stats' className='fill-sky-500 w-8 h-8 sm:w-12 sm:h-12' />

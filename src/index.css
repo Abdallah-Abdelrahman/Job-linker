@@ -120,6 +120,11 @@ li > a {
     box-shadow: 0 0 0 100vw white;
     clip-path: inset(0 -100vw);
 }
+.footer .copyright {
+    background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+    box-shadow: 0 0 0 100vw rgb(243 244 246 / var(--tw-bg-opacity));
+    clip-path: inset(0 -100vw);
+}
 
 @media (prefers-color-scheme: light) {
   :root {
