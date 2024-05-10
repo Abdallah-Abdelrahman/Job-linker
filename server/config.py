@@ -67,5 +67,6 @@ class ApplicationConfig:
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
     UPLOAD_JOB = f"{os.getcwd()}/server/jobs"
     UPLOAD_CV = f"{os.getcwd()}/server/cv"
+    UPLOAD_TEMP = f"{os.getcwd()}/server/temp"
     ALLOWED_EXTENSIONS = {"pdf"}
     MAX_CONTENT_LENGTH = 2 * 1000 * 1000
