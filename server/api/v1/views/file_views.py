@@ -15,9 +15,10 @@ from server.config import ApplicationConfig
 from server.controllers.user_file_controller import UserFileController
 from server.models import storage
 from server.models.user import User
-from server.prompts import ATS_FRIENDLY_PROMPT, CANDID_PROMPT
+from server.prompts import ATS_FRIENDLY_PROMPT, CANDID_PROMPT, JOB_PROMPT
 from server.services.ai import AIService
 from server.services.ai_cand_creator import AICandidateProfileCreator
+from server.services.ai_job_creator import AIJobCreator
 
 user_file = UserFileController()
 
@@ -30,6 +31,7 @@ def upload():
     dir_ = {
         "candidate": ApplicationConfig.UPLOAD_CV,
         "recruiter": ApplicationConfig.UPLOAD_JOB,
+        "visitor": ApplicationConfig.UPLOAD_TEMP,
     }
 
     # check if the post request has the file part
@@ -38,9 +40,11 @@ def upload():
 
     try:
         file_path, size = handle_upload(
-            request.files["file"], dir_.get(role, ApplicationConfig.UPLOAD_CV)
+            request.files["file"], dir_.get(
+                role,
+                ApplicationConfig.UPLOAD_TEMP
+                )
         )
-        filename = file_path
         original_filename = request.files["file"].filename
     except ValueError as e:
         return make_response_(str(e), "error"), 415
@@ -70,12 +74,48 @@ def upload():
                     bcrypt_instance
                     )
             candidate = creator.create_profile()
-            user_file.create_user_file(user_id, filename, original_filename)
+            # Move the file to the appropriate directory
+            new_file_path = os.path.join(
+                dir_.get("candidate", ApplicationConfig.UPLOAD_CV),
+                os.path.basename(file_path),
+            )
+            os.rename(file_path, new_file_path)
+            user_file.create_user_file(
+                    user_id,
+                    new_file_path,
+                    original_filename
+                    )
             return (
                 make_response_(
                     "File uploaded and profile created successfully",
                     "success",
                     {"size": size, "candidate_id": candidate.id},
+                ),
+                201,
+            )
+        elif user and user.role == "recruiter":
+            ai = AIService(pdf=file_path)
+            ai_data = ai.to_dict(JOB_PROMPT)
+            creator = AIJobCreator(user_id, ai_data)
+            job = creator.create_job()
+
+            # Move the file to the appropriate directory
+            new_file_path = os.path.join(
+                dir_.get("recruiter", ApplicationConfig.UPLOAD_JOB),
+                os.path.basename(file_path),
+            )
+            os.rename(file_path, new_file_path)
+            user_file.create_user_file(
+                    user_id,
+                    new_file_path,
+                    original_filename
+                    )
+
+            return (
+                make_response_(
+                    "File uploaded and job created successfully",
+                    "success",
+                    {"size": size, "job_id": job.id},
                 ),
                 201,
             )

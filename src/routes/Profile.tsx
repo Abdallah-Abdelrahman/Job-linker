@@ -145,7 +145,8 @@ const Profile = () => {
 
   const handleRecruiterFormSubmit = async (formData: Recruiter) => {
     try {
-      await createRecruiter({ user_id: userData.id, ...formData });
+      const { name, ...recruiterData } = formData;
+      await createRecruiter({ user_id: userData.id, ...recruiterData });
     } catch (error) {
       console.error(error);
     }
@@ -217,6 +218,7 @@ const Profile = () => {
           )}
           {userData.data.role === "recruiter" && (
             <>
+              <Upload />
               {!userData.data.recruiter ? (
                 <MyForm role="recruiter" onSubmit={handleRecruiterFormSubmit} />
               ) : (

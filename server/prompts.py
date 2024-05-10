@@ -29,19 +29,22 @@ CANDID_PROMPT = """\
     """
 
 JOB_PROMPT = """\
-    give me a dictionary from this job in the form of:
+    Please extract the following information from this job description and provide it in the form of a dictionary:
     {
-      title,
-      major,
-      years_of_experience,
-      responsibilites:[],
-      skills:[],
-      location,
-      job_desc:''
+      "job_title": "<str: The title of the job>",
+      "major": "<str: The major field of study required for the job>",
+      "exper_years": "<str: The number of years of experience required>",
+      "skills": ["<str: Skill 1>", "<str: Skill 2>", "..."],
+      "location": "<str: The location of the job>",
+      "job_description": "<str: A detailed description of the job>"
     }
+
     Notes:
-    - don't forget to enclose each property in double quotes
-"""
+    - Please enclose each property in double quotes.
+    - The 'skills' should be represented as lists of strings, each string being a separate skill.
+    - If the 'major' is not mentioned explicit try to understand the job and select a suitable major.
+    - If a particular piece of information is not available in the job description, please set its value to 'None'.
+    """
 
 ATS_FRIENDLY_PROMPT = """\
     As a professional applicant tracking system, please provide a detailed analysis of this CV. The analysis should include:
