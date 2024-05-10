@@ -17,3 +17,15 @@ class UnauthorizedError(Exception):
         """
         self.message = message
         super().__init__(self.message)
+
+
+class UnreadableCVError(Exception):
+    """Exception raised when the CV file is unreadable or the text is empty."""
+
+    def __init__(
+        self,
+        message="The CV file is unreadable or the text is empty. \
+            Please upload a valid CV file.",
+    ):
+        self.message = message
+        super().__init__(self.message)
