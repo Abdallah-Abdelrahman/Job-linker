@@ -7,6 +7,7 @@ CANDID_PROMPT = '''\
       name,
       email,
       major,
+      education:[str]
       skills:[],
       experiences:[
         {title,company,start_date,end_date,location,descpription:str}

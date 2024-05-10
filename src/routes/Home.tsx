@@ -1,10 +1,85 @@
-import { Box } from '@chakra-ui/react';
-import '../index.css';
+import { Accordion, AccordionButton, AccordionItem, AccordionPanel, Box, Button, Heading, Text, useDisclosure } from '@chakra-ui/react';
+import { Insights, MyIcon } from '../components';
+import { FAQS } from '../constants';
+
 
 function Home() {
+  const {isOpen, onOpen, onClose} = useDisclosure();
+
   return (
-    <Box className='home-bg w-full h-full'>
-      Job linker
+    <Box className='home container mx-auto w-full p-4 pt-8'>
+      {/* Hero section */}
+      <Box as='section' className='hero w-full h-[calc(100dvh-10rem)] flex flex-col gap-4 max-w-2xl sm:gap-8 mt-[20%]'>
+        <Heading as='h1' size={{ base: 'lg', md: '2xl' }} className='capitalize'>
+          simplify hiring, amplify growth
+        </Heading>
+        <Text className='sm:text-xl sm:leading-8'>
+          Find skilled candidates, in-demand jobs and the solutions you need to help your cv stands out.
+        </Text>
+        <Box className='relative z-10 flex flex-col gap-6 sm:flex-row sm:mt-4'>
+          <Insights isOpen={isOpen} onClose={onClose} />
+          <Button size={{ base: 'sm', sm: 'lg' }} className='w-40  rounded-md !bg-white !text-sky-600 !outline-sky-400' onClick={onOpen}>ATS insight</Button>
+          <Button size={{ base: 'sm', sm: 'lg' }} className='w-40  rounded-md !bg-white !text-sky-600 !outline-sky-400'>post a job</Button>
+        </Box>
+      </Box>
+      {/* How it works section */}
+      <Box as='section' className='how-it-work -mt-8 py-20 w-full bg-white'>
+        <Heading as='h2' className='mb-8 capitalize text-center text-gray-600 sm:mb-14'>
+          How it works
+        </Heading>
+        <Box className='flex flex-wrap gap-8 lg:justify-center lg:gap-24'>
+          <Box className='space-y-4'>
+            <Box className='grid place-content-center flex-shrink-0 w-12 h-12 rounded-lg bg-white shadow-md sm:w-20 sm:h-20'>
+              <MyIcon href='/sprite.svg#stats' className='fill-sky-500 w-8 h-8 sm:w-12 sm:h-12' />
+            </Box>
+            <Text className='text-lg sm:text-2xl'>1. scan your cv with ATS</Text>
+          </Box>
+          <Box className='space-y-4'>
+            <Box className='grid place-content-center flex-shrink-0 w-12 h-12 rounded-lg bg-white shadow-md sm:w-20 sm:h-20'>
+              <MyIcon href='/sprite.svg#matching' className='fill-sky-500 w-8 h-8 sm:w-12 sm:h-12' />
+            </Box>
+            <Text className='text-lg sm:text-2xl'>2. View matching candidates</Text>
+          </Box>
+          <Box className='space-y-4'>
+            <Box className='grid place-content-center flex-shrink-0 w-12 h-12 rounded-lg bg-white shadow-md sm:w-20 sm:h-20'>
+              <MyIcon href='/sprite.svg#apply' className='fill-sky-500 w-8 h-8 sm:w-12 sm:h-12' />
+            </Box>
+            <Text className='text-lg sm:text-2xl'>3. Apply for a job</Text>
+          </Box>
+        </Box>
+      </Box>
+      {/* FAQS section */}
+      <Box as='section' className='py-20'>
+        <Heading as='h2' className='mb-8 capitalize text-center text-gray-600'>
+          FAQs
+        </Heading>
+        <Accordion allowToggle>
+          {FAQS.map((faq, idx) =>
+            <AccordionItem key={idx} className='min-h-20'>
+              {({ isExpanded }) => (
+                <>
+                  <h2>
+                    <AccordionButton className='!h-full'>
+                      <Box as='span' className='flex-1 text-left font-bold sm:text-xl'>
+                        {Object.keys(faq)[0]}
+                      </Box>
+                      {isExpanded ? (
+                        <MyIcon href='/sprite.svg#minus' className='w-5 h-5' />
+                      ) : (
+                        <MyIcon href='/sprite.svg#plus' className='w-5 h-5' />
+                      )}
+                    </AccordionButton>
+                  </h2>
+                  <AccordionPanel pb={4} className='text-lg'>
+                    {Object.values(faq)[0]}
+                  </AccordionPanel>
+                </>
+              )}
+            </AccordionItem>
+          )}
+        </Accordion>
+      </Box>
+
     </Box>
   );
 }

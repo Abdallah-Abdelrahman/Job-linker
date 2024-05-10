@@ -60,7 +60,7 @@ function Register() {
   }, [user, navigate]);
 
   return (
-    <Box className="containter mx-auto mt-8 flex-1">
+    <Box className="containter mx-auto my-8 flex-1">
       <Heading as="h1" size="3xl" className="mb-8 max-w-md w-full mx-auto capitalize">
         Register
       </Heading>

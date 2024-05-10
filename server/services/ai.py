@@ -2,12 +2,14 @@
 '''The module defines AI service that parses a pdf file,
 generate a dictionary of info of the pdf using gemini.
 '''
+from datetime import datetime
 from os import getenv, listdir, path, getcwd
 from json import loads, JSONDecodeError
 from pdfminer.high_level import extract_text
 from pdfminer.pdfparser import PDFSyntaxError
 import google.generativeai as genai
 from server.prompts import CANDID_PROMPT, JOB_PROMPT
+from dateutil.parser import parse
 
 
 class AIService():
@@ -52,6 +54,7 @@ class AIService():
         '''
         genai.configure(api_key=getenv('GOOGLE_API_KEY'))
 
+        self.__insights = None
         self.pdf = pdf
         self.model = genai.GenerativeModel(
             model_name='gemini-1.0-pro',
@@ -76,6 +79,7 @@ class AIService():
 
         Args:
             line: prompt to provide for gemini
+            input_txt: input to extract the info from
         Notes:
             the function assumes there's a pdf file called pdf.pdf
             feel free to change this to obtain some info about the the pdf
@@ -104,17 +108,42 @@ class AIService():
         try:
             # strips out any spaces or new lines or back-slashes
             txt_cp = ''.join([c for c in text if c not in '\n\\'])
-            return loads(txt_cp)
+            dict_ = loads(txt_cp)
+            for k,v in dict_.items():
+                if k == 'experiences':
+                    for xp in dict_.get('experiences'):
+                        print(xp['start_date'], '--------START------------->')
+                        print(xp['end_date'], '--------END------------->')
+                        xp['start_date'] = parse(str(xp.get('start_date') or datetime.utcnow()))
+                        xp['end_date'] = parse(str(xp.get('end_date') or datetime.utcnow()))
+            self.__insights = dict_
+            return dict_
         except JSONDecodeError as e:
             # retry unitl we get valid json
             print('---JSON issues------>', self.pdf, e)
             return self.to_dict(prompt_enquiry)
 
+    def get_insights(self):
+        '''Retreive insights about resume'''
+        # TODO:
+        prompt = """\
+            As a professional applicant tracking system, please provide a detailed analysis of this CV. The analysis should include:
+            {
+            "ats_score": "<float: ATS friendliness score between 0.0 and 1.0>",
+            "suggestions": ["<str: Suggestion 1>", "<str: Suggestion 2>", "..."],
+            }
+        
+            Notes:
+            - 'ats_score' should be a float between 0.0 and 1.0, where 1.0 means the CV is perfectly ATS-friendly and 0.0 means it's not ATS-friendly at all.
+            - 'suggestions' should be a list of suggestions for improving the CV to make it more ATS-friendly.
+            """
+        return self.prompt(prompt)
+
 
 if __name__ == '__main__':
     ai = AIService(pdf=f'{getcwd()}/server/cv/Abdallah.pdf')
-    dict_ = ai.to_dict(CANDID_PROMPT)
-    print(dict_)
+    #dict_ = ai.to_dict(CANDID_PROMPT)
+    print(ai.get_insights())
     '''
     for pdf in listdir('pdf'):
         ai = AIService(pdf=path.join('pdf', pdf))
