@@ -402,6 +402,8 @@ class JobController:
                     job.id
                     )
             rec_user = storage.get_by_attr(Recruiter, "id", job.recruiter_id)
+            if rec_user is None:
+                continue
             jobs_data.append(
                 {
                     "id": job.id,
