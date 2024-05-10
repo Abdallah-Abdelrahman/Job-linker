@@ -101,7 +101,7 @@ def upload_insights():
 
     # Parse the CV using AI service
     ai = AIService(pdf=file_path)
-    ai_data = ai.get_cv_insights(ATS_FRIENDLY_PROMPT)
+    ai_data = ai.to_dict(ATS_FRIENDLY_PROMPT)
 
     return (
         make_response_(
