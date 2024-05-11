@@ -3,8 +3,8 @@
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, String, Text
-from sqlalchemy.orm import backref, relationship
 from sqlalchemy.dialects.mysql import LONGTEXT
+from sqlalchemy.orm import backref, relationship
 
 from server.models.base_model import Base, BaseModel
 
@@ -39,7 +39,11 @@ class WorkExperience(BaseModel, Base):
     description = Column(Text)
 
     candidate = relationship(
-        "Candidate", backref=backref("experiences", cascade="all, delete")
+        "Candidate",
+        backref=backref(
+            "experiences",
+            cascade="all, delete-orphan"
+            )
     )
 
     def __repr__(self):

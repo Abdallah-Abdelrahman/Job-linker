@@ -25,7 +25,7 @@ class Job(BaseModel, Base):
 
     # Relationship with Recruiter
     recruiter = relationship(
-        "Recruiter", backref=backref("jobs", cascade="all, delete")
+        "Recruiter", backref=backref("jobs", cascade="all, delete-orphan")
     )
 
     # Relationship with Major
