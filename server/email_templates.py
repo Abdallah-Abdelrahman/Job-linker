@@ -35,3 +35,25 @@ def shortlisted_email(name, company_name, job_title):
     </body>
     </html>
     """
+
+
+def rejection_email(name, company_name, job_title):
+    """Notify Candidates who were not selected"""
+    return f"""
+    <html>
+    <body>
+    <p>Dear {name},</p>
+
+    <p>Thank you for your interest in the <b>{job_title}</b> position at <b>{company_name}</b> and for the time you've invested in the application process.</p>
+
+    <p>We wanted to inform you that after careful consideration, we have decided to move forward with another candidate for this position. This decision was not an easy one and it was based on the specific needs of the role.</p>
+
+    <p>We appreciate your interest in {company_name} and encourage you to apply for future openings that align with your skills and interests.</p>
+
+    <p>Thank you again for your application. We wish you all the best in your job search and future professional endeavors.</p>
+
+    <p>Best regards,<br>
+    {company_name} Recruitment Team</p>
+    </body>
+    </html>
+    """
