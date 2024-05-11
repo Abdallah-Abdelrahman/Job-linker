@@ -6,7 +6,7 @@ Job-linker application.
 from marshmallow import ValidationError
 
 from server.controllers.schemas import job_schema
-from server.email_templates import shortlisted_email
+from server.email_templates import rejection_email, shortlisted_email
 from server.exception import UnauthorizedError
 from server.models import storage
 from server.models.application import Application
@@ -196,11 +196,14 @@ class JobController:
         if not job or job.recruiter_id != recruiter.id:
             raise ValueError("Job not found")
 
+        # Check if the job is being closed
+        is_being_closed = job.is_open and not data.get("is_open", True)
+
         for key, value in data.items():
             setattr(job, key, value)
 
         # If the job is closed, shortlist candidates and send emails
-        if not job.is_open:
+        if is_being_closed:
             applications = storage.get_all_by_attr(
                     Application,
                     "job_id",
@@ -223,9 +226,13 @@ class JobController:
 
                     # Create the email template
                     template = shortlisted_email(name, company_name, job_title)
+                else:
+                    application.application_status = "rejected"
+                    template = rejection_email(name, company_name, job_title)
 
-                    # Send the email
-                    self.email_service.send_mail(template, email, name)
+                # Send the email
+                self.email_service.send_mail(template, email, name)
+                storage.save()
 
         storage.save()
 
