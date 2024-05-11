@@ -36,13 +36,15 @@ JOB_PROMPT = """\
       "exper_years": "<str: The number of years of experience required>",
       "skills": ["<str: Skill 1>", "<str: Skill 2>", "..."],
       "location": "<str: The location of the job>",
-      "job_description": "<str: A detailed description of the job>"
+      "job_description": "<str: A detailed description of the job>",
+      "application_deadline": "<str: The last date to apply for the job in ISO 8601 format>"
     }
 
     Notes:
     - Please enclose each property in double quotes.
     - The 'skills' should be represented as lists of strings, each string being a separate skill.
     - If the 'major' is not mentioned explicit try to understand the job and select a suitable major.
+    - The 'application_deadline' should be represented as a string in ISO 8601 format (e.g., "2024-05-11T08:06:13.000000") if Not specified set its value to 'None'.
     - If a particular piece of information is not available in the job description, please set its value to 'None'.
     """
 
@@ -64,4 +66,10 @@ ATS_FRIENDLY_PROMPT = """\
     - 'suggestions' should be a list of suggestions for improving the CV to make it more ATS-friendly.
     - 'action_verbs' should analyze the use of action verbs in the CV, which can make the CV more dynamic.
     - 'personal_pronouns' should analyze the use of personal pronouns in the CV, as excessive use of personal pronouns can be seen as unprofessional.
+    """
+
+JOB_MATCHING_PROMPT = """\
+    Given the candidate's experiences and skills and the job's description and skills,
+    please provide a match score between 0.0 and 1.0, where 1.0 means a perfect match
+    and 0.0 means no match at all.
     """

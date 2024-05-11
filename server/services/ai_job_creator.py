@@ -1,5 +1,7 @@
 """Create a Job by Extracting the data using AI"""
 
+from datetime import datetime, timezone
+
 from marshmallow import ValidationError
 
 from server.controllers.job_controller import JobController
@@ -28,6 +30,18 @@ class AIJobCreator:
         self.ai_data = ai_data
         self.job_controller = JobController()
 
+    def parse_date(self, date_string):
+        """Try to parse the application_deadline"""
+        formats = ["%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"]
+        for fmt in formats:
+            try:
+                dt = datetime.strptime(date_string, fmt)
+                return dt.replace(tzinfo=timezone.utc)
+            except ValueError:
+                pass
+        # If all formats fail, return None
+        return None
+
     def create_job(self):
         """
         Extracts and validates data, creates a new Job, adds Skills,
@@ -46,6 +60,17 @@ class AIJobCreator:
 
         # Add the major_id to the ai_data
         self.ai_data["major_id"] = major.id
+
+        # Parse application_deadline into a datetime object
+        if "application_deadline" in self.ai_data and self.ai_data[
+            "application_deadline"
+        ] in ["None", "Not specified"]:
+            del self.ai_data["application_deadline"]
+
+        if "application_deadline" in self.ai_data:
+            self.ai_data["application_deadline"] = self.parse_date(
+                self.ai_data["application_deadline"]
+            )
 
         # Validate data
         try:

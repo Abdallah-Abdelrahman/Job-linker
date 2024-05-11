@@ -2,7 +2,25 @@
 This module provides schemas for various models in the Job-linker application.
 """
 
+from datetime import datetime
+
+from dateutil.parser import parse
 from marshmallow import Schema, fields, validate
+from marshmallow.fields import DateTime
+
+
+class MultiFormatDateTime(fields.Field):
+    def _deserialize(self, value, attr, data, **kwargs):
+        if isinstance(value, datetime):
+            return value
+
+        formats = ["%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"]
+        for fmt in formats:
+            try:
+                return datetime.strptime(value, fmt)
+            except ValueError:
+                pass
+        self.fail("invalid")
 
 
 class LoginSchema(Schema):
@@ -80,12 +98,14 @@ class JobSchema(Schema):
 
     id = fields.Str(required=False)
     recruiter_id = fields.Str(required=False)
-    major_id = fields.Str(required=True)
-    job_title = fields.Str(required=True)
+    major_id = fields.Str(required=False)
+    job_title = fields.Str(required=False)
     location = fields.Str(required=False)
-    job_description = fields.Str(required=True)
+    job_description = fields.Str(required=False)
     exper_years = fields.Str(required=False)
     salary = fields.Float(required=False)
+    application_deadline = MultiFormatDateTime()
+    is_open = fields.Boolean(required=False)
 
 
 job_schema = JobSchema()
@@ -160,6 +180,7 @@ class ApplicationSchema(Schema):
             ),
         default="applied",
     )
+    match_score = fields.Float(required=False)
 
 
 application_schema = ApplicationSchema()
