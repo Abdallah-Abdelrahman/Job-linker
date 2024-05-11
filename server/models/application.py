@@ -1,6 +1,6 @@
 """Application Model"""
 
-from sqlalchemy import Column, Enum, ForeignKey, String
+from sqlalchemy import Column, Enum, Float, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 from server.models.base_model import Base, BaseModel
@@ -20,6 +20,7 @@ class Application(BaseModel, Base):
     application_status = Column(
         Enum("applied", "shortlisted", "rejected", "hired"), default="applied"
     )
+    match_score = Column(Float, nullable=True)
 
     # Relationship with Job
     job = relationship("Job", back_populates="applications")

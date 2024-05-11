@@ -6,6 +6,7 @@ Job-linker application.
 from marshmallow import ValidationError
 
 from server.controllers.schemas import job_schema
+from server.email_templates import shortlisted_email
 from server.exception import UnauthorizedError
 from server.models import storage
 from server.models.application import Application
@@ -15,6 +16,7 @@ from server.models.major import Major
 from server.models.recruiter import Recruiter
 from server.models.skill import Skill
 from server.models.user import User
+from server.services.mail import MailService
 
 
 class JobController:
@@ -26,7 +28,7 @@ class JobController:
         """
         Initializes the JobController.
         """
-        pass
+        self.email_service = MailService()
 
     def create_job(self, user_id, data):
         """
@@ -78,6 +80,8 @@ class JobController:
             exper_years=data.get("exper_years"),
             salary=data.get("salary"),
             location=data.get("location"),
+            application_deadline=data.get("application_deadline"),
+            is_open=data.get("is_open", True),
         )
         storage.new(new_job)
         storage.save()
@@ -135,6 +139,8 @@ class JobController:
                 "job_description": job.job_description,
                 "applied_candidates": applied_candidates,
                 "created_at": job.created_at,
+                "application_deadline": job.application_deadline,
+                "is_open": job.is_open,
             }
 
         # If the user is a candidate, add a count displays the number
@@ -152,6 +158,8 @@ class JobController:
                 "salary": job.salary,
                 "exper_years": job.exper_years,
                 "skills": [skill.name for skill in job.skills],
+                "application_deadline": job.application_deadline,
+                "is_open": job.is_open,
             }
         raise ValueError("Recruiter not found")
 
@@ -190,6 +198,35 @@ class JobController:
 
         for key, value in data.items():
             setattr(job, key, value)
+
+        # If the job is closed, shortlist candidates and send emails
+        if not job.is_open:
+            applications = storage.get_all_by_attr(
+                    Application,
+                    "job_id",
+                    job.id
+                    )
+            for application in applications:
+                if application.match_score > 0.4:
+                    application.application_status = "shortlisted"
+                    storage.save()
+
+                    # Prepare the email
+                    candidate = storage.get(
+                            Candidate,
+                            application.candidate_id
+                            )
+                    email = candidate.user.email
+                    name = candidate.user.name
+                    company_name = recruiter.company_name
+                    job_title = job.job_title
+
+                    # Create the email template
+                    template = shortlisted_email(name, company_name, job_title)
+
+                    # Send the email
+                    self.email_service.send_mail(template, email, name)
+
         storage.save()
 
         return job
@@ -344,6 +381,8 @@ class JobController:
                         "id",
                         job.recruiter_id
                         )
+                if rec_user is None:
+                    continue
                 jobs_data.append(
                     {
                         "id": job.id,
@@ -356,6 +395,8 @@ class JobController:
                         "salary": job.salary,
                         "exper_years": job.exper_years,
                         "skills": [skill.name for skill in job.skills],
+                        "application_deadline": job.application_deadline,
+                        "is_open": job.is_open,
                     }
                 )
             return jobs_data
@@ -382,6 +423,8 @@ class JobController:
                         "created_at": job.created_at,
                         "job_description": job.job_description,
                         "applications_count": len(applications),
+                        "application_deadline": job.application_deadline,
+                        "is_open": job.is_open,
                     }
                 )
             return jobs_data
@@ -424,6 +467,8 @@ class JobController:
                     "salary": job.salary,
                     "exper_years": job.exper_years,
                     "skills": [skill.name for skill in job.skills],
+                    "application_deadline": job.application_deadline,
+                    "is_open": job.is_open,
                 }
             )
         return jobs_data

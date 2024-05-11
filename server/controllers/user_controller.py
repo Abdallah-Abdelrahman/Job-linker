@@ -14,6 +14,7 @@ from server.controllers.schemas import (
         registration_schema,
         update_schema
         )
+from server.email_templates import verification_email
 from server.exception import UnauthorizedError
 from server.models import storage
 from server.models.candidate import Candidate
@@ -87,19 +88,8 @@ class UserController:
             email (str): The user's email address.
             token (str): The verification token.
         """
-        # verification_url = url_for(
-        #         "user.verify_email",
-        #         token=token,
-        #         _external=True
-        #         )
-        "localhost:5173/verify?token={token}"
-        html = (
-            f"<p>Click the following link to verify your email:"
-            f"<a href='http://localhost:5173/verify?token={token}'>"
-            "Verify Email</a></p>"
-        )
-
-        self.email_service.send_mail(html, email, name)
+        template = verification_email(name, token)
+        self.email_service.send_mail(template, email, name)
 
     def verify_email(self, token):
         """
@@ -245,8 +235,7 @@ class UserController:
                     "major": candidate.major.to_dict,
                     "skills": [skill.to_dict for skill in candidate.skills],
                     "languages": [
-                        language.to_dict
-                        for language in candidate.languages
+                        language.to_dict for language in candidate.languages
                         ],
                     "applications": [
                         application.to_dict
@@ -255,7 +244,7 @@ class UserController:
                     "experiences": [
                         experience.to_dict
                         for experience in candidate.experiences
-                    ]
+                    ],
                 }
         elif user.role == "recruiter":
             recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
@@ -266,7 +255,7 @@ class UserController:
                 user_data["recruiter"] = {
                     "company_name": recruiter.company_name,
                     "company_info": recruiter.company_info,
-                    "jobs": [job.to_dict for job in jobs]
+                    "jobs": [job.to_dict for job in jobs],
                 }
 
         # user_by_role = {'candidate': Candidate, 'recruiter': Recruiter}
