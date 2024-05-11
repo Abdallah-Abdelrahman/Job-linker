@@ -73,6 +73,14 @@ class AdminController:
         if target_user_id == curr_user_id:
             raise ValueError("Ask another Admin to Delete you.")
 
+        recruiter = storage.get_by_attr(Recruiter, "user_id", target_user_id)
+        if recruiter:
+            # Delete all jobs associated with the recruiter
+            jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
+            for job in jobs:
+                storage.delete(job)
+            storage.delete(recruiter)
+
         storage.delete(user)
         storage.save()
 
