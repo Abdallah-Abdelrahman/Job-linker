@@ -8,8 +8,9 @@ from json import loads, JSONDecodeError
 from pdfminer.high_level import extract_text
 from pdfminer.pdfparser import PDFSyntaxError
 import google.generativeai as genai
-from server.prompts import CANDID_PROMPT, JOB_PROMPT
-from dateutil.parser import parse
+from dateutil.parser import parse, ParserError
+from server.exception import UnreadableCVError
+from server.prompts import CANDID_PROMPT, JOB_PROMPT, ATS_FRIENDLY_PROMPT
 
 
 class AIService():
@@ -65,7 +66,9 @@ class AIService():
         '''extract text from pdf'''
         try:
             txt = extract_text(pdf or self.pdf).strip()
-            return txt if txt else None
+            if not txt:
+                raise UnreadableCVError()
+            return txt
         except FileNotFoundError:
             print('File not found or path is incorrect')
             raise
@@ -87,7 +90,7 @@ class AIService():
         input_ = input_txt or self.parse_pdf()
         if not input_:
             print(self.pdf)
-            raise ValueError('Text is empty')
+            raise UnreadableCVError()
 
         resp = self.model.generate_content([line, input_], stream=True)
         text = ''
@@ -109,14 +112,22 @@ class AIService():
             # strips out any spaces or new lines or back-slashes
             txt_cp = ''.join([c for c in text if c not in '\n\\'])
             dict_ = loads(txt_cp)
-            for k,v in dict_.items():
-                if k == 'experiences':
-                    for xp in dict_.get('experiences'):
-                        print(xp['start_date'], '--------START------------->')
-                        print(xp['end_date'], '--------END------------->')
-                        xp['start_date'] = parse(str(xp.get('start_date') or datetime.utcnow()))
-                        xp['end_date'] = parse(str(xp.get('end_date') or datetime.utcnow()))
-            self.__insights = dict_
+            xps = dict_.get('experiences')
+            eds = dict_.get('educations')
+            for xp in xps:
+                for k, v in xp.items():
+                    if k in ('start_date', 'end_date'):
+                        try:
+                            xp[k] = parse(v)
+                        except ParserError:
+                            xp[k] = datetime.utcnow()
+            for ed in eds:
+                for k, v in ed.items():
+                    if k in ('start_date', 'end_date'):
+                        try:
+                            ed[k] = parse(v)
+                        except ParserError:
+                            ed[k] = datetime.utcnow()
             return dict_
         except JSONDecodeError as e:
             # retry unitl we get valid json
@@ -141,9 +152,10 @@ class AIService():
 
 
 if __name__ == '__main__':
-    ai = AIService(pdf=f'{getcwd()}/server/cv/Abdallah.pdf')
-    #dict_ = ai.to_dict(CANDID_PROMPT)
-    print(ai.get_insights())
+    ai = AIService(pdf=f'{getcwd()}/server/cv/john_doe.pdf')
+    dict_ = ai.to_dict(CANDID_PROMPT)
+    print(dict_)
+    #print(ai.get_insights())
     '''
     for pdf in listdir('pdf'):
         ai = AIService(pdf=path.join('pdf', pdf))

@@ -1,5 +1,12 @@
 import { Text, Heading, Box } from '@chakra-ui/react';
-type Experience = {}
+
+type Experience = {
+  title: string,
+  company: string,
+  start_date: Date,
+  end_date: Date,
+  description: string
+}
 type Application = {
   title: string,
   company: string,
@@ -15,6 +22,7 @@ type Data = {
   candidate: {
     major: { name: string },
     skills: string[],
+    languages: string[],
     applications: Application[],
     experiences: Experience[]
   },
@@ -38,15 +46,16 @@ function Candidate({ data }: CandidateProp) {
           {/*Skills*/}
           <Heading as='h4' mb='2' size='lg' className='capitalize'>skills</Heading>
           <ul className='flex flex-wrap gap-4 max-h-40 overflow-auto'>
-            {['baslfk', 'asldfkj', 'asldkfjasdlfkj', 'asldkfjasdlfkj', 'asldkfjasdlfkj', 'asldkfjasdlfkj', 'asldkfjasdlfkj', 'asldkfjasdlfkj', 'asldkfjasdlfkj', 'asldkfjasdlfkj', 'asldkfjasdlfkj', 'asldkfjasdlfkj', 'asldkfjasdlfkj']
-              .map((skill, idx) => <li key={idx} className='p-2 bg-teal-50 text-teal-500 rounded-tl-lg rounded-br-lg'>{skill}</li>)}
+            {data.candidate.skills.map((skill, idx) =>
+              <li key={idx} className='p-2 bg-teal-50 text-teal-500 rounded-tl-lg rounded-br-lg'>{skill}</li>
+            )}
           </ul>
         </div>
         <div className='w-full mt-2'>
           {/*Languages*/}
           <Heading as='h4' mb='2' size='lg' className='capitalize'>languages</Heading>
           <Box as='ul' className='flex flex-wrap gap-4 max-h-40 overflow-auto'>
-            {['english', 'Rusia'].map((l, idx) =>
+            {data.candidate.languages.map((l, idx) =>
               <Box
                 key={idx}
                 as='li'
@@ -65,7 +74,7 @@ function Candidate({ data }: CandidateProp) {
             About me
           </Heading>
           <Text>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed finibus est vitae tortor ullamcorper, ut vestibulum velit convallis. Aenean posuere risus non velit egestas suscipit. Nunc finibus vel ante id euismod. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam erat volutpat. Nulla vulputate pharetra tellus, in luctus risus rhoncus id.
+            {data.bio}
           </Text>
         </div>
         {/*Experience*/}
@@ -74,17 +83,16 @@ function Candidate({ data }: CandidateProp) {
             experience
           </Heading>
           <Box as='ul' className='flex flex-col gap-4'>
-            {Array.from({ length: 3 }).map((xp, idx) =>
+            {data.candidate.experiences.map((xp, idx) =>
               <Box key={idx} as='li'>
                 <Box className='flex justify-between flex-wrap gap-3 w-full'>
-                  <Heading as='h6' size='md' className='capitalize'>web developer</Heading>
+                  <Heading as='h6' size='md' className='capitalize'>{xp.title}</Heading>
                   <Box>
-                    <span className='mr-2'>at company name</span>
-                    <span className='span-gray-500'>2017 - 2019</span>
+                    <span className='mr-2'>at {xp.company}</span>
+                    <span className='span-gray-500'>{xp.start_date} - {xp.end_date}</span>
                   </Box>
                 </Box>
-                <Text className='mt-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed finibus est vitae tortor ullamcorper, ut vestibulum velit convallis. Aenean posuere risus non velit egestas suscipit.
-                </Text>
+                <Text className='mt-2'>{xp.description}</Text>
               </Box>
 
             )}

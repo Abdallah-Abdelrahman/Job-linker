@@ -14,7 +14,9 @@ class Major(BaseModel, Base):
 
     # Relationship with Jobs & Candidates
     jobs = relationship("Job", back_populates="major")
-    candidates = relationship("Candidate", back_populates="major")
+    candidates = relationship("Candidate",
+                              back_populates="major",
+                              cascade="all, delete-orphan")
 
     def __repr__(self):
         """Return a string representation of the Major instance"""

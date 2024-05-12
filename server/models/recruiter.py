@@ -18,7 +18,10 @@ class Recruiter(BaseModel, Base):
     # Relationship with User & Job
     user = relationship(
         "User",
-        backref=backref("recruiter", uselist=False, cascade="all, delete")
+        backref=backref("recruiter",
+                        uselist=False,
+                        cascade="all, delete-orphan"
+                        )
     )
 
     def __repr__(self):

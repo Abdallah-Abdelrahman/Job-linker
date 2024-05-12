@@ -143,3 +143,21 @@ def delete_application(application_id):
     user_id = get_jwt_identity()
     applications_controller.delete_application(user_id, application_id)
     return make_response_("success", "Application deleted successfully"), 200
+
+
+@app_views.route("/applications/hired_count", methods=["GET"])
+@swag_from("docs/app_views/get_hired_count.yaml")
+def get_hired_count():
+    """
+    Fetches the count of hired candidates.
+
+    Returns:
+        The count of hired candidates.
+    """
+    count = applications_controller.get_hired_count()
+    return (
+        make_response_(
+            "success", "Fetched count of hired candidates", {"count": count}
+        ),
+        200,
+    )

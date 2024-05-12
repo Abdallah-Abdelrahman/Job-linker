@@ -43,6 +43,7 @@ class UpdateUserSchema(Schema):
     contact_info = fields.Str(required=False)
     bio = fields.Str(required=False)
     image_url = fields.Str(required=False)
+    profile_complete = fields.Bool(required=False)
 
 
 update_schema = UpdateUserSchema()

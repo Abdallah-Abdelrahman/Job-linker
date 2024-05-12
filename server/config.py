@@ -57,7 +57,7 @@ class ApplicationConfig:
     JWT_SECRET_KEY = os.environ["SECRET_KEY"]
 
     # Set the lifespan of access tokens to 30 minutes
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=60)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)
 
     # Here you can globally configure all the ways you want to allow JWTs to
     # be sent to your web application. By default, this will be only headers.
@@ -67,5 +67,6 @@ class ApplicationConfig:
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
     UPLOAD_JOB = f"{os.getcwd()}/server/jobs"
     UPLOAD_CV = f"{os.getcwd()}/server/cv"
+    UPLOAD_TEMP = f"{os.getcwd()}/server/temp"
     ALLOWED_EXTENSIONS = {"pdf"}
     MAX_CONTENT_LENGTH = 2 * 1000 * 1000

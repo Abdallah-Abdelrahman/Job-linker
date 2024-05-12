@@ -1,61 +1,53 @@
-import { useRef, useState } from 'react';
-import { useUploadMutation } from '../app/services/auth';
-import { Text, FormControl, Input } from '@chakra-ui/react';
+import { useEffect, useRef, useState } from 'react';
+import { Text, FormControl, Input, FormLabel, Box } from '@chakra-ui/react';
 import { MyIcon } from '.';
-import { useAppSelector } from '../hooks/store';
-import { selectCurrentUser } from '../features/auth/authSlice';
 
-function Upload() {
-  const user = useAppSelector(selectCurrentUser);
-  const [upload, { isSuccess, isLoading, isError }] = useUploadMutation();
-  const inputRef = useRef(null);
-  const [isUploaded, setIsUploaded] = useState(false);
-  const [file, setFile] = useState<string | null>(null);
+function Upload(props) {
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const boxRef = useRef<HTMLDivElement | null>(null);
+  const [file, setFile] = useState<string>();
 
-  const handleSubmit = (evt) => {
-    const formData = new FormData(evt.currentTarget);
-    evt.preventDefault();
-    console.log({ user })
-    upload({ file: formData, role: user.role })
-      .unwrap()
-      .then(data => {
-        console.log({ data })
-      })
-      .catch(err => console.error({ err }))
-  };
+  // focus box when no file uploaded
+  useEffect(() => {
+    if (props.isError) {
+      boxRef.current?.focus();
+    }
+  });
 
   return (
-    <form onSubmit={handleSubmit}>
-      <FormControl className='flex flex-col items-center gap-2'>
+    <FormControl className='px-4 flex flex-col items-center gap-2'>
+      <FormLabel className='self-start text-gray-600 !text-base'>Upload your cv </FormLabel>
+      <Box
+        ref={boxRef}
+        tabIndex={0}
+        className={`
+        cursor-pointer focus:outline-none focus:ring-2  ring-offset-2
+        ${props.isError ? 'focus:ring-red-400' : 'focus:ring-sky-400'}
+        grid place-items-center gap-2 p-4 border-2 border-dashed rounded-md`}
+        onClick={() => {
+          inputRef.current?.click();
+        }}
+      >
         <MyIcon
-          href='/sprite.svg#upload-file'
-          className=''
-          onClick={() => {
-            inputRef.current?.click();
-            setIsUploaded(true);
-          }}
+          href='/sprite.svg#upload-0x01'
+          className='w-10 h-10'
         />
         <Input
           ref={inputRef}
           type='file'
           name='file'
           hidden
-          onChange={(evt) => setFile(evt.currentTarget.files[0].name)}
+          onChange={(evt) => setFile(evt.currentTarget.files?.[0].name)}
         />
-        <Text className='text-gray-500'>
+        <Text className='text-sm text-gray-500'>
           {!file
             ? <span>click to upload your file<br /> max size: 2MB<br /> media type: pdf</span>
             : file}
         </Text>
-      </FormControl>
-      {isUploaded && <button className='block bg-blue-100 text-blue-600 py-2 w-1/2 mt-3 mx-auto' type='submit'>
-        {isLoading ? 'loading..' : isSuccess ? 'saved' : isError ? 'smth wrong' : 'save'}
-      </button>
-      }
-
-    </form>
-
+      </Box>
+    </FormControl>
   );
 }
+
 
 export default Upload;

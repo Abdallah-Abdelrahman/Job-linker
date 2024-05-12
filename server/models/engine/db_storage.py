@@ -15,6 +15,7 @@ from server.models.major import Major
 from server.models.recruiter import Recruiter
 from server.models.skill import Skill
 from server.models.user import User
+from server.models.user_file import UserFile
 from server.models.work_experience import WorkExperience
 
 classes = {
@@ -27,6 +28,7 @@ classes = {
     "WorkExperience": WorkExperience,
     "Language": Language,
     "Application": Application,
+    "UserFile": UserFile,
 }
 
 
@@ -83,6 +85,10 @@ class DBStorage:
         sess_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(sess_factory)
         self.__session = Session
+
+    def rollback(self):
+        """Rollback the current transaction."""
+        self.__session.rollback()
 
     def close(self):
         """call remove() method on the private session attribute"""

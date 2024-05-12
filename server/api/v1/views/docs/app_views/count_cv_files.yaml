@@ -1,0 +1,15 @@
+tags:
+  - Files
+summary: Return the count of uploaded CV files
+description: Endpoint to return the count of uploaded CV files. Returns a response object containing the status, message, and count of uploaded CV files if successful.
+operationId: countCVFiles
+responses:
+  200:
+    description: Count of CV files retrieved successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Count retrieved successfully",
+          "data": { "count": 7 },
+        }

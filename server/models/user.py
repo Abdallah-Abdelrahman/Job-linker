@@ -20,6 +20,7 @@ class User(BaseModel, Base, UserMixin):
     image_url = Column(String(200))
     verified = Column(Boolean, default=False)
     is_admin = Column(Boolean, default=False)
+    profile_complete = Column(Boolean, default=False)
 
     def __repr__(self):
         """Return a string representation of the User instance"""

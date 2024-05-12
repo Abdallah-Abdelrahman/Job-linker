@@ -25,7 +25,7 @@ class Job(BaseModel, Base):
 
     # Relationship with Recruiter
     recruiter = relationship(
-        "Recruiter", backref=backref("jobs", cascade="all, delete")
+        "Recruiter", backref=backref("jobs", cascade="all, delete-orphan")
     )
 
     # Relationship with Major
@@ -40,7 +40,7 @@ class Job(BaseModel, Base):
 
     # Relationship with Application
     applications = relationship(
-        "Application", back_populates="job", cascade="all, delete"
+        "Application", back_populates="job", cascade="all, delete-orphan"
     )
 
     @property

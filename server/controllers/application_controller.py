@@ -101,7 +101,7 @@ class ApplicationsController:
                 recruiter = storage.get(Recruiter, recruiter_id)
                 response.append(
                     {
-                        "application_id": application.id,
+                        "id": application.id,
                         "job_id": application.job.id,
                         "job_title": application.job.job_title,
                         "application_status": application.application_status,
@@ -112,14 +112,9 @@ class ApplicationsController:
             elif user.role == "recruiter":
                 response.append(
                     {
-                        "application_id": application.id,
+                        "id": application.id,
                         "job_title": application.job.job_title,
-                        "candidate_name": application.candidate.user.name,
-                        "candidate_email": application.candidate.user.email,
-                        "candidate_experience": [
-                            exp.title
-                            for exp in application.candidate.experiences
-                        ],
+                        "candidate_profile": application.candidate.to_dict,
                         "application_status": application.application_status,
                     }
                 )
@@ -269,3 +264,19 @@ class ApplicationsController:
         # Delete application
         storage.delete(application)
         storage.save()
+
+    def get_hired_count(self):
+        """
+        Gets the count of hired candidates.
+
+        Returns:
+            The count of hired candidates.
+        """
+        applications = storage.all(Application)
+
+        hired_count = sum(
+            1 for app in applications.values()
+            if app.application_status == "hired"
+        )
+
+        return hired_count
