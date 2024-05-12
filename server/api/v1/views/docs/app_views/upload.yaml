@@ -1,7 +1,7 @@
 tags:
   - Files
 summary: Upload a file
-description: Endpoint to upload a file. The file is saved on the server. If the user is authorized and a candidate, a new profile is created using AI service.
+description: Endpoint to upload a file. The file is saved on the server. If the user is authorized and a candidate, a new profile is created using AI service, If the user is authorized and a recruiter, a new job is posted using AI service, If visitor return the uploaded cv in JSON format and remove the file from the server.
 operationId: uploadFile
 consumes:
   - multipart/form-data
