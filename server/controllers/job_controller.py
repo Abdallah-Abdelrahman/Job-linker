@@ -210,24 +210,23 @@ class JobController:
                     job.id
                     )
             for application in applications:
+                # Prepare the email
+                candidate = storage.get(
+                        Candidate,
+                        application.candidate_id
+                        )
+                email = candidate.user.email
+                name = candidate.user.name
+                company_name = recruiter.company_name
+                job_title = job.job_title
+
                 if application.match_score > 0.4:
                     application.application_status = "shortlisted"
-                    storage.save()
-
-                    # Prepare the email
-                    candidate = storage.get(
-                            Candidate,
-                            application.candidate_id
-                            )
-                    email = candidate.user.email
-                    name = candidate.user.name
-                    company_name = recruiter.company_name
-                    job_title = job.job_title
-
                     # Create the email template
                     template = shortlisted_email(name, company_name, job_title)
                 else:
                     application.application_status = "rejected"
+                    # Create the email template
                     template = rejection_email(name, company_name, job_title)
 
                 # Send the email
