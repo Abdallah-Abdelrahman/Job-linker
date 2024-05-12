@@ -106,7 +106,7 @@ class ApplicationsController:
                 recruiter = storage.get(Recruiter, recruiter_id)
                 response.append(
                     {
-                        "id": application.id,
+                        "application_id": application.id,
                         "job_id": application.job.id,
                         "job_title": application.job.job_title,
                         "application_status": application.application_status,
@@ -118,7 +118,7 @@ class ApplicationsController:
             elif user.role == "recruiter":
                 response.append(
                     {
-                        "id": application.id,
+                        "application_id": application.id,
                         "job_id": application.job.id,
                         "job_title": application.job.job_title,
                         "candidate_profile": application.candidate.to_dict,

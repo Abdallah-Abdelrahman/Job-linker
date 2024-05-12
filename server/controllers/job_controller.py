@@ -128,7 +128,8 @@ class JobController:
             applied_candidates = [
                 {
                     "name": app.candidate.user.name,
-                    "email": app.candidate.user.email
+                    "email": app.candidate.user.email,
+                    "application_status": app.application_status
                     }
                 for app in applications
                 if app.candidate and app.candidate.user
