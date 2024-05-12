@@ -22,7 +22,11 @@ class Application(BaseModel, Base):
     )
 
     # Relationship with Job
-    job = relationship("Job", back_populates="applications")
+    job = relationship("Job",
+                       back_populates="applications",
+                       )
 
     # Relationship with Candidate
-    candidate = relationship("Candidate", back_populates="applications")
+    candidate = relationship("Candidate",
+                             back_populates="applications",
+                             )

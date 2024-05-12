@@ -22,7 +22,6 @@ from server.models.recruiter import Recruiter
 from server.models.user import User
 from server.services.mail import MailService
 
-ALLOWED_UPDATE_FIELDS = ["name", "contact_info", "bio", "image_url"]
 
 
 class UserController:
@@ -295,6 +294,11 @@ class UserController:
             ValueError: If there is a validation error or the user is
             unauthorized.
         """
+        ALLOWED_UPDATE_FIELDS = [
+                "name", 'profile_complete',
+                "contact_info", "bio", "image_url"
+        ]
+
         # Validate data
         try:
             data = update_schema.load(data)

@@ -11,6 +11,7 @@ function Verify() {
   const token = parmas.get('token');
   const { data, isLoading, isSuccess, isUninitialized } = useVerfiyQuery({ token });
   const dispatch = useAppDispatch();
+  console.log({token})
 
   useEffect(() => {
     if (isSuccess) {

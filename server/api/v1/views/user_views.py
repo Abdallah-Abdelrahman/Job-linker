@@ -53,6 +53,7 @@ def verify_email():
         A response object containing the status and message.
     """
     verf_token = request.query_string.decode("utf8").split("=")[-1]
+    print('------verify------>', verf_token)
     jwt, jwt_refresh, user = user_controller.verify_email(verf_token)
 
     resp = make_response_(

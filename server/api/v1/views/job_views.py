@@ -196,3 +196,64 @@ def get_recommended_candidates(job_id):
         "Recommended Candidates based on Major & Skills",
         {"candidates": [candidate.to_dict for candidate in rec_candidates]},
     )
+
+
+@app_views.route("/jobs/all", methods=["GET"])
+@swag_from("docs/app_views/get_all_jobs.yaml")
+def get_all_jobs():
+    """
+    Fetches all jobs sorted by their major.
+
+    Returns:
+        A list of all jobs in JSON format if successful.
+        Otherwise, it returns an error message.
+    """
+    jobs = job_controller.get_all_jobs_sorted_by_major()
+    return make_response_("success", "Fetched all jobs", jobs), 200
+
+
+@app_views.route("/jobs/counts", methods=["GET"])
+@swag_from("docs/app_views/get_job_counts.yaml")
+def get_job_counts():
+    """
+    Fetches the count of all jobs and the count of jobs per major.
+
+    Returns:
+        A dictionary with the total count of jobs and the
+        count of jobs per major.
+    """
+    counts = job_controller.get_job_counts()
+    return make_response_("success", "Fetched job counts", counts), 200
+
+
+@app_views.route("/jobs/search", methods=["GET"])
+@swag_from("docs/app_views/search_jobs.yaml")
+def search_jobs():
+    """
+    Search for jobs by location and title.
+
+    Query Parameters:
+        location (str): The location to search for.
+        title (str): The title to search for.
+
+    Returns:
+        A list of jobs that match the search criteria.
+    """
+    location = request.args.get("location")
+    title = request.args.get("title")
+    jobs = job_controller.search_jobs(location, title)
+    return make_response_("success", "Fetched jobs", jobs), 200
+
+
+@app_views.route("/jobs/all/sorted", methods=["GET"])
+@swag_from("docs/app_views/get_all_jobs_sorted.yaml")
+def get_all_jobs_sorted():
+    """
+    Fetches all jobs sorted by created_at, the newest first.
+
+    Returns:
+        A list of all jobs in JSON format if successful.
+        Otherwise, it returns an error message.
+    """
+    jobs = job_controller.get_all_jobs_sorted_by_date()
+    return make_response_("success", "Fetched all jobs", jobs), 200

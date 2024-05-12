@@ -8,8 +8,8 @@ from server.models.base_model import BaseModel, Base
 candidate_skills = Table(
     "candidate_skills",
     Base.metadata,
-    Column("candidate_id", String(60), ForeignKey("candidates.user_id")),
-    Column("skill_id", String(60), ForeignKey("skills.id")),
+    Column("candidate_id", String(60), ForeignKey("candidates.user_id"),
+    Column("skill_id", String(60), ForeignKey("skills.id"),
 )
 
 # Association table for Job-Skill many-to-many relationship
