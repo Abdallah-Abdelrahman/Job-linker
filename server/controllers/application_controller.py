@@ -16,6 +16,8 @@ from server.models.job import Job
 from server.models.recruiter import Recruiter
 from server.models.user import User
 from server.services.ai_job_matcher import AIJobMatcher
+from server.email_templates import application_submission_email
+from server.services.mail import MailService
 
 
 class ApplicationsController:
@@ -27,7 +29,7 @@ class ApplicationsController:
         """
         Initialize the ApplicationsController.
         """
-        pass
+        self.email_service = MailService()
 
     def get_application(self, user_id, application_id=None):
         """
@@ -196,6 +198,19 @@ class ApplicationsController:
 
         new_application.match_score = match_score
         storage.save()
+
+        # Prepare the email
+        email = candidate.user.email
+        name = candidate.user.name
+        recruiter_id = job.to_dict["recruiter_id"]
+        recruiter = storage.get(Recruiter, recruiter_id)
+        company_name = recruiter.company_name
+        job_title = job.job_title
+
+        template = application_submission_email(name, company_name, job_title)
+
+        # Send the email
+        self.email_service.send_mail(template, email, name)
 
         return new_application
 
