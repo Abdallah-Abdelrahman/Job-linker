@@ -60,5 +60,13 @@ def handle_errors(f):
             return make_response_("error", str(e)), 401
         except ValueError as e:
             return make_response_("error", str(e)), 400
+        except Exception as e:
+            return (
+                make_response_(
+                    "error",
+                    "An unexpected error occurred: " + str(e)
+                    ),
+                500,
+            )
 
     return decorated_function

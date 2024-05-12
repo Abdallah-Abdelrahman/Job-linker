@@ -1,5 +1,5 @@
 """Job Model"""
-from sqlalchemy import Column, ForeignKey, Numeric, String
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Numeric, String
 from sqlalchemy.orm import backref, relationship
 
 from server.models.base_model import Base, BaseModel
@@ -22,6 +22,8 @@ class Job(BaseModel, Base):
     location = Column(String(128), nullable=True)
     exper_years = Column(String(128), nullable=True)
     salary = Column(Numeric(precision=10, scale=2, asdecimal=False))
+    application_deadline = Column(DateTime, nullable=True)
+    is_open = Column(Boolean, default=True)
 
     # Relationship with Recruiter
     recruiter = relationship(
@@ -49,6 +51,8 @@ class Job(BaseModel, Base):
         dict_ = super().to_dict
         dict_["skills"] = [s.name for s in self.skills]
         dict_["major"] = self.major.name
+        dict_["application_deadline"] = self.application_deadline
+        dict_["is_open"] = self.is_open
         return dict_
 
     def __repr__(self):

@@ -1,7 +1,7 @@
 tags:
   - Files
 summary: Upload a file and get ATS insights
-description: Endpoint to upload a file and get insights about its ATS friendliness. The file is saved on the server and the insights are returned in the response.
+description: Endpoint to upload a file and get insights about its ATS friendliness. The file is saved on the server for the autherized users and the insights are returned in the response.
 operationId: uploadInsights
 consumes:
   - multipart/form-data
