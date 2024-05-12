@@ -17,6 +17,24 @@ def verification_email(name, token):
     """
 
 
+def application_submission_email(name, company_name, job_title):
+    """Notify Candidates about successful application submission"""
+    return f"""
+    <html>
+    <body>
+    <p>Dear {name},</p>
+
+    <p>Thank you for applying for the position of <b>{job_title}</b> at <b>{company_name}</b>.</p>
+
+    <p>Your application is under review. We will notify you about the status of your application soon.</p>
+
+    <p>Best regards,<br>
+    {company_name} Recruitment Team</p>
+    </body>
+    </html>
+    """
+
+
 def shortlisted_email(name, company_name, job_title):
     """Notify shortlisted Candidates"""
     return f"""
