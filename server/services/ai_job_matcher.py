@@ -40,10 +40,20 @@ class AIJobMatcher:
         candidate_skills = " ".join(
                 [skill.name for skill in self.candidate.skills]
                 )
-        candidate_info = candidate_experiences + " " + candidate_skills
+        candidate_info = (
+            "Candidate's experiences and skills: "
+            + candidate_experiences
+            + " "
+            + candidate_skills
+        )
 
         job_skills = " ".join([skill.name for skill in self.job.skills])
-        job_info = self.job.job_description + " " + job_skills
+        job_info = (
+            "Job's description and Required skills: "
+            + self.job.job_description
+            + " "
+            + job_skills
+        )
 
         combined_info = candidate_info + " " + job_info
 

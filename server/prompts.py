@@ -71,5 +71,14 @@ ATS_FRIENDLY_PROMPT = """\
 JOB_MATCHING_PROMPT = """\
     Given the candidate's experiences and skills and the job's description and skills,
     please provide a match score between 0.0 and 1.0, where 1.0 means a perfect match
-    and 0.0 means no match at all.
+    and 0.0 means no match at all. 
+
+    Please consider the following factors as particularly important: 
+    - Relevant skills
+    - Years of experience in the relevant field
+    - Alignment with the job description
+
+    For example, a perfect match (1.0) might be a candidate who has all the required skills, 
+    several years of experience in the field, and whose experiences align closely with the job description. 
+    A poor match (0.0) might be a candidate who lacks the required skills and has no relevant experience.
     """
