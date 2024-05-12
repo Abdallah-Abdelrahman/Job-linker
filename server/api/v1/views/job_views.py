@@ -11,6 +11,7 @@ from server.api.v1.views import app_views
 from server.controllers.job_controller import JobController
 from server.controllers.schemas import job_schema
 from server.decorators import handle_errors
+from server.extensions import cache
 
 job_controller = JobController()
 
@@ -151,6 +152,7 @@ def remove_skill_from_job(job_id, skill_id):
 
 @app_views.route("/jobs", methods=["GET"])
 @jwt_required()
+@cache.cached(timeout=10)
 @handle_errors
 @swag_from("docs/app_views/get_jobs.yaml")
 def get_jobs():

@@ -7,7 +7,7 @@ securitySchemes:
 tags:
   - Jobs
 summary: Fetch all jobs
-description: Endpoint to fetch all jobs. Returns a list of all jobs in JSON format if successful. Otherwise, it returns an error message.
+description: Endpoint to fetch all jobs in two scenarios, if the user role is "Candidate" return all Jobs where the job major == candidate major, if the user role is "Recruiter" return the jobs that created by the recruiter. Returns a list of all jobs in JSON format if successful. Otherwise, it returns an error message.
 operationId: getJobs
 security:
   - bearerAuth: []

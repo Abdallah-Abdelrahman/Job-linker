@@ -16,6 +16,7 @@ from server.config import ApplicationConfig
 from server.api.utils import make_response_
 from server.api.v1.views import app_views, user_controller
 from server.decorators import handle_errors, verified_required
+from server.extensions import cache
 
 
 @app_views.route("/register", methods=["POST"])
@@ -147,6 +148,7 @@ def logout_user():
 
 @app_views.route("/@me")
 @jwt_required()
+@cache.cached(timeout=10)
 @verified_required
 @handle_errors
 @swag_from("docs/app_views/get_current_user.yaml")

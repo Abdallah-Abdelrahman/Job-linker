@@ -70,3 +70,7 @@ class ApplicationConfig:
     UPLOAD_TEMP = f"{os.getcwd()}/server/temp"
     ALLOWED_EXTENSIONS = {"pdf"}
     MAX_CONTENT_LENGTH = 2 * 1000 * 1000
+
+    # Configure Caching
+    CACHE_TYPE = 'simple'
+    CACHE_DEFAULT_TIMEOUT = 300

@@ -3,6 +3,8 @@ This module provides a controller for the Application model in the
 Job-linker application.
 """
 
+from datetime import datetime
+
 from marshmallow import ValidationError
 
 from server.controllers.schemas import application_schema
@@ -13,6 +15,9 @@ from server.models.candidate import Candidate
 from server.models.job import Job
 from server.models.recruiter import Recruiter
 from server.models.user import User
+from server.services.ai_job_matcher import AIJobMatcher
+from server.email_templates import application_submission_email
+from server.services.mail import MailService
 
 
 class ApplicationsController:
@@ -24,7 +29,7 @@ class ApplicationsController:
         """
         Initialize the ApplicationsController.
         """
-        pass
+        self.email_service = MailService()
 
     def get_application(self, user_id, application_id=None):
         """
@@ -101,21 +106,24 @@ class ApplicationsController:
                 recruiter = storage.get(Recruiter, recruiter_id)
                 response.append(
                     {
-                        "id": application.id,
+                        "application_id": application.id,
                         "job_id": application.job.id,
                         "job_title": application.job.job_title,
                         "application_status": application.application_status,
                         "company_name": recruiter.company_name,
                         "salary": application.job.salary,
+                        "match_score": application.match_score,
                     }
                 )
             elif user.role == "recruiter":
                 response.append(
                     {
-                        "id": application.id,
+                        "application_id": application.id,
+                        "job_id": application.job.id,
                         "job_title": application.job.job_title,
                         "candidate_profile": application.candidate.to_dict,
                         "application_status": application.application_status,
+                        "match_score": application.match_score,
                     }
                 )
         return response
@@ -155,6 +163,17 @@ class ApplicationsController:
         if not job:
             raise ValueError("Job not found")
 
+        # Check if the job is still open for applications
+        if not job.is_open:
+            raise ValueError("This job is not open for applications")
+
+        # Check if the last date to apply for the job has passed
+        if (
+                job.application_deadline and
+                datetime.utcnow() > job.application_deadline
+                ):
+            raise ValueError("The last date to apply for this job has passed")
+
         # Check if the candidate has already applied for this job
         existing_application = storage.get_by_attr(
                 Application,
@@ -162,8 +181,8 @@ class ApplicationsController:
                 job.id
                 )
         if (
-                existing_application and
-                existing_application.candidate_id == candidate.id
+                existing_application
+                and existing_application.candidate_id == candidate.id
                 ):
             raise ValueError("You have already applied for this job")
 
@@ -173,7 +192,25 @@ class ApplicationsController:
             job_id=job.id,
         )
         storage.new(new_application)
+
+        matcher = AIJobMatcher(candidate, job)
+        match_score = matcher.calculate_match_score()
+
+        new_application.match_score = match_score
         storage.save()
+
+        # Prepare the email
+        email = candidate.user.email
+        name = candidate.user.name
+        recruiter_id = job.to_dict["recruiter_id"]
+        recruiter = storage.get(Recruiter, recruiter_id)
+        company_name = recruiter.company_name
+        job_title = job.job_title
+
+        template = application_submission_email(name, company_name, job_title)
+
+        # Send the email
+        self.email_service.send_mail(template, email, name)
 
         return new_application
 
