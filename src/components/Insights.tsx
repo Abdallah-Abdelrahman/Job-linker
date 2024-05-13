@@ -1,4 +1,6 @@
-import { Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
+import { Box, Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
+import Upload from "./Upload";
+import { Form } from "react-router-dom";
 
 type Props = {
   onClose: () => void,
@@ -6,7 +8,6 @@ type Props = {
 }
 
 function Insights({ onClose, isOpen }: Props) {
-
   const handleClick = () => {
     // TODO: ajax request
     console.log('scanning...')
@@ -19,7 +20,9 @@ function Insights({ onClose, isOpen }: Props) {
         <ModalHeader>Scan Resume</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+          <Form>
+            <Upload />
+          </Form>
         </ModalBody>
         <ModalFooter className='space-x-4'>
           <Button onClick={onClose}>Close</Button>

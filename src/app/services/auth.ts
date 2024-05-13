@@ -80,6 +80,13 @@ export const api = createApi({
       },
       invalidatesTags: ['me']
     }),
+    insights: builder.mutation<unknown, FormData>({
+      query: (formdata) => ({
+        url: 'insigths',
+        method: 'POST',
+        body: formdata
+      })
+    }),
     refresh: builder.mutation<UserResponse, { token: string }>({
       query: ({ token }) => ({
         url: 'refresh',
