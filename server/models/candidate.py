@@ -18,15 +18,16 @@ class Candidate(BaseModel, Base):
 
     # Relationship with User & skills
     user = relationship('User',
-                              backref='candidate',
-                              uselist=False,
-                              cascade='all, delete-orphan')
+                        backref='candidate',
+                        single_parent=True,
+                        uselist=False,
+                        cascade='all, delete-orphan')
     skills = relationship(
-        "Skill",
-        secondary=candidate_skills,
-        back_populates="candidates",
-        cascade="all, delete"
-    )
+            "Skill",
+            secondary=candidate_skills,
+            back_populates="candidates",
+            cascade="all, delete"
+            )
 
     # Relationship with Languages and associative table
     languages = relationship(
