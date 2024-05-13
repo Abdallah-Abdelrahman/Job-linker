@@ -21,13 +21,3 @@ class Application(BaseModel, Base):
         Enum("applied", "shortlisted", "rejected", "hired"), default="applied"
     )
     match_score = Column(Float, nullable=True)
-
-    # Relationship with Job
-    job = relationship("Job",
-                       back_populates="applications",
-                       )
-
-    # Relationship with Candidate
-    candidate = relationship("Candidate",
-                             back_populates="applications",
-                             )

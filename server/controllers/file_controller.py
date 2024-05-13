@@ -121,7 +121,7 @@ class FileController:
         return (
             "File uploaded and ATS insights generated successfully",
             {"size": size, "ats_insights": ai_data},
-            201,
+            200,
         )
 
     def count_files(self, directory):

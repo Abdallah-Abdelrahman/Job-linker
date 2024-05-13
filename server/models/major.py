@@ -13,9 +13,9 @@ class Major(BaseModel, Base):
     name = Column(String(100), nullable=False, unique=True)
 
     # Relationship with Jobs & Candidates
-    jobs = relationship("Job", back_populates="major")
+    jobs = relationship("Job", backref="major")
     candidates = relationship("Candidate",
-                              back_populates="major",
+                              backref="major",
                               cascade="all, delete-orphan")
 
     def __repr__(self):

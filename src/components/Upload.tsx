@@ -8,6 +8,7 @@ function Upload(props) {
   const [file, setFile] = useState<string>();
 
   // focus box when no file uploaded
+  // TODO: make the upload clickable by enter key
   useEffect(() => {
     if (props.isError) {
       boxRef.current?.focus();

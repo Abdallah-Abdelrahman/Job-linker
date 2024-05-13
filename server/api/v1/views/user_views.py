@@ -148,7 +148,7 @@ def logout_user():
 
 @app_views.route("/@me")
 @jwt_required()
-@cache.cached(timeout=10)
+#@cache.cached(timeout=10)
 @verified_required
 @handle_errors
 @swag_from("docs/app_views/get_current_user.yaml")
