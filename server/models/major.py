@@ -13,7 +13,10 @@ class Major(BaseModel, Base):
     name = Column(String(100), nullable=False, unique=True)
 
     # Relationship with Jobs & Candidates
-    jobs = relationship("Job", backref="major")
+    jobs = relationship("Job",
+                        backref="major",
+                        cascade="all, delete-orphan"
+                        )
     candidates = relationship("Candidate",
                               backref="major",
                               cascade="all, delete-orphan")
