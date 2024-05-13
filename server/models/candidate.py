@@ -17,6 +17,8 @@ class Candidate(BaseModel, Base):
     major_id = Column(String(60), ForeignKey("majors.id"), nullable=False)
 
     # Relationship with User & skills
+    # This is used for many-to-one or many-to-many
+    # relationships that should be treated either as one-to-one or one-to-many
     user = relationship('User',
                         backref='candidate',
                         single_parent=True,

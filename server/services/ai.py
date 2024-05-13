@@ -5,6 +5,7 @@ generate a dictionary of info of the pdf using gemini.
 from datetime import datetime
 from os import getenv, listdir, path, getcwd
 from json import loads, JSONDecodeError
+from typing import Any, Dict
 from pdfminer.high_level import extract_text
 from pdfminer.pdfparser import PDFSyntaxError
 import google.generativeai as genai
@@ -98,6 +99,30 @@ class AIService():
             text += chunk.text
         return text
 
+    def __handle_cv(self, dict_:Dict[str, Any]) -> Dict[str, Any]:
+        xps = dict_.get('experiences')
+        eds = dict_.get('educations')
+        for xp in xps:
+            for k, v in xp.items():
+                if k == 'description':
+                    # replace bullet-points and new line character,
+                    # with empty string.
+                    # 8226 is the unicode for bullet point
+                    xp[k] = v.replace('\n', '').replace(chr(8226), '')
+                if k in ('start_date', 'end_date'):
+                    try:
+                        xp[k] = parse(v).isoformat()
+                    except (ParserError, TypeError):
+                        xp[k] = datetime.utcnow().isoformat()
+        for ed in eds:
+            for k, v in ed.items():
+                if k in ('start_date', 'end_date'):
+                    try:
+                        ed[k] = parse(v).isoformat()
+                    except (ParserError, TypeError):
+                        ed[k] = datetime.utcnow().isoformat()
+        return dict_
+
     def to_dict(self, prompt_enquiry, text=''):
         '''The function translates gemeni response to a dictionary
 
@@ -110,29 +135,10 @@ class AIService():
             text = self.prompt(prompt_enquiry)
         try:
             # strips out any spaces or new lines or back-slashes
-            #txt_cp = ''.join([c for c in text if c not in '\n'])
+            # txt_cp = ''.join([c for c in text if c not in '\n'])
             dict_ = loads(text)
-            xps = dict_.get('experiences')
-            eds = dict_.get('educations')
-            for xp in xps:
-                for k, v in xp.items():
-                    if k == 'description':
-                        # replace bullet-points and new line character,
-                        # with empty string.
-                        # 8226 is the unicode for bullet point
-                        xp[k] = v.replace('\n', '').replace(chr(8226), '')
-                    if k in ('start_date', 'end_date'):
-                        try:
-                            xp[k] = parse(v).isoformat()
-                        except (ParserError, TypeError):
-                            xp[k] = datetime.utcnow().isoformat()
-            for ed in eds:
-                for k, v in ed.items():
-                    if k in ('start_date', 'end_date'):
-                        try:
-                            ed[k] = parse(v).isoformat()
-                        except (ParserError, TypeError):
-                            ed[k] = datetime.utcnow().isoformat()
+            if prompt_enquiry == CANDID_PROMPT:
+                dict_ = self.__handle_cv(dict_)
             return dict_
         except JSONDecodeError as e:
             # retry unitl we get valid json
