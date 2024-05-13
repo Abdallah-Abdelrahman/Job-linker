@@ -17,6 +17,10 @@ class Candidate(BaseModel, Base):
     major_id = Column(String(60), ForeignKey("majors.id"), nullable=False)
 
     # Relationship with User & skills
+    user = relationship('User',
+                              backref='candidate',
+                              uselist=False,
+                              cascade='all, delete-orphan')
     skills = relationship(
         "Skill",
         secondary=candidate_skills,

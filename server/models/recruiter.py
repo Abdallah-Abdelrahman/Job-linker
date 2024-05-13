@@ -13,6 +13,10 @@ class Recruiter(BaseModel, Base):
 
     user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
 
+    user = relationship('User',
+                              backref='recruiter',
+                              uselist=False,
+                              cascade='all, delete-orphan')
     # Relationship with Recruiter
     jobs = relationship(
         "Job",

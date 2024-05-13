@@ -23,16 +23,6 @@ class User(BaseModel, Base, UserMixin):
     is_admin = Column(Boolean, default=False)
     profile_complete = Column(Boolean, default=False)
 
-    # relational fields
-    candidate = relationship('Candidate',
-                              backref='user',
-                              uselist=False,
-                              cascade='all, delete-orphan')
-    recruiter = relationship('Recruiter',
-                              backref='user',
-                              uselist=False,
-                              cascade='all, delete-orphan')
-
     def __repr__(self):
         """Return a string representation of the User instance"""
         return f"[{self.__class__.__name__}] ({self.id}) {self.email}"
