@@ -14,15 +14,16 @@ class Recruiter(BaseModel, Base):
     user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
 
     user = relationship('User',
-                              backref='recruiter',
-                              uselist=False,
-                              cascade='all, delete-orphan')
+                        backref='recruiter',
+                        uselist=False,
+                        single_parent=True,
+                        cascade='all, delete-orphan')
     # Relationship with Recruiter
     jobs = relationship(
-        "Job",
-        backref="recruiter",
-        cascade="all, delete-orphan"
-    )
+            "Job",
+            backref="recruiter",
+            cascade="all, delete-orphan"
+            )
 
     def __repr__(self):
         """Return a string representation of the Recruiter instance"""
