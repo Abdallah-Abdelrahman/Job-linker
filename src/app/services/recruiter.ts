@@ -11,11 +11,10 @@ export interface RecruiterResponse {
 
 export const recruiterApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    createRecruiter: builder.mutation<RecruiterResponse, Partial<Recruiter>>({
-      query: (recruiter) => ({
+    createRecruiter: builder.mutation<RecruiterResponse, void>({
+      query: () => ({
         url: 'recruiters',
         method: 'POST',
-        body: recruiter,
       }),
       invalidatesTags: ['recruiters'],
     }),
