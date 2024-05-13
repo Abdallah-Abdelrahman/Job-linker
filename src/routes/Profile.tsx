@@ -220,8 +220,13 @@ const Profile = () => {
         </Heading>
         <MyForm
           role={role}
-          onSubmit={handleRecruiterFormSubmit}
-          isLoading={recLoading}
+          onSubmit={role == 'candidate'
+            ? handleCandidateFormSubmit
+            : handleRecruiterFormSubmit}
+          isLoading={role == 'candidate'
+            ? isLoading || cvLoading || majorLoading
+            : recLoading
+          }
         />
       </Skeleton>
     </Box>
