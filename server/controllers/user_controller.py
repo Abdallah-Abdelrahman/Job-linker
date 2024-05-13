@@ -3,6 +3,7 @@ This module provides a controller for the User model in the
 Job-linker application.
 """
 
+from json import dumps, loads
 from flask import current_app, url_for
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
@@ -224,6 +225,8 @@ class UserController:
             raise ValueError("User not found")
 
         user_data = user.to_dict
+        if user_data.get('contact_info'):
+            user_data['contact_info'] = loads(user_data.get('contact_info'))
 
         if user.role == "candidate":
             candidate = storage.get_by_attr(Candidate, "user_id", user_id)
@@ -292,6 +295,7 @@ class UserController:
         try:
             data = update_schema.load(data)
         except ValidationError as err:
+            print('------validation error(update_current_user)-------->')
             raise ValueError(err.messages)
 
         # Get user and update attributes
@@ -301,7 +305,8 @@ class UserController:
 
         for key, value in data.items():
             if key in ALLOWED_UPDATE_FIELDS:
-                setattr(user, key, value)
+                setattr(user, key,
+                        dumps(value) if key == 'contact_info' else value)
             else:
                 raise ValueError(f"Cannot update field: {key}")
 

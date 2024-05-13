@@ -75,9 +75,10 @@ export const api = createApi({
           url: 'upload',
           method: 'POST',
           body: formdata,
-          params: formdata,
+          params: { role: formdata.get('role') },
         };
       },
+      invalidatesTags: ['me']
     }),
     refresh: builder.mutation<UserResponse, { token: string }>({
       query: ({ token }) => ({

@@ -25,14 +25,6 @@ class Job(BaseModel, Base):
     application_deadline = Column(DateTime, nullable=True)
     is_open = Column(Boolean, default=True)
 
-    # Relationship with Recruiter
-    recruiter = relationship(
-        "Recruiter", backref=backref("jobs", cascade="all, delete-orphan")
-    )
-
-    # Relationship with Major
-    major = relationship("Major", back_populates="jobs")
-
     # Relationship with Skill
     skills = relationship(
         "Skill",
@@ -42,7 +34,7 @@ class Job(BaseModel, Base):
 
     # Relationship with Application
     applications = relationship(
-        "Application", back_populates="job", cascade="all, delete-orphan"
+        "Application", backref="job", cascade="all, delete-orphan"
     )
 
     @property

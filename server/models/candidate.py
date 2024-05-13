@@ -17,13 +17,6 @@ class Candidate(BaseModel, Base):
     major_id = Column(String(60), ForeignKey("majors.id"), nullable=False)
 
     # Relationship with User & skills
-    user = relationship(
-        "User", backref=backref(
-            "candidate",
-            uselist=False,
-            cascade="all, delete-orphan"
-            )
-    )
     skills = relationship(
         "Skill",
         secondary=candidate_skills,
@@ -38,15 +31,16 @@ class Candidate(BaseModel, Base):
         back_populates="candidates",
     )
 
-    # Relationship with Major
-    major = relationship("Major", back_populates="candidates")
-
     # Relationship with Application
     applications = relationship(
         "Application",
-        back_populates="candidate",
+        backref="candidate",
         cascade="all, delete-orphan"
     )
+
+    experiences = relationship('WorkExperience',
+                               backref='candidate',
+                               cascade='all, delete-orphan')
 
     def __repr__(self):
         """Return a string representation of the Candidate instance"""

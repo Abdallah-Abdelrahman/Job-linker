@@ -4,9 +4,7 @@ This module provides schemas for various models in the Job-linker application.
 
 from datetime import datetime
 
-from dateutil.parser import parse
 from marshmallow import Schema, fields, validate
-from marshmallow.fields import DateTime
 
 
 class MultiFormatDateTime(fields.Field):
@@ -58,7 +56,7 @@ class UpdateUserSchema(Schema):
     """
 
     name = fields.Str(required=False)
-    contact_info = fields.Str(required=False)
+    contact_info = fields.Dict(required=False)
     bio = fields.Str(required=False)
     image_url = fields.Str(required=False)
     profile_complete = fields.Bool(required=False)

@@ -1,18 +1,15 @@
-import { useReducer, useState } from "react";
+import { useReducer } from "react";
 import {
   Box,
   Heading,
-  Text,
   Button,
   FormControl,
   FormLabel,
   Input,
   Select,
-  Spinner,
-  Alert,
-  AlertIcon,
+  Skeleton,
 } from "@chakra-ui/react";
-import { User, useMeQuery, useUpdateMeMutation } from "../app/services/auth";
+import { User, useMeQuery, useUpdateMeMutation, useUploadMutation } from "../app/services/auth";
 import { useCreateCandidateMutation } from "../app/services/candidate";
 import {
   Recruiter,
@@ -50,7 +47,7 @@ const reducer = (state, action) => {
   }
 };
 
-function MyForm({ onSubmit, role }) {
+function MyForm({ onSubmit, role, isLoading }) {
   const [formError, dispatch] = useReducer(reducer, initialErrorState);
 
   const handleSubmit = (evt) => {
@@ -59,6 +56,7 @@ function MyForm({ onSubmit, role }) {
       = Object.fromEntries(formdata) as TFormdata;
     let canSubmit = false;
     evt.preventDefault();
+    formdata.append('role', role);
 
     if (role == 'candidate') {
       dispatch({
@@ -77,7 +75,7 @@ function MyForm({ onSubmit, role }) {
     }
 
     if (canSubmit) {
-      onSubmit({file, name: major, company_info, company_name});
+      onSubmit(formdata);
     }
 
   };
@@ -128,7 +126,7 @@ function MyForm({ onSubmit, role }) {
       className='w-full p-6 space-y-4 bg-white rounded-lg shadow-md'
     >
       {role == "candidate" ? candidateJSX : recruiterJSX}
-      <Button type="submit">Create Profile</Button>
+      <Button type="submit" isLoading={isLoading}>Create Profile</Button>
     </form>
   );
 }
@@ -144,23 +142,31 @@ const Profile = () => {
     error,
   } = useAfterRefreshQuery<{ data: User }>(useMeQuery);
   const [updateUser] = useUpdateMeMutation();
-
-  const [createCandidate, { isSuccess: candidateSuccess }] =
+  const [uploadCV, { isLoading: cvLoading }] = useUploadMutation();
+  const [createCandidate, { isSuccess: candidateSuccess, isLoading: candidLoading }] =
     useCreateCandidateMutation();
-  const [addMajor] = useCreateMajorMutation();
+  const [addMajor, { isLoading: majorLoading }] = useCreateMajorMutation();
   const [createRecruiter, { isSuccess: recruiterSuccess }] =
     useCreateRecruiterMutation();
   const { role } = useAppSelector(selectCurrentUser);
 
-  const handleCandidateFormSubmit = async ({ name }) => {
+  const handleCandidateFormSubmit = async (formdata: FormData) => {
+    console.log(formdata.get('file'));
     try {
-      addMajor({ name })
+      addMajor({ name: formdata.get('major') })
         .unwrap()
         .then((data) => {
-          createCandidate({ user_id: userData.id, major_id: data.data.id })
+          createCandidate({ major_id: data.data.id })
             .unwrap()
             .then(_ => {
-              updateUser({ profile_complete: true });
+              uploadCV(formdata)
+                .unwrap()
+                .then(_ => {
+                  updateUser({ profile_complete: true })
+                    .then(_ => console.log('----------profile completed-------->'))
+                    .catch(err => console.log('------not completed---->', { err }));
+                })
+                .catch()
             })
             .catch((err) => console.log({ err }));
         })
@@ -185,18 +191,21 @@ const Profile = () => {
       error.message === "User doesn't have a recruiter profile");
 
   console.log({ userData });
-  if (isLoading || isFetching)
-    return (<h1>loading...</h1>);
   if (isSuccess && userData.data.profile_complete)
     return (<Candidate data={userData.data} />);
 
   return (
     <Box className='mx-auto max-w-2xl my-8'>
-      <Heading as="h2" size="xl" className="mb-8 capitalize">
-        complete your Profile
-      </Heading>
-      <MyForm role={role} onSubmit={handleCandidateFormSubmit} />
-
+      <Skeleton isLoaded={!isLoading}>
+        <Heading as="h2" size="xl" className="mb-8 capitalize">
+          complete your Profile
+        </Heading>
+        <MyForm
+          role={role}
+          onSubmit={handleCandidateFormSubmit}
+          isLoading={majorLoading || candidLoading || cvLoading}
+        />
+      </Skeleton>
     </Box>
   );
 };

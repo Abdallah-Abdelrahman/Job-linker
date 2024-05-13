@@ -1,4 +1,5 @@
-import { Text, Heading, Box } from '@chakra-ui/react';
+import { Text, Heading, Box, Stack } from '@chakra-ui/react';
+import MyIcon from '../Icon';
 
 type Experience = {
   title: string,
@@ -14,15 +15,28 @@ type Application = {
   end_date: Date,
   description: string
 }
+type Skill = {
+  id: string,
+  name: string
+}
+type Contact = {
+  address: string,
+  linkded: string,
+  github: string,
+  phone: string,
+  whatsapp: string
+}
+type Language = { id: string, name: string }
 type Data = {
   name: string,
   email: string,
   image_url: string,
+  contact_info: Contact,
   bio: string,
   candidate: {
     major: { name: string },
-    skills: string[],
-    languages: string[],
+    skills: Skill[],
+    languages: Language[],
     applications: Application[],
     experiences: Experience[]
   },
@@ -34,49 +48,52 @@ interface CandidateProp {
 function Candidate({ data }: CandidateProp) {
   return (
     <Box className='grid grid-cols-4 gap-6 container mt-4 mx-auto sm:grid-cols-12'>
-      <div className='col-span-4 bg-white flex p-6 flex-col items-center gap-2 rounded-md shadow-md sm:col-span-4'>
-        <div className='w-32 h-32 rounded-full overflow-hidden'>
+      <Box className='col-span-4 bg-white flex p-6 flex-col items-center gap-2 rounded-md shadow-md sm:col-span-4'>
+        <Box className='w-32 h-32  rounded-full overflow-hidden'>
           <img src='https://placehold.co/600x400' className='w-full h-full object-cover' />
-        </div>
+        </Box>
         <Heading as='h2' size='lg' className='capitalize'>{data.name}</Heading>
         <Text className='tracking-wide'>{data.candidate.major.name}</Text>
         <hr className='w-full' />
 
-        <div className='w-full mt-2'>
-          {/*Skills*/}
-          <Heading as='h4' mb='2' size='lg' className='capitalize'>skills</Heading>
-          <ul className='flex flex-wrap gap-4 max-h-40 overflow-auto'>
-            {data.candidate.skills.map((skill, idx) =>
-              <li key={idx} className='p-2 bg-teal-50 text-teal-500 rounded-tl-lg rounded-br-lg'>{skill}</li>
-            )}
-          </ul>
-        </div>
-        <div className='w-full mt-2'>
-          {/*Languages*/}
-          <Heading as='h4' mb='2' size='lg' className='capitalize'>languages</Heading>
-          <Box as='ul' className='flex flex-wrap gap-4 max-h-40 overflow-auto'>
-            {data.candidate.languages.map((l, idx) =>
-              <Box
-                key={idx}
-                as='li'
-                className='p-2 bg-orange-50 text-orange-500 rounded-tl-lg rounded-br-lg'
-              >
-                {l}
-              </Box>)}
+        <Stack className='w-full mt-2 space-y-6'>
+          <Contact_info data={data.contact_info} />
+          <Box as='section' className='flex flex-col gap-4'>
+            {/*Skills*/}
+            <Heading as='h4' mb='2' size='lg' className='capitalize'>skills</Heading>
+            <ul className='flex flex-wrap gap-4 max-h-64 overflow-auto'>
+              {data.candidate.skills.map((skill, idx) =>
+                <li key={idx} className='p-2 bg-teal-50 text-teal-500 rounded-tl-lg rounded-br-lg'>{skill.name}</li>
+              )}
+            </ul>
           </Box>
-        </div>
-      </div>
+          <Box as='section' className='flex flex-col gap-4'>
+            {/*Languages*/}
+            <Heading as='h4' mb='2' size='lg' className='capitalize'>languages</Heading>
+            <Box as='ul' className='flex flex-wrap gap-4 max-h-40 overflow-auto'>
+              {data.candidate.languages.map((l, idx) =>
+                <Box
+                  key={idx}
+                  as='li'
+                  className='p-2 bg-orange-50 text-orange-500 rounded-tl-lg rounded-br-lg'
+                >
+                  {l.name}
+                </Box>)}
+            </Box>
+          </Box>
+        </Stack>
+      </Box>
 
-      <div className='col-span-4 bg-white flex flex-col rounded-md shadow-md p-6 gap-4 sm:col-span-8'>
+      <Box className='col-span-4 bg-white flex flex-col rounded-md shadow-md p-6 gap-4 sm:col-span-8'>
         {/*About*/}
-        <div>
+        <Box>
           <Heading as='h4' mb='2' size='lg' className='capitalize'>
             About me
           </Heading>
           <Text>
             {data.bio}
           </Text>
-        </div>
+        </Box>
         {/*Experience*/}
         <Box>
           <Heading as='h4' mb='4' size='lg' className='capitalize'>
@@ -89,19 +106,55 @@ function Candidate({ data }: CandidateProp) {
                   <Heading as='h6' size='md' className='capitalize'>{xp.title}</Heading>
                   <Box>
                     <span className='mr-2'>at {xp.company}</span>
-                    <span className='span-gray-500'>{xp.start_date} - {xp.end_date}</span>
+                    <span className='span-gray-500'>
+                      {formateDate(xp.start_date)} - {formateDate(xp.end_date)}
+                    </span>
                   </Box>
                 </Box>
+                {/* TODO: use dangerousely html to handle bullet-points */}
                 <Text className='mt-2'>{xp.description}</Text>
               </Box>
 
             )}
           </Box>
         </Box>
-      </div>
+      </Box>
     </Box>
   );
 
+}
+
+function Contact_info({ data }: { data: Contact }) {
+  if (!data) {
+    return (null);
+  }
+
+  return (
+    <Box as='section' className='flex flex-col gap-4'>
+      <Heading as='h4' mb='2' size='lg' className='capitalize'>contact info</Heading>
+      {Object.entries(data).map(([k, v]) => {
+        if (!v) return (null);
+        return (<Box key={k} className='flex gap-3'>
+          <MyIcon href={`/sprite.svg#${k}`} className='w-5 h-5' />
+          {k == 'linkedin' || k == 'github'
+            ? <a href={v} target='_blank' className='text-sky-500'>{k}</a>
+            : <Text>{v}</Text>}
+        </Box>
+        );
+      }
+      )}
+    </Box>
+  );
+
+}
+
+/**
+ * utility to format date
+ * @param {Date} date - date object
+ * @returns string format in `Month year`
+ */
+function formateDate(date: Date) {
+  return new Date(date).toLocaleDateString('en', { year: 'numeric', month: 'short' });
 }
 
 export default Candidate;

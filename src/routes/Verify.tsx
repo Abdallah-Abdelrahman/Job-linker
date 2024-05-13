@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useVerfiyQuery } from '../app/services/auth';
 import { useAppDispatch } from '../hooks/store';
 import { setCredentials } from '../features/auth';
+import { SkeletonText } from '@chakra-ui/react';
 
 function Verify() {
   // extarct the query from url
@@ -21,7 +22,7 @@ function Verify() {
   }, [token, isSuccess, dispatch, data, navigate]);
 
   if (isUninitialized || isLoading) {
-    return (<h1>loading...</h1>);
+    return (<SkeletonText mt='4' noOfLines={4} spacing='4' skeletonHeight='2' />);
   }
   return (null);
 }

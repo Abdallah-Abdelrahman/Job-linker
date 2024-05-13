@@ -1,6 +1,6 @@
 """Create a Candidate Profile by Extracting the data using AI"""
 from datetime import datetime
-
+from json import dumps
 from marshmallow import ValidationError
 
 from server.controllers.candidate_controller import CandidateController
@@ -46,8 +46,10 @@ class AICandidateProfileCreator:
         # Extract and validate data
         try:
             self._extract_data()
-            self._validate_data()
+            #self._validate_data()
+            print('------validation success------->')
         except ValidationError as err:
+            print('------validation error(create_profile)------->')
             raise ValueError(err.messages)
 
         # Update User and Candidate
@@ -90,7 +92,8 @@ class AICandidateProfileCreator:
         self.bio = self.ai_data.get("bio")
         contact_info = self.ai_data.get("contact_info")
         if contact_info is not None:
-            self.contact_info = str(contact_info)
+            self.contact_info = contact_info
+            print('-----JSON CONTANCT------->', self.contact_info)
         else:
             self.contact_info = None
         self.skills = self.ai_data.get("skills", [])

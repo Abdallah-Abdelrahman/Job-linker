@@ -8,7 +8,7 @@ CANDID_PROMPT = """\
     "email": "<str>",
     "educations":[{"title": "<str>", "school": <str>, "start_date":<Date>, "end_date": <Date>}],
     "languages": [<str>],
-    "address": <str>,
+    "contact_info": {"address": <str>, "linkedin": <str>, "github": <str>, "phone": <str>, "whatsapp": <str>},
     "major": "<str: Major field of study of the candidate>",
     "skills": ["<str: Skill 1>", "<str: Skill 2>", "..."],
     "experiences": [
