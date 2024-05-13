@@ -22,7 +22,7 @@ class RecruiterController:
         """
         pass
 
-    def create_recruiter(self, user_id, data):
+    def create_recruiter(self, user_id):
         """
         Creates a new recruiter.
 
@@ -46,17 +46,9 @@ class RecruiterController:
         if existing_recruiter:
             raise ValueError("Recruiter already exists for this user")
 
-        # Validate data
-        try:
-            data = recruiter_schema.load(data)
-        except ValidationError as err:
-            raise ValueError(err.messages)
-
         # Create new recruiter
         new_recruiter = Recruiter(
             user_id=user_id,
-            company_name=data["company_name"],
-            company_info=data.get("company_info"),
         )
         storage.new(new_recruiter)
         storage.save()

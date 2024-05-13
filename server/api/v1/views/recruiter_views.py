@@ -31,7 +31,6 @@ def create_recruiter():
     user_id = get_jwt_identity()
     new_recruiter = recruiter_controller.create_recruiter(
             user_id,
-            request.json
             )
     return (
         make_response_(

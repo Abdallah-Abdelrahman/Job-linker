@@ -12,8 +12,6 @@ class Recruiter(BaseModel, Base):
     __tablename__ = "recruiters"
 
     user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
-    company_name = Column(String(100), nullable=False)
-    company_info = Column(String(500))
 
     # Relationship with Recruiter
     jobs = relationship(
