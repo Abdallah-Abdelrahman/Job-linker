@@ -1,4 +1,4 @@
-import { Text, Box, Button, List, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Skeleton } from "@chakra-ui/react";
+import { Text, Box, Button, List, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Skeleton, Progress } from "@chakra-ui/react";
 import Upload from "./Upload";
 import { useInsightsMutation } from "../app/services/auth";
 import MyIcon from "./Icon";
@@ -31,7 +31,9 @@ function Insights({ onClose, isOpen }: Props) {
               <Upload />
             </form>
             : <Skeleton isLoaded={isSuccess}>
-              <h1>{data.data.ats_insights.ats_score}</h1>
+              <Text>ATS Score:</Text>
+		<Text mr={2}>{(data.data.ats_insights.ats_score * 100).toFixed(2)}%</Text>
+		<Progress className="progress-bar" value={data.data.ats_insights.ats_score * 100} />
               <List spacing='3'>
                 {data.data.ats_insights.suggestions.map((s, idx) =>
                   <ListItem key={idx} className='flex gap-3'>
