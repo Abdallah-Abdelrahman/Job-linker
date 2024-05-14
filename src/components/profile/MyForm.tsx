@@ -34,6 +34,7 @@ const reducer = (state, action) => {
 
 function MyForm({ onSubmit, role, isLoading }) {
   const [formError, dispatch] = useReducer(reducer, initialErrorState);
+
   const recruiterJSX = (
     <>
       <FormControl isInvalid={formError.recruiter.company_name}>
@@ -79,7 +80,6 @@ function MyForm({ onSubmit, role, isLoading }) {
     </>
   );
 
-
   const handleSubmit = (evt) => {
     const formdata = new FormData(evt.currentTarget);
     const { file, major, company_email, company_name, company_address }
@@ -109,10 +109,8 @@ function MyForm({ onSubmit, role, isLoading }) {
     }
 
     if (canSubmit) {
-      console.log(Object.fromEntries(formdata))
       onSubmit(formdata);
     }
-
   };
 
 
