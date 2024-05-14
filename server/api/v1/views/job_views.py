@@ -152,7 +152,7 @@ def remove_skill_from_job(job_id, skill_id):
 
 @app_views.route("/jobs", methods=["GET"])
 @jwt_required()
-#@cache.cached(timeout=10)
+# @cache.cached(timeout=10)
 @handle_errors
 @swag_from("docs/app_views/get_jobs.yaml")
 def get_jobs():

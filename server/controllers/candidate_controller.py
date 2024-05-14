@@ -205,7 +205,7 @@ class CandidateController:
             raise ValueError("Skill not found")
 
         if skill in candidate.skills:
-            raise ValueError("Skill already added")
+            return candidate
 
         try:
             candidate.skills.append(skill)

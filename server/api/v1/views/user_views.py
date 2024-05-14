@@ -5,16 +5,16 @@ from flasgger.utils import swag_from
 from flask import request
 from flask_jwt_extended import (
     create_access_token,
+    get_jwt,
     get_jwt_identity,
     jwt_required,
     set_refresh_cookies,
-    get_jwt,
-    unset_jwt_cookies
+    unset_jwt_cookies,
 )
 
-from server.config import ApplicationConfig
 from server.api.utils import make_response_
 from server.api.v1.views import app_views, user_controller
+from server.config import ApplicationConfig
 from server.decorators import handle_errors, verified_required
 from server.extensions import cache
 
@@ -54,7 +54,7 @@ def verify_email():
         A response object containing the status and message.
     """
     verf_token = request.query_string.decode("utf8").split("=")[-1]
-    print('------verify------>', verf_token)
+    print("------verify------>", verf_token)
     jwt, jwt_refresh, user = user_controller.verify_email(verf_token)
 
     resp = make_response_(
@@ -127,8 +127,9 @@ def refresh_token():
 def logout_user():
     """
     Endpoint for revoking the current users access token. Save the JWTs unique
-    identifier (jti) in redis. Also set a Time to Live (TTL)  when storing the JWT
-    so that it will automatically be cleared out of redis after the token expires.
+    identifier (jti) in redis. Also set a Time to Live (TTL)  when storing the
+    JWT so that it will automatically be cleared out of redis after the token
+    expires.
 
     Returns:
         A response object containing the status and message.
@@ -136,10 +137,13 @@ def logout_user():
     from server.api.v1.app import jwt_redis_blocklist
 
     token = get_jwt()
-    jti = token.get('jti')
+    jti = token.get("jti")
     ttype = token.get("type")
-    jwt_redis_blocklist.set(jti, "",
-                            ex=ApplicationConfig.JWT_ACCESS_TOKEN_EXPIRES)
+    jwt_redis_blocklist.set(
+            jti,
+            "",
+            ex=ApplicationConfig.JWT_ACCESS_TOKEN_EXPIRES
+            )
     print(f"--------> {ttype.capitalize()} token successfully revoked")
     resp = make_response_("success", "Access token revoked successfully")
     unset_jwt_cookies(resp)
@@ -148,7 +152,7 @@ def logout_user():
 
 @app_views.route("/@me")
 @jwt_required()
-#@cache.cached(timeout=10)
+# @cache.cached(timeout=10)
 @verified_required
 @handle_errors
 @swag_from("docs/app_views/get_current_user.yaml")

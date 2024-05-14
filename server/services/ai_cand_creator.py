@@ -1,17 +1,16 @@
 """Create a Candidate Profile by Extracting the data using AI"""
 from datetime import datetime
-from json import dumps
+
+from dateutil.parser import parse
 from marshmallow import ValidationError
 
 from server.controllers.candidate_controller import CandidateController
-from server.controllers.schemas import work_experience_schema
+from server.controllers.education_controller import EducationController
+from server.controllers.language_controller import LanguageController
+from server.controllers.schemas import education_schema, work_experience_schema
+from server.controllers.skill_controller import SkillController
 from server.controllers.user_controller import UserController
-from server.models import storage
-from server.models.candidate import Candidate
-from server.models.language import Language
-from server.models.skill import Skill
-from server.models.user import User
-from server.models.work_experience import WorkExperience
+from server.controllers.work_experience_controller import WorkExperienceController
 
 
 class AICandidateProfileCreator:
@@ -33,10 +32,15 @@ class AICandidateProfileCreator:
     """
 
     def __init__(self, user_id, ai_data, bcrypt_instance):
+        print(ai_data)
         self.user_id = user_id
         self.ai_data = ai_data
         self.user_controller = UserController(bcrypt_instance)
         self.candidate_controller = CandidateController()
+        self.skill_controller = SkillController()
+        self.work_experience_controller = WorkExperienceController()
+        self.language_controller = LanguageController()
+        self.education_controller = EducationController()
 
     def create_profile(self):
         """
@@ -46,10 +50,10 @@ class AICandidateProfileCreator:
         # Extract and validate data
         try:
             self._extract_data()
-            #self._validate_data()
-            print('------validation success------->')
+            # self._validate_data()
+            print("------validation success------->")
         except ValidationError as err:
-            print('------validation error(create_profile)------->')
+            print("------validation error(create_profile)------->")
             raise ValueError(err.messages)
 
         # Update User and Candidate
@@ -60,110 +64,115 @@ class AICandidateProfileCreator:
         self._add_skills(candidate)
         self._add_languages(candidate)
         self._add_work_experiences(candidate)
+        self._add_educations(candidate)
 
-        storage.save()
         return candidate
 
     def parse_date(self, date_string):
         """Try to parse the start and end date for experience"""
-        formats = ["%d/%m/%Y", "%m/%Y", "%Y-%m-%dT%H:%M:%S.%f"]
-        for fmt in formats:
-            try:
-                return datetime.strptime(date_string, fmt).isoformat()
-            except ValueError:
-                pass
-
-        if len(date_string.split("/")) == 2:
-            date_string = "01/" + date_string
-            return datetime.strptime(date_string, "%d/%m/%Y").isoformat()
+        try:
+            # Try to parse the date string using dateutil.parser.parse
+            return parse(date_string).isoformat()
+        except ValueError:
+            pass
 
         if date_string.lower() == "present":
             return datetime.now().isoformat()
 
-        if date_string.startswith("2024-"):
-            try:
-                year = int(date_string.split("-")[0])
-                return datetime(year=year, month=1, day=1).isoformat()
-            except ValueError:
-                pass
+        return date_string
 
     def _extract_data(self):
         """Extracts data from the AI data"""
         self.bio = self.ai_data.get("bio")
-        contact_info = self.ai_data.get("contact_info")
-        if contact_info is not None:
-            self.contact_info = contact_info
-            print('-----JSON CONTANCT------->', self.contact_info)
-        else:
-            self.contact_info = None
+        self.contact_info = self.ai_data.get("contact_info", None)
         self.skills = self.ai_data.get("skills", [])
         self.languages = self.ai_data.get("languages", [])
         self.experiences = self.ai_data.get("experiences", [])
+        self.educations = self.ai_data.get("educations", [])
 
-        # Convert start_date and end_date to datetime objects
-        for experience in self.experiences:
-            for date_field in ["start_date", "end_date"]:
-                if date_field in experience:
-                    if experience[date_field] is not None:
-                        date_obj = self.parse_date(experience[date_field])
-                        if date_obj is not None:
-                            experience[date_field] = date_obj
-                    else:
-                        if date_field == "end_date":
-                            experience[date_field] = datetime.now().isoformat()
-                # Convert location to string
-                if "location" in experience:
-                    if experience["location"] is not None:
-                        experience["location"] = str(experience["location"])
+        # Define a helper function to handle date conversion and missing fields
+        def process_fields(data, date_fields, missing_fields):
+            for item in data:
+                for date_field in date_fields:
+                    parsed_date = self.parse_date(item.get(date_field))
+                    if parsed_date is not None:
+                        item[date_field] = parsed_date
+                for missing_field, default_value in missing_fields.items():
+                    if item.get(missing_field) is None:
+                        item[missing_field] = default_value
+
+        # Convert start_date and end_date to datetime valid
+        # strings and handle missing fields
+        process_fields(
+            self.educations,
+            ["start_date", "end_date"],
+            {
+                "field_of_study": "Not specified",
+                "description": "Not specified"
+                },
+        )
+        process_fields(
+            self.experiences,
+            ["start_date", "end_date"],
+            {"location": "Not specified"}
+        )
 
     def _validate_data(self):
         """Validates the extracted data"""
         for experience in self.experiences:
             work_experience_schema.load(experience)
 
+        for education in self.educations:
+            education_schema.load(education)
+
     def _update_user(self):
         """Updates the user data"""
         user_data = {"bio": self.bio, "contact_info": self.contact_info}
-        user = storage.get(User, self.user_id)
-        if user:
-            return self.user_controller.update_current_user(
-                    self.user_id,
-                    user_data
-                    )
-        else:
-            raise ValueError("User not found")
+        return self.user_controller.update_current_user(
+                self.user_id,
+                user_data
+                )
 
     def _update_candidate(self, user):
         """Updates the candidate data"""
-        candidate = storage.get_by_attr(Candidate, "user_id", user.id)
-        if candidate:
-            return candidate
-        else:
-            raise ValueError("Candidate not found")
+        return self.candidate_controller.get_current_candidate(user.id)
 
     def _add_skills(self, candidate):
         """Adds skills to the candidate"""
         for skill_name in self.skills:
-            skill = storage.get_by_attr(Skill, "name", skill_name)
-            if not skill:
-                skill = Skill(name=skill_name)
-                storage.new(skill)
-            candidate.skills.append(skill)
+            try:
+                skill = self.skill_controller.create_skill(
+                        {"name": skill_name}
+                        )
+            except Exception as e:
+                continue
+            self.candidate_controller.add_skill(candidate.user_id, skill.id)
 
     def _add_languages(self, candidate):
         """Adds languages to the candidate"""
         for language_name in self.languages:
-            language = storage.get_by_attr(Language, "name", language_name)
-            if not language:
-                language = Language(name=language_name)
-                storage.new(language)
-            candidate.languages.append(language)
+            try:
+                language = self.language_controller.create_language(
+                    self.user_id, {"name": language_name}
+                )
+            except Exception as e:
+                continue
+            self.candidate_controller.add_language(
+                    candidate.user_id,
+                    language.id
+                    )
 
     def _add_work_experiences(self, candidate):
         """Adds work experiences to the candidate"""
         for experience_data in self.experiences:
-            experience = WorkExperience(
-                    candidate_id=candidate.id,
-                    **experience_data
+            self.work_experience_controller.create_work_experience(
+                candidate.user_id, experience_data
+            )
+
+    def _add_educations(self, candidate):
+        """Adds educations to the candidate"""
+        for education_data in self.educations:
+            self.education_controller.create_education(
+                    candidate.id,
+                    education_data
                     )
-            storage.new(experience)

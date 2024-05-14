@@ -1,7 +1,7 @@
 """Recruiter Class"""
 
 from sqlalchemy import Column, ForeignKey, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 from server.models.base_model import Base, BaseModel
 
@@ -11,13 +11,16 @@ class Recruiter(BaseModel, Base):
 
     __tablename__ = "recruiters"
 
-    user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
+    user_id = Column(
+        String(60), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
 
-    user = relationship('User',
-                        backref='recruiter',
-                        uselist=False,
-                        single_parent=True,
-                        cascade='all, delete-orphan')
+    user = relationship(
+        "User",
+        backref=backref("recruiter", uselist=False, cascade="all,delete"),
+        single_parent=True,
+        passive_deletes=True,
+    )
     # Relationship with Recruiter
     jobs = relationship(
             "Job",

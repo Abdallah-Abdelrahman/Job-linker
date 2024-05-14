@@ -4,7 +4,7 @@ Job-linker application.
 """
 
 from datetime import datetime
-
+import json
 from marshmallow import ValidationError
 
 from server.controllers.schemas import application_schema
@@ -77,6 +77,8 @@ class ApplicationsController:
                 raise UnauthorizedError("Unauthorized")
         else:
             # Get application
+            candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+            recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
             application = storage.get(Application, application_id)
             if not application:
                 raise ValueError("Application not found")
@@ -85,12 +87,12 @@ class ApplicationsController:
             # recruiter for the job
             if (
                 user.role == "candidate"
-                and application.candidate_id != user.candidate.id
+                and application.candidate_id != candidate.id
             ):
                 raise UnauthorizedError("Unauthorized")
             elif (
                 user.role == "recruiter"
-                and application.job.recruiter_id != user.recruiter.id
+                and application.job.recruiter_id != recruiter.id
             ):
                 raise UnauthorizedError("Unauthorized")
 
@@ -110,7 +112,9 @@ class ApplicationsController:
                         "job_id": application.job.id,
                         "job_title": application.job.job_title,
                         "application_status": application.application_status,
-                        "company_name": recruiter.company_name,
+                        "company_name": json.loads(
+                            recruiter.user.contact_info
+                            ).get('company_name'),
                         "salary": application.job.salary,
                         "match_score": application.match_score,
                     }
@@ -204,7 +208,9 @@ class ApplicationsController:
         name = candidate.user.name
         recruiter_id = job.to_dict["recruiter_id"]
         recruiter = storage.get(Recruiter, recruiter_id)
-        company_name = recruiter.company_name
+        company_name = json.loads(
+                recruiter.user.contact_info
+                ).get('company_name')
         job_title = job.job_title
 
         template = application_submission_email(name, company_name, job_title)
@@ -283,18 +289,20 @@ class ApplicationsController:
 
         # Get application
         application = storage.get(Application, application_id)
+        candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+        recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
         if not application:
             raise ValueError("Application not found")
 
         # Check if user is candidate who applied or the recruiter for the job
         if (
                 user.role == "candidate" and
-                application.candidate_id != user.candidate.id
+                application.candidate_id != candidate.id
                 ):
             raise UnauthorizedError("Unauthorized")
         elif (
             user.role == "recruiter"
-            and application.job.recruiter_id != user.recruiter.id
+            and application.job.recruiter_id != recruiter.id
         ):
             raise UnauthorizedError("Unauthorized")
 

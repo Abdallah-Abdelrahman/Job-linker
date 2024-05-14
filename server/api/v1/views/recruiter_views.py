@@ -30,8 +30,8 @@ def create_recruiter():
     """
     user_id = get_jwt_identity()
     new_recruiter = recruiter_controller.create_recruiter(
-            user_id,
-            )
+        user_id,
+    )
     return (
         make_response_(
             "success",
@@ -62,8 +62,7 @@ def get_current_recruiter():
         "Recruiter details fetched successfully",
         {
             "id": recruiter.id,
-            "company_name": recruiter.company_name,
-            "company_info": recruiter.company_info,
+            "contact_info": recruiter.user.contact_info,
         },
     )
 
@@ -91,7 +90,6 @@ def update_current_recruiter():
         "Recruiter details updated successfully",
         {
             "id": recruiter.id,
-            "company_name": recruiter.company_name,
-            "company_info": recruiter.company_info,
+            "contact_info": recruiter.user.contact_info,
         },
     )

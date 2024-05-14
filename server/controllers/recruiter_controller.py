@@ -2,7 +2,7 @@
 This module provides a controller for the Recruiter model in the
 Job-linker application.
 """
-
+import json
 from marshmallow import ValidationError
 
 from server.controllers.schemas import recruiter_schema
@@ -90,19 +90,16 @@ class RecruiterController:
             ValueError: If there is a validation error or the recruiter
             is not found.
         """
-        # Validate data
-        try:
-            data = recruiter_schema.load(data)
-        except ValidationError as err:
-            raise ValueError(err.messages)
-
         # Get recruiter and update attributes
         recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
         if not recruiter:
             raise ValueError("Recruiter not found")
 
+        contact_info = json.loads(recruiter.user.contact_info)
         for key, value in data.items():
-            setattr(recruiter, key, value)
+            contact_info[key] = value
+
+        recruiter.user.contact_info = json.dumps(contact_info)
         storage.save()
 
         return recruiter

@@ -4,6 +4,7 @@ Job-linker application.
 """
 
 from json import dumps, loads
+
 from flask import current_app, url_for
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
@@ -23,7 +24,6 @@ from server.models.job import Job
 from server.models.recruiter import Recruiter
 from server.models.user import User
 from server.services.mail import MailService
-
 
 
 class UserController:
@@ -225,8 +225,8 @@ class UserController:
             raise ValueError("User not found")
 
         user_data = user.to_dict
-        if user_data.get('contact_info'):
-            user_data['contact_info'] = loads(user_data.get('contact_info'))
+        if user_data.get("contact_info"):
+            user_data["contact_info"] = loads(user_data.get("contact_info"))
 
         if user.role == "candidate":
             candidate = storage.get_by_attr(Candidate, "user_id", user_id)
@@ -246,6 +246,10 @@ class UserController:
                     "experiences": [
                         experience.to_dict
                         for experience in candidate.experiences
+                    ],
+                    "education": [
+                        education.to_dict
+                        for education in candidate.educations
                     ],
                 }
         elif user.role == "recruiter":
@@ -285,15 +289,18 @@ class UserController:
             unauthorized.
         """
         ALLOWED_UPDATE_FIELDS = [
-                "name", 'profile_complete',
-                "contact_info", "bio", "image_url"
+            "name",
+            "profile_complete",
+            "contact_info",
+            "bio",
+            "image_url",
         ]
 
         # Validate data
         try:
             data = update_schema.load(data)
         except ValidationError as err:
-            print('------validation error(update_current_user)-------->')
+            print("------validation error(update_current_user)-------->")
             raise ValueError(err.messages)
 
         # Get user and update attributes
@@ -303,8 +310,11 @@ class UserController:
 
         for key, value in data.items():
             if key in ALLOWED_UPDATE_FIELDS:
-                setattr(user, key,
-                        dumps(value) if key == 'contact_info' else value)
+                setattr(
+                        user,
+                        key,
+                        dumps(value) if key == "contact_info" else value
+                        )
             else:
                 raise ValueError(f"Cannot update field: {key}")
 
