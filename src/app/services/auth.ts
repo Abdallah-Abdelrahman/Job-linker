@@ -82,7 +82,7 @@ export const api = createApi({
     }),
     insights: builder.mutation<unknown, FormData>({
       query: (formdata) => ({
-        url: 'insigths',
+        url: 'upload/insights',
         method: 'POST',
         body: formdata
       })
@@ -142,4 +142,5 @@ export const {
   useDeleteMeMutation,
   useUpdatePasswordMutation,
   useLogoutMutation,
+  useInsightsMutation
 } = api;

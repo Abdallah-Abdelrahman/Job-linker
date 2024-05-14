@@ -55,20 +55,14 @@ ATS_FRIENDLY_PROMPT = """\
     As a professional applicant tracking system, please provide a detailed analysis of this CV. The analysis should include:
     {
     "ats_score": "<float: ATS friendliness score between 0.0 and 1.0>",
-    "missing_keywords": ["<str: Missing keyword 1>", "<str: Missing keyword 2>", "..."],
-    "unnecessary_keywords": ["<str: Unnecessary keyword 1>", "<str: Unnecessary keyword 2>", "..."],
     "suggestions": ["<str: Suggestion 1>", "<str: Suggestion 2>", "..."],
-    "action_verbs": "<str: Analysis of the use of action verbs in the CV>",
-    "personal_pronouns": "<str: Analysis of the use of personal pronouns in the CV>"
     }
 
     Notes:
+    - the input is provided in raw text don't mention any suggestion about fonts style or design.
+    - your response criteria based on these tag lines (profile summary or about me, education, work experience, skills, languages, contact information).
     - 'ats_score' should be a float between 0.0 and 1.0, where 1.0 means the CV is perfectly ATS-friendly and 0.0 means it's not ATS-friendly at all.
-    - 'missing_keywords' should be a list of important keywords that are missing from the CV.
-    - 'unnecessary_keywords' should be a list of keywords that are not necessary and could be removed from the CV.
-    - 'suggestions' should be a list of suggestions for improving the CV to make it more ATS-friendly.
-    - 'action_verbs' should analyze the use of action verbs in the CV, which can make the CV more dynamic.
-    - 'personal_pronouns' should analyze the use of personal pronouns in the CV, as excessive use of personal pronouns can be seen as unprofessional.
+    - 'suggestions' should be a list of suggestions based on the above criteria for improving the CV to make it more ATS-friendly.
     """
 
 JOB_MATCHING_PROMPT = """\
