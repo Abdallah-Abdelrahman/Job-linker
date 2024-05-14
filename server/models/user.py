@@ -2,7 +2,7 @@
 
 from flask_login import UserMixin
 from sqlalchemy import JSON, TEXT, Boolean, Column, Enum, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 from server.models.base_model import Base, BaseModel
 

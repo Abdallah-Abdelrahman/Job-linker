@@ -83,8 +83,6 @@ class RecruiterSchema(Schema):
     """
 
     id = fields.Str(required=False)
-    company_name = fields.Str(required=True)
-    company_info = fields.Str(required=False)
 
 
 recruiter_schema = RecruiterSchema()
@@ -183,3 +181,21 @@ class ApplicationSchema(Schema):
 
 
 application_schema = ApplicationSchema()
+
+
+class EducationSchema(Schema):
+    """
+    Schema for the Education model
+    """
+
+    id = fields.Str(required=False)
+    candidate_id = fields.Str(required=False)
+    institute = fields.Str(required=False)
+    degree = fields.Str(required=False)
+    field_of_study = fields.Str(required=False)
+    start_date = fields.DateTime()
+    end_date = fields.DateTime()
+    description = fields.Str()
+
+
+education_schema = EducationSchema()

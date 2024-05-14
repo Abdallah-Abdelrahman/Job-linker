@@ -6,8 +6,6 @@ CANDID_PROMPT = """\
     "bio": "<str: A brief biography of the candidate>",
     "name": "<str>",
     "email": "<str>",
-    "educations":[{"title": "<str>", "school": <str>, "start_date":<Date>, "end_date": <Date>}],
-    "languages": [<str>],
     "contact_info": {"address": <str>, "linkedin": <str>, "github": <str>, "phone": <str>, "whatsapp": <str>},
     "major": "<str: Major field of study of the candidate>",
     "skills": ["<str: Skill 1>", "<str: Skill 2>", "..."],
@@ -21,6 +19,16 @@ CANDID_PROMPT = """\
             "description": "<str: Job description>"
         },
     ],
+    "educations": [
+        {
+            "institute": "<str: Name of the institute>",
+            "degree": "<str: Degree obtained>",
+            "field_of_study": "<str: Field of study>",
+            "start_date": "<str: Start date in '%Y-%m-%dT%H:%M:%S.%f' format>",
+            "end_date": "<str: End date in '%Y-%m-%dT%H:%M:%S.%f' format>",
+            "description": "<str: Description of the education>"
+        },
+    ],
     "languages": ["<str: Language name 1>", "<str: Language name 2>", "..."]
     }
 
@@ -30,6 +38,7 @@ CANDID_PROMPT = """\
     - If the 'end_date' is 'present' set it to the current date.
     - Each language should be represented by a string containing the language name.
     """
+
 
 JOB_PROMPT = """\
     Please extract the following information from this job description and provide it in the form of a dictionary:
