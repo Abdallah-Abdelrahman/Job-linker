@@ -52,17 +52,8 @@ class AIJobCreator:
         Extracts and validates data, creates a new Job, adds Skills,
         and saves the changes to the storage.
         """
-        # Extract skills and major from the AI data
+        # Extract skills from the AI data
         skills = self.ai_data.pop("skills", [])
-        major_name = self.ai_data.pop("major", None)
-
-        # Get or create the Major
-        major = self.major_controller.create_major(
-            self.recruiter_id, {"name": major_name}
-        )
-
-        # Add the major_id to the ai_data
-        self.ai_data["major_id"] = major.id
 
         # Parse application_deadline into a datetime object
         if "application_deadline" in self.ai_data and self.ai_data[
