@@ -7,6 +7,9 @@ export interface Job {
   job_description: string;
   exper_years: string;
   salary: number;
+  application_deadline: string;
+  is_open: boolean;
+  skills: string[];
 }
 
 export interface JobResponse {
@@ -79,6 +82,25 @@ export const jobApi = api.injectEndpoints({
     >({
       query: ({ job_id }) => `jobs/${job_id}/recommended_candidates`,
     }),
+
+    getAllJobsSortedByDate: builder.query<Job[], void>({
+      query: () => "jobs/all/sorted",
+    }),
+    getAllJobsSortedByMajor: builder.query<Job[], void>({
+      query: () => "jobs/all",
+    }),
+    searchJobs: builder.query<Job[], { location?: string; title?: string }>({
+      query: ({ location, title }) => ({
+        url: "jobs/search",
+        params: { location, title },
+      }),
+    }),
+    getJobCounts: builder.query<
+      { total_count: number; major_counts: Record<string, number> },
+      void
+    >({
+      query: () => "jobs/counts",
+    }),
   }),
 });
 
@@ -91,4 +113,8 @@ export const {
   useRemoveSkillFromJobMutation,
   useGetJobsQuery,
   useGetRecommendedCandidatesQuery,
+  useGetAllJobsSortedByDateQuery,
+  useGetAllJobsSortedByMajorQuery,
+  useSearchJobsQuery,
+  useGetJobCountsQuery,
 } = jobApi;
