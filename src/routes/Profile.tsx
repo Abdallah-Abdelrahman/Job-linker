@@ -7,18 +7,17 @@ import {
   Input,
   Select,
   Skeleton,
-} from "@chakra-ui/react";
-import { User, useMeQuery, useUpdateMeMutation, useUploadMutation } from "../app/services/auth";
-import { useCreateCandidateMutation } from "../app/services/candidate";
-import { useCreateRecruiterMutation } from "../app/services/recruiter";
-import { useAppSelector } from "../hooks/store";
-
-import { useAfterRefreshQuery } from "../hooks";
-import { useCreateMajorMutation } from "../app/services/major";
-import { selectCurrentUser } from "../features/auth";
-import { Candidate } from "../components/profile";
+} from '@chakra-ui/react';
+import { User, useMeQuery, useUpdateMeMutation, useUploadMutation } from '../app/services/auth';
+import { useCreateCandidateMutation } from '../app/services/candidate';
+import { useCreateRecruiterMutation } from '../app/services/recruiter';
+import { useAppSelector } from '../hooks/store';
+import { useAfterRefreshQuery } from '../hooks';
+import { useCreateMajorMutation } from '../app/services/major';
+import { selectCurrentUser } from '../features/auth';
+import { Candidate } from '../components/profile';
 import { Recruiter } from '../components/profile';
-import { MyForm } from "../components/profile";
+import { MyForm } from '../components/profile';
 
 
 
@@ -100,7 +99,7 @@ const Profile = () => {
   return (
     <Box className='mx-auto max-w-2xl my-8'>
       <Skeleton isLoaded={!isLoading}>
-        <Heading as="h2" size="xl" className="mb-8 capitalize">
+        <Heading as='h2' size='xl' className='mb-8 capitalize'>
           complete your Profile
         </Heading>
         <MyForm
