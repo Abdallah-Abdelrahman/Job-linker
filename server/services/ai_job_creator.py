@@ -5,10 +5,9 @@ from datetime import datetime, timezone
 from marshmallow import ValidationError
 
 from server.controllers.job_controller import JobController
+from server.controllers.major_controller import MajorController
 from server.controllers.schemas import job_schema
-from server.models import storage
-from server.models.major import Major
-from server.models.skill import Skill
+from server.controllers.skill_controller import SkillController
 
 
 class AIJobCreator:
@@ -23,12 +22,18 @@ class AIJobCreator:
         a dictionary containing the AI data
     job_controller : JobController
         an instance of the JobController class
+    major_controller : MajorController
+        an instance of the MajorController class
+    skill_controller : SkillController
+        an instance of the SkillController class
     """
 
     def __init__(self, recruiter_id, ai_data):
         self.recruiter_id = recruiter_id
         self.ai_data = ai_data
         self.job_controller = JobController()
+        self.major_controller = MajorController()
+        self.skill_controller = SkillController()
 
     def parse_date(self, date_string):
         """Try to parse the application_deadline"""
@@ -52,11 +57,9 @@ class AIJobCreator:
         major_name = self.ai_data.pop("major", None)
 
         # Get or create the Major
-        major = storage.get_by_attr(Major, "name", major_name)
-        if not major:
-            major = Major(name=major_name)
-            storage.new(major)
-            storage.save()
+        major = self.major_controller.create_major(
+            self.recruiter_id, {"name": major_name}
+        )
 
         # Add the major_id to the ai_data
         self.ai_data["major_id"] = major.id
@@ -87,15 +90,8 @@ class AIJobCreator:
         # Add Skills
         self._add_skills(new_job, skills)
 
-        storage.save()
-        return new_job
-
     def _add_skills(self, job, skills):
         """Adds skills to the job"""
         for skill_name in skills:
-            skill = storage.get_by_attr(Skill, "name", skill_name)
-            if not skill:
-                skill = Skill(name=skill_name)
-                storage.new(skill)
-                storage.save()
-            job.skills.append(skill)
+            skill = self.skill_controller.create_skill({"name": skill_name})
+            self.job_controller.add_skill(self.recruiter_id, job.id, skill.id)
