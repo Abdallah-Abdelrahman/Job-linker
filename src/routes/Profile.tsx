@@ -10,16 +10,14 @@ import {
 } from "@chakra-ui/react";
 import { User, useMeQuery, useUpdateMeMutation, useUploadMutation } from "../app/services/auth";
 import { useCreateCandidateMutation } from "../app/services/candidate";
-import {
-  Recruiter,
-  useCreateRecruiterMutation,
-} from "../app/services/recruiter";
+import { useCreateRecruiterMutation } from "../app/services/recruiter";
 import { useAppSelector } from "../hooks/store";
 
 import { useAfterRefreshQuery } from "../hooks";
 import { useCreateMajorMutation } from "../app/services/major";
 import { selectCurrentUser } from "../features/auth";
 import { Candidate } from "../components/profile";
+import { Recruiter } from '../components/profile';
 import { MyForm } from "../components/profile";
 
 
@@ -70,16 +68,34 @@ const Profile = () => {
   };
 
   const handleRecruiterFormSubmit = async (formdata: FormData) => {
+  try {
     createRecruiter()
       .unwrap()
-      .then(_ => updateUser({ contact_info: Object.fromEntries(formdata) }))
+      .then(_ => {
+        updateUser({ contact_info: Object.fromEntries(formdata) })
+          .unwrap()
+          .then(_ => {
+            updateUser({ profile_complete: true })
+              .then(_ => console.log('----------profile completed-------->'))
+              .catch(err => console.log('------not completed---->', { err }));
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      })
       .catch((error) => {
         console.error(error);
-      })
-  };
+      });
+  } catch (error) {
+    console.error(error);
+  }  
+};
 
   if (role == 'candidate' && isSuccess && userData.data.profile_complete)
     return (<Candidate data={userData.data} />);
+
+  if (role == 'recruiter' && isSuccess && userData.data.profile_complete)
+    return (<Recruiter data={userData.data} />);
 
   return (
     <Box className='mx-auto max-w-2xl my-8'>

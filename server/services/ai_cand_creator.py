@@ -32,7 +32,6 @@ class AICandidateProfileCreator:
     """
 
     def __init__(self, user_id, ai_data, bcrypt_instance):
-        print(ai_data)
         self.user_id = user_id
         self.ai_data = ai_data
         self.user_controller = UserController(bcrypt_instance)
