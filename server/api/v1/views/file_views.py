@@ -30,7 +30,7 @@ def upload():
     if "file" not in request.files:
         return make_response_("error", "No file part"), 400
 
-    major_id = request.form.get('major_id', None)
+    major_id = request.json.get("major_id", None)
 
     file_path, original_filename = file_controller.handle_upload(
         request.files["file"], dir_.get(role, ApplicationConfig.UPLOAD_TEMP)
