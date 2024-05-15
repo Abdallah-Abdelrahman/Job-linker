@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { Text, FormControl, Input, FormLabel, Box } from '@chakra-ui/react';
 import { MyIcon } from '.';
 
-function Upload(props) {
+type Props = {
+  isError: boolean
+}
+
+function Upload(props:Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const boxRef = useRef<HTMLDivElement | null>(null);
   const [file, setFile] = useState<string>();

@@ -1,7 +1,8 @@
-import { Text, Box, Button, List, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Skeleton, Progress } from "@chakra-ui/react";
-import Upload from "./Upload";
-import { useInsightsMutation } from "../app/services/auth";
-import MyIcon from "./Icon";
+import { Text, Box, Button, List, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Skeleton, Progress, Heading } from '@chakra-ui/react';
+import Upload from './Upload';
+import { useInsightsMutation } from '../app/services/auth';
+import MyIcon from './Icon';
+import { useEffect, useState } from 'react';
 
 type Props = {
   onClose: () => void,
@@ -9,52 +10,96 @@ type Props = {
 }
 
 function Insights({ onClose, isOpen }: Props) {
-  const [generateInsights, { data, isLoading, isSuccess }] = useInsightsMutation();
+  const [score, setScore] = useState(0.0);
+  const [isFileError, setFileError] = useState(false);
+  const [generateInsights,
+    { data = {}, isLoading, isSuccess, isUninitialized, isError, error, reset }]
+    = useInsightsMutation();
+
+  // effect to increase the ats score on intervals
+  useEffect(() => {
+    let timeoutID: number;
+
+    if (isSuccess && (score < (data.data.ats_insights.ats_score * 100))) {
+      timeoutID = setInterval(() => {
+        setScore(score + 0.5);
+      });
+    }
+
+    // cleanup
+    return () => {
+      clearInterval(timeoutID);
+    };
+  });
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (evt) => {
-    console.log('%chello', 'background:red;');
     evt.preventDefault();
     const formdata = new FormData(evt.currentTarget);
-    if (!formdata.get('file').name) return;
+    if (!formdata.get('file').name) {
+      setFileError(true);
+      return;
+    }
     generateInsights(formdata);
   };
 
   return (
-    <Modal onClose={onClose} isOpen={isOpen} size='4xl' isCentered>
+    <Modal onClose={() => {
+      onClose();
+      reset();
+      setFileError(false);
+    }} isOpen={isOpen} size='4xl' isCentered>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Scan Resume</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          {!isSuccess
+          {isUninitialized
             ? <form id='insight' onSubmit={handleSubmit}>
-              <Upload />
+              <Upload isError={isFileError} />
             </form>
-            : <Skeleton isLoaded={isSuccess}>
-              <Text>ATS Score:</Text>
-		<Text mr={2}>{(data.data.ats_insights.ats_score * 100).toFixed(2)}%</Text>
-		<Progress className="progress-bar" value={data.data.ats_insights.ats_score * 100} />
-              <List spacing='3'>
-                {data.data.ats_insights.suggestions.map((s, idx) =>
-                  <ListItem key={idx} className='flex gap-3'>
-                    <Box>
-                      <MyIcon href='/sprite.svg#insight' className='w-6 h-6' />
-                    </Box>
-                    <Text>
-                      {s}
-                    </Text>
-                  </ListItem>)}
-              </List>
+            : <Skeleton isLoaded={!isLoading}>
+              {isError
+                ? <Box className='flex flex-col justify-center items-center gap-4'>
+                  <Text className='w-full p-3 border border-l-4 border-l-red-400 bg-red-100 text-red-400 rounded-md rounded-tl-none rounded-bl-none'>
+                    {error?.data.message}
+                  </Text>
+                  <MyIcon href='/sprite.svg#upload-error' />
+                </Box>
+                : <>
+                  <Heading as='h3' className='!text-base !font-normal'>ATS Score:</Heading>
+                  <Text className='!font-semibold !text-2xl'>{(score).toFixed(2)}%</Text>
+                  <Progress
+                    className='mb-4'
+                    value={score}
+                  />
+                  <List spacing='3'>
+                    {data.data?.ats_insights.suggestions.map((s, idx) =>
+                      <ListItem key={idx} className='flex gap-3'>
+                        <Box>
+                          <MyIcon href='/sprite.svg#insight' className='w-6 h-6' />
+                        </Box>
+                        <Text className='sm:text-xl'>
+                          {s}
+                        </Text>
+                      </ListItem>)}
+                  </List>
+                </>
+              }
             </Skeleton>
           }
-
         </ModalBody>
         <ModalFooter className='space-x-4'>
-          <Button onClick={onClose}>Close</Button>
+          <Button onClick={() => {
+            onClose();
+            reset();
+            setScore(0.0);
+          }}>Close</Button>
           <Button
             form='insight'
             type='submit'
             isLoading={isLoading}
+            disabled={!isUninitialized && (isSuccess || isError)}
+            className={`!bg-white !border !border-sky-400 ${!isUninitialized && (isSuccess || isError) ? 'opacity-25' : ''}`}
           >
             scan
           </Button>
