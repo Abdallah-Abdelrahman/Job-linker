@@ -52,6 +52,7 @@ JOB_PROMPT = """\
     }
 
     Notes:
+    - each skill should not be more than 100 characters.
     - Please enclose each property in double quotes.
     - The 'skills' should be represented as lists of strings, each string being a separate skill.
     - The 'application_deadline' should be represented as a string in ISO 8601 format (e.g., "2024-05-11T08:06:13.000000") if Not specified set its value to 'None'.

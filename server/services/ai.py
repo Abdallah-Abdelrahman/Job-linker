@@ -100,6 +100,7 @@ class AIService():
         return text
 
     def __handle_cv(self, dict_:Dict[str, Any]) -> Dict[str, Any]:
+        '''clean the dictionary received from ai'''
         xps = dict_.get('experiences')
         eds = dict_.get('educations')
         for xp in xps:
@@ -123,6 +124,19 @@ class AIService():
                         ed[k] = datetime.utcnow().isoformat()
         return dict_
 
+    def __handle_job(self, dict_:Dict[str, Any]) -> Dict[str, Any]:
+        '''clean the dictionary received from ai'''
+        app_deadline = dict_.get('application_deadline')
+        desc = dict_.get('job_description')
+        if desc:
+            dict_['job_description'] = desc.replace('\n', '')
+        if app_deadline:
+            try:
+                dict_['application_deadline'] = parse(app_deadline).isoformat()
+            except (ParserError, TypeError):
+                dict_['application_deadline'] = None
+        return dict_
+
     def to_dict(self, prompt_enquiry, text=''):
         '''The function translates gemeni response to a dictionary
 
@@ -139,6 +153,8 @@ class AIService():
             dict_ = loads(text)
             if prompt_enquiry == CANDID_PROMPT:
                 dict_ = self.__handle_cv(dict_)
+            if prompt_enquiry == JOB_PROMPT:
+                dict_ = self.__handle_job(dict_)
             return dict_
         except JSONDecodeError as e:
             # retry unitl we get valid json
@@ -154,7 +170,7 @@ class AIService():
             "ats_score": "<float: ATS friendliness score between 0.0 and 1.0>",
             "suggestions": ["<str: Suggestion 1>", "<str: Suggestion 2>", "..."],
             }
-        
+
             Notes:
             - 'ats_score' should be a float between 0.0 and 1.0, where 1.0 means the CV is perfectly ATS-friendly and 0.0 means it's not ATS-friendly at all.
             - 'suggestions' should be a list of suggestions for improving the CV to make it more ATS-friendly.

@@ -1,6 +1,7 @@
 """Job Model"""
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Numeric, String
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy import (Boolean, Column, DateTime, ForeignKey,
+                        Numeric, String, Text)
+from sqlalchemy.orm import relationship
 
 from server.models.base_model import Base, BaseModel
 from server.models.skill import job_skills
@@ -18,7 +19,7 @@ class Job(BaseModel, Base):
             )
     major_id = Column(String(60), ForeignKey("majors.id"), nullable=False)
     job_title = Column(String(100), nullable=False)
-    job_description = Column(String(500), nullable=False)
+    job_description = Column(Text, nullable=False)
     location = Column(String(128), nullable=True)
     exper_years = Column(String(128), nullable=True)
     salary = Column(Numeric(precision=10, scale=2, asdecimal=False))

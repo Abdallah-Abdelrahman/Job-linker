@@ -1,17 +1,17 @@
-import { FormControl, Select } from "@chakra-ui/react";
-import { college_majors } from "../../constants";
-import Upload from "../Upload";
-import { useCreateJobMutation } from "../../app/services/job";
-import { useCreateMajorMutation } from "../../app/services/major";
-import { useReducer } from "react";
-import { useUploadMutation } from "../../app/services/auth";
-import { useAppSelector } from "../../hooks/store";
-import { selectCurrentUser } from "../../features/auth";
+import { FormControl, Select } from '@chakra-ui/react';
+import { college_majors } from '../../constants';
+import Upload from '../Upload';
+import { useCreateMajorMutation } from '../../app/services/major';
+import { useReducer } from 'react';
+import { useUploadMutation } from '../../app/services/auth';
+import { useAppSelector } from '../../hooks/store';
+import { selectCurrentUser } from '../../features/auth';
 
-function AddJob() {
-
+type Props = {
+  [k in 'setLoading' | 'setInitialized']: React.Dispatch<React.SetStateAction<boolean>>
+}
+function AddJob({ setLoading, setInitialized }: Props) {
   const user = useAppSelector(selectCurrentUser);
-  const [add_job] = useCreateJobMutation();
   const [uploadJOB] = useUploadMutation();
   const [add_major] = useCreateMajorMutation();
   const [formError, dispatch] = useReducer((oldState, newState) => {
@@ -33,13 +33,17 @@ function AddJob() {
       add_major({ name: major })
         .unwrap()
         .then(data => {
-            formdata.append('major_id', data.data.id);
-            uploadJOB(formdata)
+          setLoading(true);
+          setInitialized(false);
+          formdata.append('major_id', (data.data.id));
+          uploadJOB(formdata)
             .unwrap()
-            .then(d => console.log({d}))
-            .catch(e => console.log('--------upload error------->', e));
-            })
-        .catch();
+            .then(d => console.log({ d }))
+            .catch(e => console.log('--------upload error------->', e))
+            .finally(_ => setLoading(false));
+        })
+        .catch(e => console.log('--------add_major error------->', e))
+        
     }
   };
 

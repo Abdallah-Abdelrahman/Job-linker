@@ -56,9 +56,10 @@ class AIJobCreator:
         skills = self.ai_data.pop("skills", [])
 
         # Parse application_deadline into a datetime object
+        # 'None', None, 'Not specified'
         if "application_deadline" in self.ai_data and self.ai_data[
             "application_deadline"
-        ] in ["None", "Not specified"]:
+        ] in (None, "None", "Not specified"):
             del self.ai_data["application_deadline"]
 
         if "application_deadline" in self.ai_data:
@@ -66,6 +67,7 @@ class AIJobCreator:
                 self.ai_data["application_deadline"]
             )
 
+        print('----job ai------->', self.ai_data)
         # Validate data
         try:
             self.ai_data = job_schema.load(self.ai_data)
@@ -80,6 +82,7 @@ class AIJobCreator:
 
         # Add Skills
         self._add_skills(new_job, skills)
+        return new_job
 
     def _add_skills(self, job, skills):
         """Adds skills to the job"""
