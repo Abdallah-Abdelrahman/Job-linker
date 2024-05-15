@@ -9,6 +9,7 @@ from sqlalchemy.exc import IntegrityError
 from server.controllers.schemas import skill_schema
 from server.models import storage
 from server.models.skill import Skill
+from server.skill_synonyms import SKILL_SYNONYMS
 
 
 class SkillController:
@@ -51,6 +52,12 @@ class SkillController:
             data = skill_schema.load(data)
         except ValidationError as err:
             raise ValueError(err.messages)
+
+        # Check if skill name is a synonym and replace it
+        # with the canonical name
+        skill_name = data["name"]
+        canonical_name = SKILL_SYNONYMS.get(skill_name, skill_name)
+        data["name"] = canonical_name
 
         # Check if skill already exists
         existing_skill = storage.get_by_attr(Skill, "name", data["name"])
