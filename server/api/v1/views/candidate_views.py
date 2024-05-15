@@ -64,8 +64,10 @@ def get_current_candidate():
         {
             "id": candidate.id,
             "major_id": candidate.major_id,
-            "skills": [skill.id for skill in candidate.skills],
-            "languages": [language.id for language in candidate.languages],
+            "skills": [skill.name for skill in candidate.skills],
+            "languages": [
+                language.name for language in candidate.languages
+                ],
         },
     )
 
@@ -143,9 +145,10 @@ def add_skill_to_current_candidate():
     return make_response_(
         "success",
         "Skill added successfully",
-        {"id": candidate.id, "skills": [
-            skill.id for skill in candidate.skills
-            ]},
+        {
+            "id": candidate.id,
+            "skills": [skill.name for skill in candidate.skills]
+            },
     )
 
 
@@ -166,9 +169,10 @@ def remove_skill_from_current_candidate(skill_id):
     return make_response_(
         "success",
         "Skill removed successfully",
-        {"id": candidate.id, "skills": [
-            skill.id for skill in candidate.skills
-            ]},
+        {
+            "id": candidate.id,
+            "skills": [skill.name for skill in candidate.skills]
+            },
     )
 
 
@@ -192,7 +196,7 @@ def add_language_to_current_candidate():
         "Language added successfully",
         {
             "id": candidate.id,
-            "languages": [language.id for language in candidate.languages],
+            "languages": [language.name for language in candidate.languages],
         },
     )
 
@@ -216,7 +220,7 @@ def remove_language_from_current_candidate(lang_id):
         "Language removed successfully",
         {
             "id": candidate.id,
-            "languages": [language.id for language in candidate.languages],
+            "languages": [language.name for language in candidate.languages],
         },
     )
 
