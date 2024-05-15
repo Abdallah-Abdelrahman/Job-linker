@@ -69,6 +69,7 @@ function Insights({ onClose, isOpen }: Props) {
         onClose();
         reset();
         setFileError(false);
+        setScore(0.0);
       }}
       body={
         isUninitialized

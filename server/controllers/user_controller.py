@@ -256,7 +256,7 @@ class UserController:
             recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
             if not recruiter:
                 return user_data
-            jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
+            jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.user_id)
             if recruiter:
                 user_data["recruiter"] = {
                     "jobs": [job.to_dict for job in jobs],

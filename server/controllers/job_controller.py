@@ -75,7 +75,7 @@ class JobController:
 
         # Create new job
         new_job = Job(
-            recruiter_id=recruiter.id,
+            recruiter_id=recruiter.user_id,
             major_id=data["major_id"],
             job_title=data["job_title"],
             job_description=data["job_description"],

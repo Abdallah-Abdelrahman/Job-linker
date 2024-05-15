@@ -1,7 +1,8 @@
-import { Text, Heading, Box, Stack, Button, Collapse, useDisclosure } from '@chakra-ui/react';
+import { Text, Heading, Box, Stack, Button, useDisclosure, Skeleton, SkeletonText } from '@chakra-ui/react';
 import MyIcon from '../Icon';
 import MyModal from '../MyModal';
 import { AddJob } from '../job';
+import { useState } from 'react';
 
 type Job = {
   id: string;
@@ -41,6 +42,8 @@ interface RecruiterProp {
 
 function Recruiter({ data }: RecruiterProp) {
   const { isOpen, onClose, onOpen } = useDisclosure();
+  const [isLoading, setLoading] = useState(false);
+  const [isUninitialized, setInitialized] = useState(true);
 
   return (
     <Box className='grid grid-cols-4 gap-6 container mt-4 mx-auto sm:grid-cols-12'>
@@ -71,7 +74,12 @@ function Recruiter({ data }: RecruiterProp) {
               title='add new job'
               isOpen={isOpen}
               onClose={onClose}
-              body={<AddJob />}
+              body={isUninitialized
+                ? <AddJob setLoading={setLoading} setInitialized={setInitialized} />
+                : <SkeletonText isLoaded={!isLoading}>
+                  <Text className='text-gray-300'>your file has been parsed successfully</Text>
+                </SkeletonText>
+              }
               confirm={<Button type='submit' form='job'>add</Button>}
             />
             <MyIcon href='/sprite.svg#plus' className='w-6 h-6' />

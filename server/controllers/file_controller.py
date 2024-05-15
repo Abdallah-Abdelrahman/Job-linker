@@ -89,6 +89,7 @@ class FileController:
             ai_data['major_id'] = major_id
             creator = AIJobCreator(user_id, ai_data)
             job = creator.create_job()
+            print('-----process_upload------->', job)
             new_file_path = os.path.join(
                 ApplicationConfig.UPLOAD_JOB,
                 os.path.basename(file_path),

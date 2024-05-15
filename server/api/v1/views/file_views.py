@@ -15,7 +15,7 @@ file_controller = FileController()
 
 @app_views.route("/upload", methods=["POST"])
 @jwt_required(optional=True)
-@handle_errors
+#@handle_errors
 @swag_from("docs/app_views/upload.yaml")
 def upload():
     """save file into server"""
@@ -30,7 +30,7 @@ def upload():
     if "file" not in request.files:
         return make_response_("error", "No file part"), 400
 
-    major_id = request.json.get("major_id", None)
+    major_id = request.form.get("major_id", None)
 
     file_path, original_filename = file_controller.handle_upload(
         request.files["file"], dir_.get(role, ApplicationConfig.UPLOAD_TEMP)
