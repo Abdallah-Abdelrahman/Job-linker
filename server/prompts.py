@@ -44,7 +44,6 @@ JOB_PROMPT = """\
     Please extract the following information from this job description and provide it in the form of a dictionary:
     {
       "job_title": "<str: The title of the job>",
-      "major": "<str: The major field of study required for the job>",
       "exper_years": "<str: The number of years of experience required>",
       "skills": ["<str: Skill 1>", "<str: Skill 2>", "..."],
       "location": "<str: The location of the job>",
@@ -55,7 +54,6 @@ JOB_PROMPT = """\
     Notes:
     - Please enclose each property in double quotes.
     - The 'skills' should be represented as lists of strings, each string being a separate skill.
-    - If the 'major' is not mentioned explicit try to understand the job and select a suitable major.
     - The 'application_deadline' should be represented as a string in ISO 8601 format (e.g., "2024-05-11T08:06:13.000000") if Not specified set its value to 'None'.
     - If a particular piece of information is not available in the job description, please set its value to 'None'.
     """

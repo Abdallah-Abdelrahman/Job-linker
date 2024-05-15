@@ -46,7 +46,13 @@ class FileController:
 
         return file_path, file.filename
 
-    def process_upload(self, file_path, original_filename, user_id):
+    def process_upload(
+            self,
+            file_path,
+            original_filename,
+            user_id,
+            major_id=None
+            ):
         """Process the uploaded file based on the user's role."""
         ai = AIService(pdf=file_path)
 
@@ -80,6 +86,7 @@ class FileController:
 
         elif user and user.role == "recruiter":
             ai_data = ai.to_dict(JOB_PROMPT)
+            ai_data['major_id'] = major_id
             creator = AIJobCreator(user_id, ai_data)
             job = creator.create_job()
             new_file_path = os.path.join(

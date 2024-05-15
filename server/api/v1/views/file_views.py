@@ -30,12 +30,14 @@ def upload():
     if "file" not in request.files:
         return make_response_("error", "No file part"), 400
 
+    major_id = request.form.get('major_id', None)
+
     file_path, original_filename = file_controller.handle_upload(
         request.files["file"], dir_.get(role, ApplicationConfig.UPLOAD_TEMP)
     )
     user_id = get_jwt_identity()
     message, data, status_code = file_controller.process_upload(
-        file_path, original_filename, user_id
+        file_path, original_filename, user_id, major_id
     )
     return make_response_("success", message, data), status_code
 
