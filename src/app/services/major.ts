@@ -10,7 +10,7 @@ export const majorApi = api.injectEndpoints({
     getMajors: builder.query<Major[], void>({
       query: () => 'majors',
     }),
-    createMajor: builder.mutation<Major, Partial<Major>>({
+    createMajor: builder.mutation<{ data: Major }, Partial<Major>>({
       query: (body) => ({
         url: 'majors',
         method: 'POST',

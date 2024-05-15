@@ -13,6 +13,7 @@ function Header() {
   // token refresher
   useRefresh();
 
+  // TODO: logout should be a button not a page
   return (
     <header className='container mx-auto mt-4 pt-4 border-t border-x bg-white rounded-lg'>
       <nav className='nav flex justify-center gap-4 md:gap-10'>
