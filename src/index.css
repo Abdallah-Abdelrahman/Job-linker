@@ -158,6 +158,5 @@ li > a {
 }
 
 .progress-bar {
-    background: linear-gradient(to right, red, yellow, green);
-    animation: fill 2s ease-in-out;
+    background: linear-gradient(to right, red, yellow, green) !important;
 }
