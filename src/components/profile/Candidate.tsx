@@ -1,6 +1,14 @@
 import { Text, Heading, Box, Stack } from '@chakra-ui/react';
 import MyIcon from '../Icon';
 
+type Education = {
+  degree: string;
+  institute: string;
+  start_date: Date;
+  end_date: Date;
+  description: string;
+}
+
 type Experience = {
   title: string,
   company: string,
@@ -38,7 +46,8 @@ type Data = {
     skills: Skill[],
     languages: Language[],
     applications: Application[],
-    experiences: Experience[]
+    experiences: Experience[],
+    education: Education[]
   },
 }
 interface CandidateProp {
@@ -116,6 +125,30 @@ function Candidate({ data }: CandidateProp) {
               </Box>
 
             )}
+          </Box>
+        </Box>
+	{/*Education*/}
+        <Box>
+          <Heading as='h4' mb='4' size='lg' className='capitalize'>
+            education
+          </Heading>
+          <Box as='ul' className='flex flex-col gap-4'>
+            {data.candidate.education.map((ed, idx) => (
+              <Box key={idx} as='li'>
+                <Box className='flex justify-between flex-wrap gap-3 w-full'>
+                  <Heading as='h6' size='md' className='capitalize'>
+                    {ed.degree}
+                  </Heading>
+                  <Box>
+                    <span className='mr-2'>at {ed.institute}</span>
+                    <span className='span-gray-500'>
+                      {formateDate(ed.start_date)} - {formateDate(ed.end_date)}
+                    </span>
+                  </Box>
+                </Box>
+		<Text className='mt-2'>{ed.description}</Text>
+              </Box>
+            ))}
           </Box>
         </Box>
       </Box>
