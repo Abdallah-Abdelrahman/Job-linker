@@ -7,6 +7,7 @@ from server.exception import UnauthorizedError
 from server.models import storage
 from server.models.application import Application
 from server.models.candidate import Candidate
+from server.models.education import Education
 from server.models.job import Job
 from server.models.language import Language
 from server.models.major import Major
@@ -180,6 +181,7 @@ class AdminController:
             "total_skills": Skill,
             "total_majors": Major,
             "total_work_experiences": WorkExperience,
+            "total_educations": Education,
         }
 
         return {name: storage.count(model) for name, model in models.items()}
