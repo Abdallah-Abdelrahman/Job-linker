@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Text, Heading, Box, Stack, Button, Collapse } from '@chakra-ui/react';
+import { Text, Heading, Box, Stack, Button, Collapse, useDisclosure } from '@chakra-ui/react';
 import MyIcon from '../Icon';
-import { useGetJobQuery } from '../../app/services/job';
+import MyModal from '../MyModal';
+import { AddJob } from '../job';
 
 type Job = {
   id: string;
@@ -40,19 +40,8 @@ interface RecruiterProp {
 }
 
 function Recruiter({ data }: RecruiterProp) {
+  const { isOpen, onClose, onOpen } = useDisclosure();
 
-  const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
-  const { data: jobDetails, isLoading: isJobDetailsLoading, refetch } = useGetJobQuery({ job_id: expandedJobId }, {
-    enabled: false,
-  });
-
-  useEffect(() => {
-    if (expandedJobId) {
-      refetch({ job_id: expandedJobId });
-    }
-  }, [expandedJobId, refetch]);
-
- console.log({data})
   return (
     <Box className='grid grid-cols-4 gap-6 container mt-4 mx-auto sm:grid-cols-12'>
       <Box className='col-span-4 bg-white flex p-6 flex-col items-center gap-2 rounded-md shadow-md sm:col-span-4'>
@@ -62,7 +51,6 @@ function Recruiter({ data }: RecruiterProp) {
         <Heading as='h2' size='lg' className='capitalize'>{data.name}</Heading>
         <Text className='tracking-wide'>{data.contact_info.company_name}</Text>
         <hr className='w-full' />
-
         <Stack className='w-full mt-2 space-y-6'>
           <Contact_info data={data.contact_info} />
         </Stack>
@@ -70,11 +58,27 @@ function Recruiter({ data }: RecruiterProp) {
 
       <Box className='col-span-4 bg-white flex flex-col rounded-md shadow-md p-6 gap-4 sm:col-span-8'>
         {/*Jobs*/}
-        <Box>
+        <Box className='relative'>
           <Heading as='h4' mb='4' size='lg' className='capitalize'>
             Jobs
           </Heading>
-            <Box as='ul' className='flex flex-col gap-4'>
+          <Button
+            className='!absolute !right-0 !top-0 hover:border-sky-300'
+            onClick={onOpen}
+          >
+            {/* job modal */}
+            <MyModal
+              title='add new job'
+              isOpen={isOpen}
+              onClose={onClose}
+              body={<AddJob />}
+              confirm={<Button type='submit' form='job'>add</Button>}
+            />
+            <MyIcon href='/sprite.svg#plus' className='w-6 h-6' />
+          </Button>
+
+          {data.recruiter.jobs.length > 0
+            ? <Box as='ul' className='flex flex-col gap-4'>
               {data.recruiter.jobs.map((job, idx) =>
                 <Box key={idx} as='li'>
                   <Box className='flex justify-between flex-wrap gap-3 w-full'>
@@ -87,22 +91,12 @@ function Recruiter({ data }: RecruiterProp) {
                     </Box>
                   </Box>
                   <Text className='mt-2'>{job.job_description}</Text>
-                  <Button onClick={() => setExpandedJobId(job.id === expandedJobId ? null : job.id)}>
-        		{job.id === expandedJobId ? "Hide Details" : "Show Details"}
-        	</Button>
-        <Collapse in={job.id === expandedJobId}>
-          {isJobDetailsLoading || !jobDetails || !jobDetails.data ? (
-            <div>Loading...</div>
-          ) : (
-            <div>
-              {/* ... display other job details ... */}
-              <p>Status: {jobDetails.data.is_open ? '**Open**' : '**Closed**'}</p>
-            </div>
-          )}
-        </Collapse>
-                </Box>
-              )}
-            </Box> 
+                </Box>)}
+            </Box>
+            : <>
+              <Text>you haven't created any job yet, hit the plus sign to add new one</Text>
+            </>}
+
         </Box>
       </Box>
     </Box>

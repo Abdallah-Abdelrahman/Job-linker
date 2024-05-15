@@ -29,8 +29,6 @@ const Profile = () => {
     data: userData = { data: {} },
     isLoading,
     isSuccess,
-    isFetching,
-    error,
   } = useAfterRefreshQuery<{ data: User }>(useMeQuery);
   const [updateUser] = useUpdateMeMutation();
   const [uploadCV, { isLoading: cvLoading }] = useUploadMutation();
@@ -68,28 +66,30 @@ const Profile = () => {
   };
 
   const handleRecruiterFormSubmit = async (formdata: FormData) => {
-  try {
-    createRecruiter()
-      .unwrap()
-      .then(_ => {
-        updateUser({ contact_info: Object.fromEntries(formdata) })
-          .unwrap()
-          .then(_ => {
-            updateUser({ profile_complete: true })
-              .then(_ => console.log('----------profile completed-------->'))
-              .catch(err => console.log('------not completed---->', { err }));
-          })
-          .catch((error) => {
-            console.error(error);
-          });
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  } catch (error) {
-    console.error(error);
-  }  
-};
+    formdata.delete('role');
+
+    try {
+      createRecruiter()
+        .unwrap()
+        .then(_ => {
+          updateUser({ contact_info: Object.fromEntries(formdata) })
+            .unwrap()
+            .then(_ => {
+              updateUser({ profile_complete: true })
+                .then(_ => console.log('----------profile completed-------->'))
+                .catch(err => console.log('------not completed---->', { err }));
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (role == 'candidate' && isSuccess && userData.data.profile_complete)
     return (<Candidate data={userData.data} />);
