@@ -48,7 +48,7 @@ As a professional data extraction system, please extract the following informati
   "location": "<str: The location of the job>",
   "job_description": "<str: A detailed description of the job>",
   "application_deadline": "<str: The last date to apply for the job in ISO 8601 format>",
-  "responsibilities": ["<str: Responsibility 1>", "<str: Responsibility 2>", "..."]  # Add this line
+  "responsibilities": ["<str: Responsibility 1>", "<str: Responsibility 2>", "..."]
 }
 
 Guidelines:
