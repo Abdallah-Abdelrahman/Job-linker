@@ -1,3 +1,5 @@
+import json
+
 """Contains the Email templates used in the app"""
 
 
@@ -72,6 +74,38 @@ def rejection_email(name, company_name, job_title):
 
     <p>Best regards,<br>
     {company_name} Recruitment Team</p>
+    </body>
+    </html>
+    """
+
+
+def shortlisted_candidates_email(recruiter_name, company_name, job_title, candidates):
+    """Notify the recruiter about the shortlisted candidates"""
+    # Create a string that lists all the shortlisted candidates
+    candidates_list = ""
+    for name, email, contact_info in candidates:
+        contact_info_dict = json.loads(contact_info)
+        phone = contact_info_dict.get("phone", "N/A")
+        address = contact_info_dict.get("address", "N/A")
+        linkedin = contact_info_dict.get("linkedin", "N/A")
+        github = contact_info_dict.get("github", "N/A")
+        candidates_list += f"<li>Name: {name}, Email: {email}, Phone Number: {phone}, Address: {address}, LinkedIn: {linkedin}, GitHub: {github}</li>"
+
+    return f"""
+    <html>
+    <body>
+    <p>Dear {recruiter_name},</p>
+
+    <p>The job posting for the position of <b>{job_title}</b> at <b>{company_name}</b> has been closed. Here are the candidates that have been shortlisted:</p>
+
+    <ul>
+    {candidates_list}
+    </ul>
+
+    <p>You may now proceed with scheduling interviews with these candidates.</p>
+
+    <p>Best regards,<br>
+    Joblinker Team</p>
     </body>
     </html>
     """

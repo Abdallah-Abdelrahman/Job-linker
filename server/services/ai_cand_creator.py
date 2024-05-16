@@ -107,8 +107,9 @@ class AICandidateProfileCreator:
             ["start_date", "end_date"],
             {
                 "field_of_study": "Not specified",
-                "description": "Not specified"
-                },
+                "description": "Not specified",
+                "degree": "Not specified",
+            },
         )
         process_fields(
             self.experiences,

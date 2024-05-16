@@ -16,8 +16,8 @@ class AIJobCreator:
 
     Attributes
     ----------
-    recruiter_id : str
-        a string representing the recruiter's ID
+    user_id : str
+        a string representing the user's ID
     ai_data : dict
         a dictionary containing the AI data
     job_controller : JobController
@@ -28,8 +28,8 @@ class AIJobCreator:
         an instance of the SkillController class
     """
 
-    def __init__(self, recruiter_id, ai_data):
-        self.recruiter_id = recruiter_id
+    def __init__(self, user_id, ai_data):
+        self.user_id = user_id
         self.ai_data = ai_data
         self.job_controller = JobController()
         self.major_controller = MajorController()
@@ -67,7 +67,7 @@ class AIJobCreator:
                 self.ai_data["application_deadline"]
             )
 
-        print('----job ai------->', self.ai_data)
+        print("----job ai------->", self.ai_data)
         # Validate data
         try:
             self.ai_data = job_schema.load(self.ai_data)
@@ -75,10 +75,7 @@ class AIJobCreator:
             raise ValueError(err.messages)
 
         # Create new job
-        new_job = self.job_controller.create_job(
-                self.recruiter_id,
-                self.ai_data
-                )
+        new_job = self.job_controller.create_job(self.user_id, self.ai_data)
 
         # Add Skills
         self._add_skills(new_job, skills)
@@ -88,4 +85,4 @@ class AIJobCreator:
         """Adds skills to the job"""
         for skill_name in skills:
             skill = self.skill_controller.create_skill({"name": skill_name})
-            self.job_controller.add_skill(self.recruiter_id, job.id, skill.id)
+            self.job_controller.add_skill(self.user_id, job.id, skill.id)
