@@ -21,7 +21,7 @@ class Job(BaseModel, Base):
 
     recruiter_id = Column(
             String(60),
-            ForeignKey("recruiters.user_id"),
+            ForeignKey("recruiters.id"),
             nullable=False
             )
     major_id = Column(String(60), ForeignKey("majors.id"), nullable=False)
