@@ -36,6 +36,7 @@ CANDID_PROMPT = """\
     - Enclose each property in double quotes.
     - The 'start_date' and 'end_date' should respect the format '%Y-%m-%dT%H:%M:%S.%f'.
     - If the 'end_date' is 'present' set it to the current date.
+    - Skills: Extract the skills listed in the CV. Each skill should be represented by a string and listed in an array. Each skill should not exceed 100 characters.
     - Each language should be represented by a string containing the language name.
     """
 
@@ -116,19 +117,21 @@ Example Response:
 """
 
 JOB_MATCHING_PROMPT = """\
-As an advanced matching system, please evaluate the compatibility between the candidate's experiences and skills and the job's description and required skills. Provide a match score as a float between 0.0 and 1.0, where 1.0 indicates a perfect match and 0.0 indicates no match at all.
+As an advanced matching system, please evaluate the compatibility between the candidate's experiences, skills, and education and the job's description, required skills, and responsibilities. Provide a match score as a float between 0.0 and 1.0, where 1.0 indicates a perfect match and 0.0 indicates no match at all.
 
 Important Factors:
 1. Relevant Skills: Evaluate how well the candidate's skills match the required skills for the job.
 2. Years of Experience: Consider the candidate's years of experience in the relevant field compared to the job requirements.
 3. Alignment with Job Description: Assess how closely the candidate's experiences align with the job description.
+4. Education: Consider the candidate's education background and how well it aligns with the job requirements.
+5. Job Responsibilities: Evaluate how well the candidate's past experiences and skills align with the responsibilities of the job.
 
 Output Format:
 - Return only a single float number as the match score.
 - Do not provide any descriptive text or additional explanations.
 
 Example:
-A candidate who has all the required skills, significant years of relevant experience, and experiences closely aligned with the job description might receive a score close to 1.0. Conversely, a candidate lacking the required skills and relevant experience might receive a score close to 0.0.
+A candidate who has all the required skills, significant years of relevant experience, a suitable education background, and experiences closely aligned with the job description and responsibilities might receive a score close to 1.0. Conversely, a candidate lacking these might receive a score close to 0.0.
 
 Please provide the match score based on the above criteria.
 """
