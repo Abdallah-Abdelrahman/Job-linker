@@ -5,6 +5,7 @@ Job-linker application.
 
 import json
 
+from fuzzywuzzy import fuzz
 from marshmallow import ValidationError
 
 from server.controllers.schemas import job_schema
@@ -75,7 +76,7 @@ class JobController:
 
         # Create new job
         new_job = Job(
-            recruiter_id=recruiter.user_id,
+            recruiter_id=recruiter.id,
             major_id=data["major_id"],
             job_title=data["job_title"],
             job_description=data["job_description"],
@@ -301,12 +302,10 @@ class JobController:
         if not skill:
             raise ValueError("Skill not found")
 
-        if skill in job.skills:
-            raise ValueError("Skill already added")
-
-        # Add skill to job
-        job.skills.append(skill)
-        storage.save()
+        # Add skill to job only if it's not already added
+        if skill not in job.skills:
+            job.skills.append(skill)
+            storage.save()
 
         return job
 
@@ -380,17 +379,13 @@ class JobController:
                 "applications_count": len(applications),
                 "application_deadline": job.application_deadline,
                 "is_open": job.is_open,
+                "location": job.location,
+                "salary": job.salary,
+                "exper_years": job.exper_years,
+                "skills": [skill.name for skill in job.skills],
             }
             if company_name is not None:
-                job_data.update(
-                    {
-                        "company_name": company_name,
-                        "location": job.location,
-                        "salary": job.salary,
-                        "exper_years": job.exper_years,
-                        "skills": [skill.name for skill in job.skills],
-                    }
-                )
+                job_data.update({"company_name": company_name})
             return job_data
 
         # Check if user is a candidate
@@ -523,21 +518,27 @@ class JobController:
             A list of jobs that match the search criteria.
         """
         jobs_dict = storage.all(Job)
+        matched_jobs = {}
 
-        # Filter jobs by location and title
-        if location is not None:
-            jobs_dict = {
-                    k: v for k, v in jobs_dict.items()
-                    if v.location == location
-                    }
-        if title is not None:
-            jobs_dict = {
-                k: v
-                for k, v in jobs_dict.items()
-                if title.lower() in v.job_title.lower()
-            }
+        for k, v in jobs_dict.items():
+            # Calculate match scores for location and title
+            location_score = (
+                fuzz.token_set_ratio(location.lower(), v.location.lower())
+                if location
+                else 100
+            )
+            title_score = (
+                fuzz.token_set_ratio(title.lower(), v.job_title.lower())
+                if title
+                else 100
+            )
 
-        jobs = [job.to_dict for job in jobs_dict.values()]
+            # If both scores are above a certain threshold
+            # add the job to the results
+            if location_score > 70 and title_score > 70:
+                matched_jobs[k] = v
+
+        jobs = [job.to_dict for job in matched_jobs.values()]
 
         return jobs
 

@@ -2,8 +2,8 @@
 
 import uuid
 from datetime import datetime
-from dateutil.parser import parse
 
+from dateutil.parser import parse
 from sqlalchemy import Column, DateTime, String
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -12,7 +12,14 @@ Base = declarative_base()
 
 class BaseModel:
     """The BaseModel class from which future classes will be derived"""
-    __DATES = ("updated_at", "created_at", "start_date", "end_date")
+
+    __DATES = (
+        "updated_at",
+        "created_at",
+        "start_date",
+        "end_date",
+        "application_deadline",
+    )
 
     id = Column(
             String(60),
@@ -40,11 +47,15 @@ class BaseModel:
             return
         for k, v in kwargs.items():
             if k != "__class__":
-                setattr(self, k, v if k not in self.__DATES
-                        else self._str_to_date(v, k=k))
+                setattr(
+                    self, k, v if k not in self.__DATES
+                    else self._str_to_date(v, k=k)
+                )
 
     def _str_to_date(self, date_str, k=""):
         """Convert a string to a datetime object"""
+        if isinstance(date_str, datetime):
+            return date_str
         try:
             if k in ("start_date", "end_date"):
                 return parse(date_str)

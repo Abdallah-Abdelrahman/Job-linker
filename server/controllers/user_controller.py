@@ -5,7 +5,7 @@ Job-linker application.
 
 from json import dumps, loads
 
-from flask import current_app, url_for
+from flask import current_app
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
@@ -256,7 +256,7 @@ class UserController:
             recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
             if not recruiter:
                 return user_data
-            jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.user_id)
+            jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
             if recruiter:
                 user_data["recruiter"] = {
                     "jobs": [job.to_dict for job in jobs],
