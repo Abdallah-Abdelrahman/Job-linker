@@ -5,10 +5,15 @@ Job-linker application.
 
 import json
 
+from fuzzywuzzy import fuzz
 from marshmallow import ValidationError
 
 from server.controllers.schemas import job_schema
-from server.email_templates import rejection_email, shortlisted_email
+from server.email_templates import (
+    rejection_email,
+    shortlisted_candidates_email,
+    shortlisted_email,
+)
 from server.exception import UnauthorizedError
 from server.models import storage
 from server.models.application import Application
@@ -25,6 +30,10 @@ class JobController:
     """
     Controller for Job model.
     """
+
+    MATCH_SCORE_THRESHOLD = 0.4
+    STATUS_SHORTLISTED = "shortlisted"
+    STATUS_REJECTED = "rejected"
 
     def __init__(self):
         """
@@ -75,13 +84,14 @@ class JobController:
 
         # Create new job
         new_job = Job(
-            recruiter_id=recruiter.user_id,
+            recruiter_id=recruiter.id,
             major_id=data["major_id"],
             job_title=data["job_title"],
             job_description=data["job_description"],
             exper_years=data.get("exper_years"),
             salary=data.get("salary"),
             location=data.get("location"),
+            responsibilities=data.get("responsibilities", {}),
             application_deadline=data.get("application_deadline"),
             is_open=data.get("is_open", True),
         )
@@ -166,6 +176,7 @@ class JobController:
                 "skills": [skill.name for skill in job.skills],
                 "application_deadline": job.application_deadline,
                 "is_open": job.is_open,
+                "responsibilities": job.responsibilities,
             }
         raise ValueError("Recruiter not found")
 
@@ -209,38 +220,50 @@ class JobController:
             setattr(job, key, value)
 
         # If the job is closed, shortlist candidates and send emails
+        # and notify the recruiter with the shortlisted candidates
         if is_being_closed:
-            applications = storage.get_all_by_attr(
-                    Application,
-                    "job_id",
-                    job.id
-                    )
-            for application in applications:
-                # Prepare the email
-                candidate = storage.get(Candidate, application.candidate_id)
-                email = candidate.user.email
-                name = candidate.user.name
-                company_name = json.loads(recruiter.user.contact_info).get(
-                    "company_name"
-                )
-                job_title = job.job_title
-
-                if application.match_score > 0.4:
-                    application.application_status = "shortlisted"
-                    # Create the email template
-                    template = shortlisted_email(name, company_name, job_title)
-                else:
-                    application.application_status = "rejected"
-                    # Create the email template
-                    template = rejection_email(name, company_name, job_title)
-
-                # Send the email
-                self.email_service.send_mail(template, email, name)
-                storage.save()
+            self.handle_job_closure(job, recruiter)
 
         storage.save()
 
         return job
+
+    def handle_job_closure(self, job, recruiter):
+        """Handle Job Closing Process and email notifications"""
+        applications = storage.get_all_by_attr(Application, "job_id", job.id)
+        shortlisted_candidates = []
+        for application in applications:
+            candidate = storage.get(Candidate, application.candidate_id)
+            email = candidate.user.email
+            name = candidate.user.name
+            contact_info = candidate.user.contact_info
+            company_name = json.loads(
+                    recruiter.user.contact_info
+                    ).get("company_name")
+            job_title = job.job_title
+
+            if application.match_score > self.MATCH_SCORE_THRESHOLD:
+                application.application_status = self.STATUS_SHORTLISTED
+                template = shortlisted_email(name, company_name, job_title)
+                shortlisted_candidates.append((name, email, contact_info))
+            else:
+                application.application_status = self.STATUS_REJECTED
+                template = rejection_email(name, company_name, job_title)
+
+            self.email_service.send_mail(template, email, name)
+            storage.save()
+
+        recruiter_email = recruiter.user.email
+        shortlisted_template = shortlisted_candidates_email(
+            recruiter.user.name,
+            company_name,
+            job_title,
+            shortlisted_candidates
+        )
+        self.email_service.send_mail(
+                shortlisted_template,
+                recruiter_email, "Recruiter"
+                )
 
     def delete_job(self, user_id, job_id):
         """
@@ -301,12 +324,10 @@ class JobController:
         if not skill:
             raise ValueError("Skill not found")
 
-        if skill in job.skills:
-            raise ValueError("Skill already added")
-
-        # Add skill to job
-        job.skills.append(skill)
-        storage.save()
+        # Add skill to job only if it's not already added
+        if skill not in job.skills:
+            job.skills.append(skill)
+            storage.save()
 
         return job
 
@@ -380,17 +401,14 @@ class JobController:
                 "applications_count": len(applications),
                 "application_deadline": job.application_deadline,
                 "is_open": job.is_open,
+                "location": job.location,
+                "salary": job.salary,
+                "exper_years": job.exper_years,
+                "skills": [skill.name for skill in job.skills],
+                "responsibilities": job.responsibilities,
             }
             if company_name is not None:
-                job_data.update(
-                    {
-                        "company_name": company_name,
-                        "location": job.location,
-                        "salary": job.salary,
-                        "exper_years": job.exper_years,
-                        "skills": [skill.name for skill in job.skills],
-                    }
-                )
+                job_data.update({"company_name": company_name})
             return job_data
 
         # Check if user is a candidate
@@ -457,6 +475,7 @@ class JobController:
                 "salary": job.salary,
                 "exper_years": job.exper_years,
                 "skills": [skill.name for skill in job.skills],
+                "responsibilities": job.responsibilities,
             }
             if company_name is not None:
                 job_data.update(
@@ -523,21 +542,27 @@ class JobController:
             A list of jobs that match the search criteria.
         """
         jobs_dict = storage.all(Job)
+        matched_jobs = {}
 
-        # Filter jobs by location and title
-        if location is not None:
-            jobs_dict = {
-                    k: v for k, v in jobs_dict.items()
-                    if v.location == location
-                    }
-        if title is not None:
-            jobs_dict = {
-                k: v
-                for k, v in jobs_dict.items()
-                if title.lower() in v.job_title.lower()
-            }
+        for k, v in jobs_dict.items():
+            # Calculate match scores for location and title
+            location_score = (
+                fuzz.token_set_ratio(location.lower(), v.location.lower())
+                if location
+                else 100
+            )
+            title_score = (
+                fuzz.token_set_ratio(title.lower(), v.job_title.lower())
+                if title
+                else 100
+            )
 
-        jobs = [job.to_dict for job in jobs_dict.values()]
+            # If both scores are above a certain threshold
+            # add the job to the results
+            if location_score > 70 and title_score > 70:
+                matched_jobs[k] = v
+
+        jobs = [job.to_dict for job in matched_jobs.values()]
 
         return jobs
 

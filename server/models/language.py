@@ -11,9 +11,9 @@ candidate_languages = Table(
     Column(
         "candidate_id",
         String(60),
-        ForeignKey("candidates.user_id"),
+        ForeignKey("candidates.id"),
         primary_key=True
-    ),
+        ),
     Column(
         "lang_id",
         String(60),

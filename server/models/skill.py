@@ -2,13 +2,13 @@
 from sqlalchemy import Column, ForeignKey, String, Table
 from sqlalchemy.orm import relationship
 
-from server.models.base_model import BaseModel, Base
+from server.models.base_model import Base, BaseModel
 
 # Association table for Candidate-Skill many-to-many relationship
 candidate_skills = Table(
     "candidate_skills",
     Base.metadata,
-    Column("candidate_id", String(60), ForeignKey("candidates.user_id")),
+    Column("candidate_id", String(60), ForeignKey("candidates.id")),
     Column("skill_id", String(60), ForeignKey("skills.id")),
 )
 
