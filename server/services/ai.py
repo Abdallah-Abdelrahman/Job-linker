@@ -10,6 +10,7 @@ from pdfminer.high_level import extract_text
 from pdfminer.pdfparser import PDFSyntaxError
 import google.generativeai as genai
 from dateutil.parser import parse, ParserError
+from dateutil.relativedelta import relativedelta
 from server.exception import UnreadableCVError
 from server.prompts import CANDID_PROMPT, JOB_PROMPT, ATS_FRIENDLY_PROMPT
 
@@ -99,7 +100,7 @@ class AIService():
             text += chunk.text
         return text
 
-    def __handle_cv(self, dict_:Dict[str, Any]) -> Dict[str, Any]:
+    def __handle_cv(self, dict_: Dict[str, Any]) -> Dict[str, Any]:
         '''clean the dictionary received from ai'''
         xps = dict_.get('experiences')
         eds = dict_.get('educations')
@@ -124,7 +125,7 @@ class AIService():
                         ed[k] = datetime.utcnow().isoformat()
         return dict_
 
-    def __handle_job(self, dict_:Dict[str, Any]) -> Dict[str, Any]:
+    def __handle_job(self, dict_: Dict[str, Any]) -> Dict[str, Any]:
         '''clean the dictionary received from ai'''
         app_deadline = dict_.get('application_deadline')
         desc = dict_.get('job_description')
@@ -134,7 +135,8 @@ class AIService():
             try:
                 dict_['application_deadline'] = parse(app_deadline).isoformat()
             except (ParserError, TypeError):
-                dict_['application_deadline'] = None
+                one_month_ahead = datetime.utcnow() + relativedelta(months=1)
+                dict_['application_deadline'] = one_month_ahead.isoformat()
         return dict_
 
     def to_dict(self, prompt_enquiry, text=''):
@@ -182,7 +184,7 @@ if __name__ == '__main__':
     ai = AIService(pdf=f'{getcwd()}/server/cv/2024-05-13-01-02-49_Abdallah.pdf')
     dict_ = ai.to_dict(CANDID_PROMPT)
     print(dict_)
-    #print(ai.get_insights())
+    # print(ai.get_insights())
     '''
     for pdf in listdir('pdf'):
         ai = AIService(pdf=path.join('pdf', pdf))
