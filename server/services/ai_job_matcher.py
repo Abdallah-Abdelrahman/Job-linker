@@ -1,5 +1,6 @@
 """Calculat the match between applied Candidate and Job using AI"""
 
+
 from server.prompts import JOB_MATCHING_PROMPT
 from server.services.ai import AIService
 
@@ -27,9 +28,10 @@ class AIJobMatcher:
         """
         Calculate the match score between the candidate and the job.
 
-        Concatenate the candidate's experiences and skills and the job's
-        description and skills into one text, add a prompt to tell the AI
-        to make the comparison, and return a match_score.
+        Concatenate the candidate's experiences, skills, and education and
+        the job's description, skills, and responsibilities into one text,
+        add a prompt to tell the AI to make the comparison, and return a
+        match_score.
 
         Returns:
             float: The match score.
@@ -40,19 +42,32 @@ class AIJobMatcher:
         candidate_skills = " ".join(
                 [skill.name for skill in self.candidate.skills]
                 )
+
+        candidate_education = " ".join(
+            [
+                f"{edu.degree} in {edu.field_of_study} from {edu.description}"
+                for edu in self.candidate.educations
+            ]
+        )
+
         candidate_info = (
-            "Candidate's experiences and skills: "
+            "Candidate's experiences, skills, and education:"
             + candidate_experiences
             + " "
             + candidate_skills
+            + " "
+            + candidate_education
         )
 
         job_skills = " ".join([skill.name for skill in self.job.skills])
+        job_responsibilities = " ".join(self.job.responsibilities)
         job_info = (
-            "Job's description and Required skills: "
+            "Job's description, required skills, and responsibilities:"
             + self.job.job_description
             + " "
             + job_skills
+            + " "
+            + job_responsibilities
         )
 
         combined_info = candidate_info + " " + job_info
