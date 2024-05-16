@@ -83,6 +83,7 @@ class JobController:
             exper_years=data.get("exper_years"),
             salary=data.get("salary"),
             location=data.get("location"),
+            responsibilities=data.get("responsibilities", {}),
             application_deadline=data.get("application_deadline"),
             is_open=data.get("is_open", True),
         )
@@ -167,6 +168,7 @@ class JobController:
                 "skills": [skill.name for skill in job.skills],
                 "application_deadline": job.application_deadline,
                 "is_open": job.is_open,
+                "responsibilities": job.responsibilities,
             }
         raise ValueError("Recruiter not found")
 
@@ -383,6 +385,7 @@ class JobController:
                 "salary": job.salary,
                 "exper_years": job.exper_years,
                 "skills": [skill.name for skill in job.skills],
+                "responsibilities": job.responsibilities,
             }
             if company_name is not None:
                 job_data.update({"company_name": company_name})
@@ -391,7 +394,11 @@ class JobController:
         # Check if user is a candidate
         candidate = storage.get_by_attr(Candidate, "user_id", user_id)
         if candidate:
-            jobs = storage.get_all_by_attr(Job, "major_id", candidate.major_id)
+            jobs = storage.get_all_by_attr(
+                    Job,
+                    "major_id",
+                    candidate.major_id
+                    )
             if not jobs:
                 raise ValueError("No jobs found for your major")
 
@@ -408,15 +415,19 @@ class JobController:
                 if (recruiter := storage.get_by_attr(
                     Recruiter,
                     "id",
-                    job.recruiter_id
-                    ))
+                    job.recruiter_id)
+                    )
                 is not None
             ]
 
         # Check if user is a recruiter
         recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
         if recruiter:
-            jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
+            jobs = storage.get_all_by_attr(
+                    Job,
+                    "recruiter_id",
+                    recruiter.id
+                    )
             if not jobs:
                 raise ValueError("No jobs found")
 
@@ -452,6 +463,7 @@ class JobController:
                 "salary": job.salary,
                 "exper_years": job.exper_years,
                 "skills": [skill.name for skill in job.skills],
+                "responsibilities": job.responsibilities,
             }
             if company_name is not None:
                 job_data.update(
@@ -470,15 +482,16 @@ class JobController:
                 job,
                 storage.get_all_by_attr(Application, "job_id", job.id),
                 json.loads(recruiter.user.contact_info).get("company_name")
-                if recruiter and recruiter.user and recruiter.user.contact_info
+                if recruiter and recruiter.user
+                and recruiter.user.contact_info
                 else None,
             )
             for job in jobs
             if (recruiter := storage.get_by_attr(
                 Recruiter,
                 "id",
-                job.recruiter_id
-                ))
+                job.recruiter_id)
+                )
             is not None
         ]
 

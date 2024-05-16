@@ -47,7 +47,8 @@ As a professional data extraction system, please extract the following informati
   "skills": ["<str: Skill 1>", "<str: Skill 2>", "..."],
   "location": "<str: The location of the job>",
   "job_description": "<str: A detailed description of the job>",
-  "application_deadline": "<str: The last date to apply for the job in ISO 8601 format>"
+  "application_deadline": "<str: The last date to apply for the job in ISO 8601 format>",
+  "responsibilities": ["<str: Responsibility 1>", "<str: Responsibility 2>", "..."]  # Add this line
 }
 
 Guidelines:
@@ -55,9 +56,10 @@ Guidelines:
 2. Experience Years: Extract the number of years of experience required. If not specified, set the value to 'None'.
 3. Skills: Extract the required skills and list them as strings within an array. Each skill should not exceed 100 characters. If not specified, set the value to an empty list.
 4. Location: Extract the job location. If not specified, set the value to 'None'.
-5. Job Description*: Provide a detailed description of the job as mentioned in the text.
+5. Job Description: Provide a detailed description of the job as mentioned in the text.
 6. Application Deadline: Extract the application deadline in ISO 8601 format (e.g., "2024-05-11T08:06:13.000000"). If not specified, set its value to 'None'.
-7. Format: Ensure each property is enclosed in double quotes and the structure of the dictionary is maintained.
+7. Responsibilities: Extract the job responsibilities and list them as strings within an array. Each responsibility should not exceed 200 characters. If not specified, set the value to an empty list.  # Add this line
+8. Format: Ensure each property is enclosed in double quotes and the structure of the dictionary is maintained.
 
 Example Response:
 {
@@ -66,7 +68,8 @@ Example Response:
   "skills": ["Python", "Django", "REST APIs"],
   "location": "New York, NY",
   "job_description": "We are looking for a skilled Software Engineer...",
-  "application_deadline": "2024-05-11T08:06:13.000000"
+  "application_deadline": "2024-05-11T08:06:13.000000",
+  "responsibilities": ["Develop and maintain software", "Collaborate with cross-functional teams"]  # Add this line
 }
 
 Notes:
