@@ -9,7 +9,11 @@ from fuzzywuzzy import fuzz
 from marshmallow import ValidationError
 
 from server.controllers.schemas import job_schema
-from server.email_templates import rejection_email, shortlisted_email
+from server.email_templates import (
+    rejection_email,
+    shortlisted_candidates_email,
+    shortlisted_email,
+)
 from server.exception import UnauthorizedError
 from server.models import storage
 from server.models.application import Application
@@ -26,6 +30,10 @@ class JobController:
     """
     Controller for Job model.
     """
+
+    MATCH_SCORE_THRESHOLD = 0.4
+    STATUS_SHORTLISTED = "shortlisted"
+    STATUS_REJECTED = "rejected"
 
     def __init__(self):
         """
@@ -212,38 +220,50 @@ class JobController:
             setattr(job, key, value)
 
         # If the job is closed, shortlist candidates and send emails
+        # and notify the recruiter with the shortlisted candidates
         if is_being_closed:
-            applications = storage.get_all_by_attr(
-                    Application,
-                    "job_id",
-                    job.id
-                    )
-            for application in applications:
-                # Prepare the email
-                candidate = storage.get(Candidate, application.candidate_id)
-                email = candidate.user.email
-                name = candidate.user.name
-                company_name = json.loads(recruiter.user.contact_info).get(
-                    "company_name"
-                )
-                job_title = job.job_title
-
-                if application.match_score > 0.4:
-                    application.application_status = "shortlisted"
-                    # Create the email template
-                    template = shortlisted_email(name, company_name, job_title)
-                else:
-                    application.application_status = "rejected"
-                    # Create the email template
-                    template = rejection_email(name, company_name, job_title)
-
-                # Send the email
-                self.email_service.send_mail(template, email, name)
-                storage.save()
+            self.handle_job_closure(job, recruiter)
 
         storage.save()
 
         return job
+
+    def handle_job_closure(self, job, recruiter):
+        """Handle Job Closing Process and email notifications"""
+        applications = storage.get_all_by_attr(Application, "job_id", job.id)
+        shortlisted_candidates = []
+        for application in applications:
+            candidate = storage.get(Candidate, application.candidate_id)
+            email = candidate.user.email
+            name = candidate.user.name
+            contact_info = candidate.user.contact_info
+            company_name = json.loads(
+                    recruiter.user.contact_info
+                    ).get("company_name")
+            job_title = job.job_title
+
+            if application.match_score > self.MATCH_SCORE_THRESHOLD:
+                application.application_status = self.STATUS_SHORTLISTED
+                template = shortlisted_email(name, company_name, job_title)
+                shortlisted_candidates.append((name, email, contact_info))
+            else:
+                application.application_status = self.STATUS_REJECTED
+                template = rejection_email(name, company_name, job_title)
+
+            self.email_service.send_mail(template, email, name)
+            storage.save()
+
+        recruiter_email = recruiter.user.email
+        shortlisted_template = shortlisted_candidates_email(
+            recruiter.user.name,
+            company_name,
+            job_title,
+            shortlisted_candidates
+        )
+        self.email_service.send_mail(
+                shortlisted_template,
+                recruiter_email, "Recruiter"
+                )
 
     def delete_job(self, user_id, job_id):
         """
@@ -394,11 +414,7 @@ class JobController:
         # Check if user is a candidate
         candidate = storage.get_by_attr(Candidate, "user_id", user_id)
         if candidate:
-            jobs = storage.get_all_by_attr(
-                    Job,
-                    "major_id",
-                    candidate.major_id
-                    )
+            jobs = storage.get_all_by_attr(Job, "major_id", candidate.major_id)
             if not jobs:
                 raise ValueError("No jobs found for your major")
 
@@ -415,19 +431,15 @@ class JobController:
                 if (recruiter := storage.get_by_attr(
                     Recruiter,
                     "id",
-                    job.recruiter_id)
-                    )
+                    job.recruiter_id
+                    ))
                 is not None
             ]
 
         # Check if user is a recruiter
         recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
         if recruiter:
-            jobs = storage.get_all_by_attr(
-                    Job,
-                    "recruiter_id",
-                    recruiter.id
-                    )
+            jobs = storage.get_all_by_attr(Job, "recruiter_id", recruiter.id)
             if not jobs:
                 raise ValueError("No jobs found")
 
@@ -482,16 +494,15 @@ class JobController:
                 job,
                 storage.get_all_by_attr(Application, "job_id", job.id),
                 json.loads(recruiter.user.contact_info).get("company_name")
-                if recruiter and recruiter.user
-                and recruiter.user.contact_info
+                if recruiter and recruiter.user and recruiter.user.contact_info
                 else None,
             )
             for job in jobs
             if (recruiter := storage.get_by_attr(
                 Recruiter,
                 "id",
-                job.recruiter_id)
-                )
+                job.recruiter_id
+                ))
             is not None
         ]
 

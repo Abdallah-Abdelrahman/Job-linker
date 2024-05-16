@@ -40,15 +40,18 @@ class MailService:
         # Turn these into plain/html MIMEText objects
         part1 = MIMEText(TEXT, "plain")
         part2 = MIMEText(HTML, "html")
-        
+
         # Add HTML/plain-text parts to MIMEMultipart message
         # The receiver_email client will try to render the last part first
         message.attach(part1)
         message.attach(part2)
-        
-        with smtplib.SMTP_SSL(self.__SMTP_SERVER, self.__PORT,
-                              context=self.__CONTEXT) as server:
-            server.login(self.__SENDER_EMAIL, self.__PASSWORD)
-            # Send receiver_email here
-            server.sendmail(self.__SENDER_EMAIL,
-                            receiver_email, message.as_string())
+
+        try:
+            with smtplib.SMTP_SSL(self.__SMTP_SERVER, self.__PORT,
+                                  context=self.__CONTEXT) as server:
+                server.login(self.__SENDER_EMAIL, self.__PASSWORD)
+                # Send receiver_email here
+                server.sendmail(self.__SENDER_EMAIL,
+                                receiver_email, message.as_string())
+        except Exception as e:
+            print(f"An error occurred while sending the email: {e}")
