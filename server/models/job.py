@@ -1,13 +1,14 @@
 """Job Model"""
 from sqlalchemy import (
-        Boolean,
-        Column,
-        DateTime,
-        ForeignKey,
-        Numeric,
-        String,
-        Text
-        )
+    JSON,
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Numeric,
+    String,
+    Text,
+)
 from sqlalchemy.orm import relationship
 
 from server.models.base_model import Base, BaseModel
@@ -32,6 +33,7 @@ class Job(BaseModel, Base):
     salary = Column(Numeric(precision=10, scale=2, asdecimal=False))
     application_deadline = Column(DateTime, nullable=True)
     is_open = Column(Boolean, default=True)
+    responsibilities = Column(JSON, nullable=True)
 
     # Relationship with Skill
     skills = relationship(
@@ -53,6 +55,7 @@ class Job(BaseModel, Base):
         dict_["major"] = self.major.name
         dict_["application_deadline"] = self.application_deadline
         dict_["is_open"] = self.is_open
+        dict_["responsibilities"] = self.responsibilities
         return dict_
 
     def __repr__(self):
