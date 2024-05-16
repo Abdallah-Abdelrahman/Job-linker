@@ -1,60 +1,9 @@
 import { Text, Heading, Box, Stack } from '@chakra-ui/react';
 import MyIcon from '../Icon';
+import * as T from './types';
 
-type Education = {
-  degree: string;
-  institute: string;
-  start_date: Date;
-  end_date: Date;
-  description: string;
-}
 
-type Experience = {
-  title: string,
-  company: string,
-  start_date: Date,
-  end_date: Date,
-  description: string
-}
-type Application = {
-  title: string,
-  company: string,
-  start_date: Date,
-  end_date: Date,
-  description: string
-}
-type Skill = {
-  id: string,
-  name: string
-}
-type Contact = {
-  address: string,
-  linkded: string,
-  github: string,
-  phone: string,
-  whatsapp: string
-}
-type Language = { id: string, name: string }
-type Data = {
-  name: string,
-  email: string,
-  image_url: string,
-  contact_info: Contact,
-  bio: string,
-  candidate: {
-    major: { name: string },
-    skills: Skill[],
-    languages: Language[],
-    applications: Application[],
-    experiences: Experience[],
-    education: Education[]
-  },
-}
-interface CandidateProp {
-  data: Data
-}
-
-function Candidate({ data }: CandidateProp) {
+function Candidate({ data }: T.CandidateProp) {
   return (
     <Box className='grid grid-cols-4 gap-6 container mt-4 mx-auto sm:grid-cols-12'>
       <Box className='col-span-4 bg-white flex p-6 flex-col items-center gap-2 rounded-md shadow-md sm:col-span-4'>
@@ -157,7 +106,7 @@ function Candidate({ data }: CandidateProp) {
 
 }
 
-function Contact_info({ data }: { data: Contact }) {
+export function Contact_info({ data }: { data: Contact }) {
   if (!data) {
     return (null);
   }

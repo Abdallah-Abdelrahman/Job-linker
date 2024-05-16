@@ -1,46 +1,12 @@
-import { Text, Heading, Box, Stack, Button, useDisclosure, Skeleton, SkeletonText } from '@chakra-ui/react';
+import { Text, Heading, Box, Stack, Button, useDisclosure, SkeletonText } from '@chakra-ui/react';
 import MyIcon from '../Icon';
 import MyModal from '../MyModal';
 import { AddJob } from '../job';
 import { useState } from 'react';
+import * as T  from './types';
+import { Contact_info } from './Candidate';
 
-type Job = {
-  id: string;
-  application_deadline: Date | null;
-  exper_years: string;
-  is_open: boolean;
-  job_description: string;
-  job_title: string;
-  location: string;
-  major: string;
-  salary: number;
-  skills: string[];
-}
-
-type Recruiter = {
-  jobs: Job[];
-}
-
-type ContactInfo = {
-  company_address: string;
-  company_email: string;
-  company_name: string;
-}
-
-type Data = {
-  bio: string | null;
-  contact_info: ContactInfo;
-  email: string;
-  image_url: string | null;
-  name: string;
-  recruiter: Recruiter;
-}
-
-interface RecruiterProp {
-  data: Data;
-}
-
-function Recruiter({ data }: RecruiterProp) {
+function Recruiter({ data }: T.RecruiterProp) {
   const { isOpen, onClose, onOpen } = useDisclosure();
   const [isLoading, setLoading] = useState(false);
   const [isUninitialized, setInitialized] = useState(true);
@@ -107,29 +73,6 @@ function Recruiter({ data }: RecruiterProp) {
 
         </Box>
       </Box>
-    </Box>
-  );
-}
-
-function Contact_info({ data }: { data: ContactInfo }) {
-  if (!data) {
-    return (null);
-  }
-
-  return (
-    <Box as='section' className='flex flex-col gap-4'>
-      <Heading as='h4' mb='2' size='lg' className='capitalize'>contact info</Heading>
-      {Object.entries(data).map(([k, v]) => {
-        if (!v) return (null);
-        return (<Box key={k} className='flex gap-3'>
-          <MyIcon href={`/sprite.svg#${k}`} className='w-5 h-5' />
-          {k == 'linkedin' || k == 'github'
-            ? <a href={v} target='_blank' className='text-sky-500'>{k}</a>
-            : <Text>{v}</Text>}
-        </Box>
-        );
-      }
-      )}
     </Box>
   );
 }

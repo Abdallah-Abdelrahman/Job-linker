@@ -90,12 +90,16 @@ const Profile = () => {
     }
   };
 
+  // candidate profile
   if (role == 'candidate' && isSuccess && userData.data.profile_complete)
     return (<Candidate data={userData.data} />);
 
+  // recruiter profile
   if (role == 'recruiter' && isSuccess && userData.data.profile_complete)
     return (<Recruiter data={userData.data} />);
 
+  // if user hasn't completed their profile yet,
+  // return a form to complete
   return (
     <Box className='mx-auto max-w-2xl my-8'>
       <Skeleton isLoaded={!isLoading}>
