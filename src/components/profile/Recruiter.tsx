@@ -55,7 +55,7 @@ function Recruiter({ data }: T.RecruiterProp) {
                 body={isUninitialized
                   ? <AddJob setLoading={setLoading} setUnInitialized={setUnInitialized} />
                   : <SkeletonText isLoaded={!isLoading}>
-                    <Text className='text-green-300'>your file has been parsed successfully</Text>
+                    <Text className='text-teal-500'>your file has been parsed successfully</Text>
                   </SkeletonText>
                 }
                 confirm={<Button type='submit' form='job'>add</Button>}
@@ -71,27 +71,33 @@ function Recruiter({ data }: T.RecruiterProp) {
                 </Box>
                 : data.recruiter.jobs.map((job, idx) => {
                   return (
-                    <Link key={idx} className='border-2 border-black' to={`jobs/${job.id}`}>
-                      <Box as='li'>
-                        <Box className='flex justify-between flex-wrap gap-3 w-full'>
-                          <Heading as='h6' size='md' className='capitalize'>{job.job_title}</Heading>
-                          <Box>
-                            <span className='mr-2'>Location: {job.location}</span>
-                            <span className='span-gray-500'>
-                              Salary: {job.salary}
-                            </span>
+                    <Box key={idx} as='li' className='p-2 ring-1 ring-gray-300  rounded-md'>
+                      <Box className='space-y-2'>
+                        <Heading as='h6' size='md' className='capitalize'>{job.job_title}</Heading>
+                        <Box className='flex gap-2'>
+                          <Box className='flex gap-1 items-start'>
+                            <MyIcon href='/sprite.svg#location' className='w-6 h-6 fill-gray-300' />
+                            <Text className='text-gray-500'>Location</Text>
                           </Box>
+                          <Text>{job.location}</Text>
                         </Box>
-                        <JobDesc desc={job.job_description} />
+                        <Box className='flex gap-2'>
+                          <Box className='flex items-end gap-1'>
+                            <MyIcon href='/sprite.svg#money' className='w-6 h-6 fill-gray-300' />
+                            <Text className='text-gray-500 leading-snug'>salary</Text>
+                          </Box>
+                          <Text>{job.salary}</Text>
+                        </Box>
+                        <JobDesc desc={job.job_description} id={job.id} />
                       </Box>
-                    </Link>
+                    </Box>
                   );
                 }
                 )
               }
             </Box>)
             : (<>
-              <Text>you haven't created any job yet, hit the plus sign to add new one</Text>
+              <Text color='gray.500'>you haven't created any job yet, hit the plus sign to add new one</Text>
             </>)}
 
         </Box>
@@ -102,28 +108,22 @@ function Recruiter({ data }: T.RecruiterProp) {
 
 type DescProps = {
   desc: string
+  id: string
 }
-function JobDesc({ desc }: DescProps) {
-  const { isOpen, onToggle } = useDisclosure();
-  const desc_part1 = desc.substring(0, 200);
-  const desc_part2 = desc.substring(200);
+function JobDesc({ id, desc }: DescProps) {
+  const desc_sub = desc.substring(0, 200);
 
   return (
     <Box>
-      {desc.length > 200
-        ? <>
-          {!isOpen && desc_part1 + '...'}
-          <Collapse in={isOpen} animateOpacity>
-            {desc_part1 + desc_part2}
-          </Collapse>
-          <Button onClick={(evt) => {
-            evt.stopPropagation();
-            evt.preventDefault();
-            onToggle();
-          }}>{isOpen ? 'see less' : 'see more'}</Button>
-        </>
-        : desc
-      }
+      <Text>
+        {desc.length > 200
+          ? desc_sub + '...'
+          : desc + '...'
+        }
+        <Link className='text-sky-500' to={`jobs/${id}`}>
+          see more
+        </Link>
+      </Text>
     </Box>
   );
 }

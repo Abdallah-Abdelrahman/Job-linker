@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider, useParams } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './app/store.ts';
 import { ChakraProvider } from '@chakra-ui/react';
@@ -12,12 +12,8 @@ import {
 import { ErrorPage, Layout, Private } from './components';
 import { Verify, Register, Login, Profile, Home } from './routes';
 import './index.css';
+import { Job } from './components/job';
 
-function Job() {
-  const param = useParams();
-
-  return (<h1>{param.job_id}</h1>);
-}
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<Layout />} errorElement={<ErrorPage />}>
