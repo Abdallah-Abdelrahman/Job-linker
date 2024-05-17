@@ -1,11 +1,6 @@
 import {
   Box,
   Heading,
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  Select,
   Skeleton,
 } from '@chakra-ui/react';
 import { User, useMeQuery, useUpdateMeMutation, useUploadMutation } from '../app/services/auth';

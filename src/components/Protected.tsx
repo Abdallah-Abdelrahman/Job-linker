@@ -15,12 +15,11 @@ function Private() {
     }
   }, [user, navigate]);
 
-  if (isAuthenticated) {
-    return <Outlet />;
-  }
-  if (user.isRefreshing)
-    return <SkeletonText mt='4' noOfLines={4} spacing='4' skeletonHeight='2' />;
-  return null;
+  return (
+    <SkeletonText spacing={4}  isLoaded={!user.isRefreshing}>
+      {isAuthenticated ? <Outlet /> : null}
+    </SkeletonText>
+  );
 }
 
 export default Private;

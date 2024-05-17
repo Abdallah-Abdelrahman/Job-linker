@@ -1,5 +1,13 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { RootState } from '../store';
+import { setCredentials } from '../../features/auth';
+import type {
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+} from '@reduxjs/toolkit/query';
+import { unsetCredentials } from '../../features/auth/authSlice';
+
 
 export interface ServerResponse<T> {
   message: string
@@ -28,18 +36,55 @@ export interface RegisterRequest {
   role: 'candidate' | 'recruiter';
 }
 
+const baseQuery = fetchBaseQuery({
+  baseUrl: '/api/v1',
+  prepareHeaders: async (headers, { getState }) => {
+    const token = (getState() as RootState).auth.jwt;
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
+    return (headers);
+  }
+});
+
+const baseQueryWithReauth: BaseQueryFn<
+  string | FetchArgs,
+  unknown,
+  FetchBaseQueryError
+> = async (args, api, extraOptions) => {
+  let result = await baseQuery(args, api, extraOptions);
+
+  if (result.error && result.error.status === 401) {
+    console.log('-------token expires------->');
+    api.dispatch(setCredentials({ isRefreshing: true }));
+
+    // try to get a new token
+    const refreshResult = await baseQuery({
+      url: '/refresh',
+      method: 'POST',
+      headers: { 'X-CSRF-TOKEN': document.cookie.split('=')[1] },
+      credentials: 'include',
+    }, api, extraOptions);
+
+
+    if (refreshResult.data) {
+      // store the new token
+      api.dispatch(setCredentials({
+        ...refreshResult.data.data, isRefreshed: true, isRefreshing: false
+      }));
+
+      // retry the initial query
+      result = await baseQuery(args, api, extraOptions);
+    } else {
+      // no refresh token; logout
+      api.dispatch(unsetCredentials());
+    }
+  }
+  return (result);
+};
+
 export const api = createApi({
-  baseQuery: fetchBaseQuery({
-    baseUrl: '/api/v1',
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).auth.jwt;
-      if (token) {
-        //console.log({ token });
-        headers.set('Authorization', `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: baseQueryWithReauth,
   tagTypes: ['me', 'refresh', 'candidates', 'recruiters'],
   endpoints: (builder) => ({
     login: builder.mutation<UserResponse, LoginRequest>({
