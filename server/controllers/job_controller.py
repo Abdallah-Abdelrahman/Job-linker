@@ -150,10 +150,13 @@ class JobController:
                 "id": job.id,
                 "job_title": job.job_title,
                 "job_description": job.job_description,
+                "location": job.location,
+                "salary": job.salary,
                 "applied_candidates": applied_candidates,
                 "created_at": job.created_at,
                 "application_deadline": job.application_deadline,
                 "is_open": job.is_open,
+                'responsibilities': job.responsibilities
             }
 
         # If the user is a candidate, add a count displays the number
