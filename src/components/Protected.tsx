@@ -9,6 +9,7 @@ function Private() {
   const navigate = useNavigate();
   const isAuthenticated = user.jwt || user.isRefreshed;
 
+  // if user not authenticated redirect to login page
   useEffect(() => {
     if (!user.isRefreshing && !user.isRefreshed) {
       navigate('/login', { replace: true, state: user });
