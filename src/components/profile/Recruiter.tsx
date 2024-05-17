@@ -50,7 +50,11 @@ function Recruiter({ data }: T.RecruiterProp) {
               <MyModal
                 title='add new job'
                 isOpen={isOpen}
-                onClose={onClose}
+                onClose={()=>{
+                  onClose();
+                  setUnInitialized(true);
+                  setLoading(false);
+                }}
                 body={isUninitialized
                   ? <AddJob setLoading={setLoading} setUnInitialized={setUnInitialized} />
                   : <SkeletonText isLoaded={!isLoading}>
