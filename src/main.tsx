@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider } from 'react-router-dom';
+import { Navigate, RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './app/store.ts';
 import { ChakraProvider } from '@chakra-ui/react';
@@ -20,12 +20,14 @@ const router = createBrowserRouter(
       <Route index element={<Home />} />
       <Route path='signup' element={<Register />} />
       <Route path='login' element={<Login />} />
+      <Route path='logout' element={<Navigate to='/' />} />
       <Route path='verify' element={<Verify />} />
       <Route element={<Private />}>
         <Route path='@me' element={<Profile />}>
           <Route path='jobs/:job_id' element={<Job />} />
         </Route>
       </Route>
+      <Route path='*' element={<ErrorPage />} />
     </Route>
   ),
 );
