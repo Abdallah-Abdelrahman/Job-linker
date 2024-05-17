@@ -13,7 +13,6 @@ function Recruiter({ data }: T.RecruiterProp) {
   const [isUninitialized, setUnInitialized] = useState(true);
   const match = useMatch('@me/jobs/:job_id');
 
-  console.log({ match });
 
   return (
     <Box className='grid grid-cols-4 gap-6 container mt-4 mx-auto sm:grid-cols-12'>
@@ -58,7 +57,17 @@ function Recruiter({ data }: T.RecruiterProp) {
                     <Text className='text-teal-500'>your file has been parsed successfully</Text>
                   </SkeletonText>
                 }
-                confirm={<Button type='submit' form='job'>add</Button>}
+                confirm={
+                  <Button
+                    isLoading={isLoading}
+                    type='submit'
+                    form='job'
+                    disabled={isLoading}
+                    className='!bg-sky-400 !text-white'
+                  >
+                    add
+                  </Button>
+                }
               />
               <MyIcon href='/sprite.svg#plus' className='w-6 h-6' />
             </Button>}
