@@ -4,7 +4,7 @@ TMUX := $(shell command -v tmux 2> /dev/null)
 YARN := $(shell command -v yarn 2> /dev/null)
 NPM := $(shell command -v npm 2> /dev/null)
 PIP := $(shell command -v pip 2> /dev/null)
-PYTHON := python3.10
+PYTHON := $(shell command -v python3.10 2> /dev/null)
 VENV_DIR := server/venv
 
 setup: check-dependencies create-venv install-dependencies
@@ -25,7 +25,9 @@ endif
 
 ifndef PYTHON
 	sudo apt-get update
-	sudo apt-get install -y python3.10 python3.10-venv python3.10-dev
+	sudo add-apt-repository ppa:deadsnakes/ppa # Add custom APT repository
+	sudo apt-get install -y python3.10 python3.10-venv python3.10-dev # Install Python 3.10
+	curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10 # Install PIP for Python 3.10
 endif
 
 create-venv:
