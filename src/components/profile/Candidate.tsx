@@ -60,23 +60,35 @@ function Candidate({ data }: T.CandidateProp) {
           <Box as='ul' className='flex flex-col gap-4'>
             {data.candidate.experiences.map((xp, idx) =>
               <Box key={idx} as='li'>
-                <Box className='flex justify-between flex-wrap gap-3 w-full'>
-                  <Heading as='h6' size='md' className='capitalize'>{xp.title}</Heading>
-                  <Box>
-                    <span className='mr-2'>at {xp.company}</span>
-                    <span className='span-gray-500'>
-                      {formateDate(xp.start_date)} - {formateDate(xp.end_date)}
-                    </span>
+                <Box className='flex flex-col gap-3 w-full'>
+                  <Heading as='h6' size='md' className='capitalize'>{xp.title.toLowerCase()}</Heading>
+                  <Box className='space-y-2'>
+                    <Box className='flex gap-2'>
+                      <Box className='flex gap-1'>
+                        <MyIcon href='/sprite.svg#company' className='w-5 h-5 fill-gray-500' />
+                        <Text className='text-gray-500' children='at' />
+                      </Box>
+                      <Text className='capitalize font-semibold' children={xp.company.toLowerCase()} />
+                    </Box>
+                    <Box className='flex gap-2'>
+                      <Box className='flex gap-1 text-gray-500'>
+                        <MyIcon href='/sprite.svg#date' className='w-5 h-5 fill-gray-500' />
+                        <Text children='date' />
+                      </Box>
+                      <Text
+                        className='font-semibold'
+                        children={`${formateDate(xp.start_date)} - ${formateDate(xp.end_date)}`}
+                      />
+                    </Box>
                   </Box>
                 </Box>
-                {/* TODO: use dangerousely html to handle bullet-points */}
                 <Text className='mt-2'>{xp.description}</Text>
               </Box>
 
             )}
           </Box>
         </Box>
-	{/*Education*/}
+        {/*Education*/}
         <Box>
           <Heading as='h4' mb='4' size='lg' className='capitalize'>
             education
@@ -84,18 +96,40 @@ function Candidate({ data }: T.CandidateProp) {
           <Box as='ul' className='flex flex-col gap-4'>
             {data.candidate.education.map((ed, idx) => (
               <Box key={idx} as='li'>
-                <Box className='flex justify-between flex-wrap gap-3 w-full'>
-                  <Heading as='h6' size='md' className='capitalize'>
-                    {ed.degree}
-                  </Heading>
-                  <Box>
-                    <span className='mr-2'>at {ed.institute}</span>
-                    <span className='span-gray-500'>
+                <Box className='flex flex-col gap-3 w-full'>
+                  <Box className='flex gap-2'>
+                    <Box className='flex gap-1'>
+                      <MyIcon
+                        href='/sprite.svg#field_of_study'
+                        className='w-5 h-5 fill-gray-500'
+                      />
+                      <Text className='text-gray-500'>field</Text>
+                    </Box>
+                    <Text className='font-semibold'>{ed.field_of_study}</Text>
+                  </Box>
+                  <Box className='flex gap-2'>
+                    <Box className='flex gap-1'>
+                      <MyIcon
+                        href='/sprite.svg#degree'
+                        className='w-5 h-5 fill-gray-500'
+                      />
+                      <Text className='text-gray-500'>degree</Text>
+                    </Box>
+                    <Text className='font-semibold'>{ed.degree}</Text>
+                  </Box>
+                  <Box className='flex gap-2'>
+                    <Box className='flex gap-1'>
+                      <MyIcon
+                        href='/sprite.svg#date'
+                        className='w-5 h-5 fill-gray-500'
+                      />
+                      <Text className='text-gray-500'>date</Text>
+                    </Box>
+                    <Text className='font-semibold'>
                       {formateDate(ed.start_date)} - {formateDate(ed.end_date)}
-                    </span>
+                    </Text>
                   </Box>
                 </Box>
-		<Text className='mt-2'>{ed.description}</Text>
               </Box>
             ))}
           </Box>

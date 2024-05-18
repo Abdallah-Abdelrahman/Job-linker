@@ -10,7 +10,7 @@ function Verify() {
   const parmas = new URLSearchParams(window.location.search);
   const navigate = useNavigate();
   const token = parmas.get('token');
-  const { data, isLoading, isSuccess, isUninitialized } = useVerfiyQuery({ token });
+  const { data, isLoading, isError, isSuccess, isUninitialized } = useVerfiyQuery({ token });
   const dispatch = useAppDispatch();
   console.log({token})
 
@@ -19,7 +19,10 @@ function Verify() {
       dispatch(setCredentials(data));
       navigate('/@me');
     }
-  }, [token, isSuccess, dispatch, data, navigate]);
+    if (isError) {
+      navigate('/login');
+    }
+  }, [token, isSuccess, isError, dispatch, data, navigate]);
 
   if (isUninitialized || isLoading) {
     return (<SkeletonText mt='4' noOfLines={4} spacing='4' skeletonHeight='2' />);
