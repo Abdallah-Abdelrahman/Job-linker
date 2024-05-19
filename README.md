@@ -1,6 +1,7 @@
 # Job Linker
 
-The application links between recruiters and candidates in one unified platform.
+It's an AI powered application that links between recruiters and candidates in one unified platform.<br>
+Tt helps candidates refine their cv by giving them ats insights, find in-demand jobs, ease the process for recruiters to find skilled candidates through the help of AI.
 
 ## Technologies :
 
@@ -13,22 +14,29 @@ The application links between recruiters and candidates in one unified platform.
     + [flask](https://flask.palletsprojects.com/en/3.0.x/) to manage api services
     + [SQLAlchemy](https://www.sqlalchemy.org/) the so-called orm
 
-## Installation :
-
-+ clone the repo
-+ navigate to project tree and run `yarn` or `npm install` if you're using `npm`
-+ navigate to `api` directory:
-    - run `python3 -m venv venv`
-    - run `source venv/bin/activate`
-    - run `pip install -r requirements`
+## Installation and Run :
++ clone the repo.
++ navigate to the project tree.
+- #### unix-like systems:
+    + ensure you have `make` utility installed on your machine.
+    + run `make setup` to install all project libraries and dependencies (front and back altogether).
+    + on successful installation, run `make run` to run backend and frontend altogether.
+    + if any dependancy fail on installation, try to install it manually.
+    + now you're good to go, open up your browser and type `localhost:5173`. voila!
++ #### windows system: 
+    - run `yarn` or `npm install` if you're using `npm` to install frontend dependancies.
+    - navigate to `server` directory:
+    - run `python3 -m venv venv`, make sure you have python3.9+ installed.
+    - run `source venv/bin/activate`.
+    - run `pip install -r requirements`.
+    - from the project root directory run `yarn api` to start backend api service.
+    - run `yarn dev` to startoff your frontend. 
 
 ## How to use :
+ + head over to [google](https://aistudio.google.com/app/apikey) and generate an api key, and put it in your environment variable under the name `GOOGLE_API_KEY`, to utilize the power of ai.
+ + Explore the platform and if you like it, please give us a star.
 
- + In on terminal runs `api` service `yarn api` or `npm run api`
- + In another session runs the client `yarn dev` or `npm run dev`
- + You can read more about package.json `scripts` work in
+## Inspiration :
+<!-- TODO -->
 
- **_Notes_ :** <br/>
-+ In order to proxy any endpoint you can edit `vite.config.ts` file.<br/>
-+ All backend code lives in `server/` direcrtoy.<br/>
-+ visit [npm](https://docs.npmjs.com/cli/v10/configuring-npm/package-json) to learn more about the `package.json` file.
+## License :
