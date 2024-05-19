@@ -7,3 +7,4 @@ export { default as Insights } from './Insights';
 export { default as Header } from './Header';
 export { default as Footer } from './Footer';
 export { default as MyModal } from './MyModal';
+export { default as Explore } from './Explore';
