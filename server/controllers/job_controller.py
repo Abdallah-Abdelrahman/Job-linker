@@ -139,6 +139,7 @@ class JobController:
             # candidates names and emails
             applied_candidates = [
                 {
+                    "id": app.candidate.user.id,
                     "name": app.candidate.user.name,
                     "email": app.candidate.user.email,
                     "application_status": app.application_status,
