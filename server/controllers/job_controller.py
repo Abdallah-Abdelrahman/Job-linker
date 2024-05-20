@@ -182,7 +182,8 @@ class JobController:
                 "is_open": job.is_open,
                 "responsibilities": job.responsibilities,
             }
-        raise ValueError("Recruiter not found")
+        # raise ValueError("Recruiter not found")
+        return job.to_dict
 
     def update_job(self, user_id, job_id, data):
         """

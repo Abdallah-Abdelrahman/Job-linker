@@ -65,7 +65,7 @@ function Header() {
         />
         <NavLink
           className='py-3 px-4 md:px-5'
-          to='search'
+          to='find_jobs'
           children='find jobs'
         />
       </nav>

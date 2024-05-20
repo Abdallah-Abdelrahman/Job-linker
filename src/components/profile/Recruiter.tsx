@@ -1,4 +1,4 @@
-import { Text, Heading, Box, Stack, Button, useDisclosure, SkeletonText, Collapse } from '@chakra-ui/react';
+import { Text, Heading, Box, Stack, Button, useDisclosure, SkeletonText } from '@chakra-ui/react';
 import MyIcon from '../Icon';
 import MyModal from '../MyModal';
 import { AddJob } from '../job';
@@ -75,7 +75,6 @@ function Recruiter({ data }: T.RecruiterProp) {
               />
               <MyIcon href='/sprite.svg#plus' className='w-6 h-6' />
             </Button>}
-
           {data.recruiter.jobs.length > 0
             ? (<Box as='ul' className='flex flex-col gap-4'>
               {match
