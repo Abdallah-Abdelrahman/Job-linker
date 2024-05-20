@@ -567,7 +567,10 @@ class JobController:
             if location_score > 70 and title_score > 70:
                 matched_jobs[k] = v
 
-        jobs = [job.to_dict for job in matched_jobs.values()]
+        jobs = list(matched_jobs.values())
+        jobs.sort(key=lambda job: job.created_at, reverse=True)
+
+        jobs = [job.to_dict for job in jobs]
 
         return jobs
 
