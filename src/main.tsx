@@ -9,8 +9,8 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from 'react-router-dom';
-import { ErrorPage, Explore, Layout, Private } from './components';
-import { Verify, Register, Login, Profile, Home } from './routes';
+import { ErrorPage, Layout, Private } from './components';
+import { Verify, Register, Login, Profile, Home, Explore } from './routes';
 import './index.css';
 import { Job } from './components/job';
 
@@ -18,7 +18,9 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<Layout />} errorElement={<ErrorPage />}>
       <Route index element={<Home />} />
-      <Route path='search' element={<Explore />} />
+      <Route path='find_jobs' element={<Explore />}>
+        <Route path=':job_id' element={<Job />} />
+      </Route>
       <Route path='signup' element={<Register />} />
       <Route path='login' element={<Login />} />
       <Route path='verify' element={<Verify />} />

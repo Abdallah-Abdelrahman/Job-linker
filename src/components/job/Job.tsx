@@ -1,11 +1,28 @@
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useGetJobQuery } from '../../app/services/job';
-import { Box, Heading, ListItem, Skeleton, Text, UnorderedList } from '@chakra-ui/react';
+import { Box, Button, Heading, ListItem, Skeleton, Text, UnorderedList, useDisclosure } from '@chakra-ui/react';
 import MyIcon from '../Icon';
+import { useAppSelector } from '../../hooks/store';
+import { selectCurrentUser } from '../../features/auth';
+import { useCreateApplicationMutation } from '../../app/services/application';
+import MyModal from '../MyModal';
 
 function Job() {
   const { job_id } = useParams();
+  const user = useAppSelector(selectCurrentUser);
+  const { onClose, isOpen, onOpen } = useDisclosure();
   const { data: job = { data: {} }, isSuccess } = useGetJobQuery({ job_id });
+  const [apply, { isLoading, applySuccess, error }] = useCreateApplicationMutation();
+
+  const handleApply = () => {
+    apply({ job_id })
+      .unwrap()
+      .catch(err => {
+        if (err.status == 401) {
+          onOpen();
+        }
+      });
+  };
 
   return (
     <Box>
@@ -33,6 +50,27 @@ function Job() {
               <ListItem key={idx} children={re} />)}
           </UnorderedList>
         </Box>
+        <MyModal
+          title='error'
+          isOpen={isOpen}
+          body={
+            <Text>
+              you need to <Link className='text-sky-400' to='/login' children='sign in' /> as candidate to be able to apply
+            </Text>
+          }
+          onClose={onClose}
+          confirm={<></>}
+        />
+        {user.role != 'recruiter'
+          ? <Button
+            isLoading={isLoading}
+            size='lg'
+            className='mt-4 !bg-white border border-sky-400'
+            children='apply'
+            onClick={handleApply}
+          />
+          : null}
+
       </Skeleton>
     </Box>
   );

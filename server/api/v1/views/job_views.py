@@ -42,7 +42,7 @@ def create_job():
 
 
 @app_views.route("/jobs/<job_id>", methods=["GET"])
-@jwt_required()
+@jwt_required(optional=True)
 @handle_errors
 @swag_from("docs/app_views/get_job.yaml")
 def get_job(job_id):
