@@ -163,7 +163,7 @@ function Explore() {
                   )
                 }
               </Box>
-              <Box className='col-span-5'>
+              <Box className='col-span-5 min-h-96'>
                 {match ? <Outlet /> : <MyIcon href='/sprite.svg#join-us' className='w-full h-full' />}
               </Box>
             </Box>

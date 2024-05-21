@@ -53,7 +53,8 @@ class CandidateController:
         # Check if candidate already exists
         existing_candidate = storage.get_by_attr(Candidate, "user_id", user_id)
         if existing_candidate:
-            raise ValueError("Candidate already exists for this user")
+            #raise ValueError("Candidate already exists for this user")
+            return existing_candidate
 
         # Validate data
         try:
@@ -289,7 +290,8 @@ class CandidateController:
             raise ValueError("Language not found")
 
         if language in candidate.languages:
-            raise ValueError("Language already added")
+            # raise ValueError("Language already added")
+            return candidate
 
         try:
             candidate.languages.append(language)

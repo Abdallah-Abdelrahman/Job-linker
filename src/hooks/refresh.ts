@@ -23,7 +23,7 @@ function useRefresh() {
           return resp.json();
         })
         .then(({ data }) => {
-          console.log('----useRefresh---->');
+          //console.log('----useRefresh---->');
           dispatch(setCredentials({ ...data, isRefreshing: false }));
         })
         .catch(err => console.error({ err }))
