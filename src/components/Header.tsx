@@ -4,8 +4,9 @@ import { useLogoutMutation } from '../app/services/auth';
 import { useRefresh } from '../hooks';
 import { selectCurrentUser } from '../features/auth';
 import { unsetCredentials } from '../features/auth/authSlice';
-import { IconButton, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
+import { Box, IconButton, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
 import MyIcon from './Icon';
+import logo from '../assets/logo.png';
 
 function Header() {
   const user = useAppSelector(selectCurrentUser);
@@ -21,8 +22,12 @@ function Header() {
       <nav className='nav relative flex justify-center gap-4 md:gap-10'>
         <Link
           to='/'
-          className='absolute py-3 px-3 text-sky-400 left-0 md:px-5'
-          children='joblinker'
+          className='absolute py-3 px-3 text-sky-400 left-0 -bottom-1 md:px-5'
+          children={
+            <Box className='w-12 h-12'>
+              <img src={logo} className='inline-block w-full h-full object-fill' />
+            </Box>
+          }
         />
         <Menu>
           <MenuButton

@@ -70,14 +70,16 @@ const baseQueryWithReauth: BaseQueryFn<
     if (refreshResult.data) {
       // store the new token
       api.dispatch(setCredentials({
-        ...refreshResult.data.data, isRefreshed: true, isRefreshing: false
+        ...refreshResult.data.data,
+        isRefreshed: true,
+        isRefreshing: false
       }));
 
       // retry the initial query
       result = await baseQuery(args, api, extraOptions);
     } else {
       // no refresh token; logout
-      api.dispatch(unsetCredentials());
+      api.dispatch(setCredentials({ isRefreshing: false }));
     }
   }
   return (result);

@@ -30,6 +30,7 @@ const slice = createSlice({
       }: PayloadAction<Partial<AuthState>>,
     ) => {
       const { message, status, ...rest } = payload;
+      console.log('------payload---->',{payload, state});
       return {
         ...state,
         ...rest,
