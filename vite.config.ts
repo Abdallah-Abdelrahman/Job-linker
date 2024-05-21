@@ -3,10 +3,10 @@ import react from "@vitejs/plugin-react-swc";
 import tailwindcss from "tailwindcss";
 
 const env = {
-  development: 'http://0.0.0.0:5000',
-  test: 'http://0.0.0.0:5000',
-  production: ''
-}
+  development: "http://127.0.0.1:5000",
+  test: "http://0.0.0.0:5000",
+  production: "",
+};
 // https://vitejs.dev/config/
 export default defineConfig({
   css: {
@@ -17,7 +17,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': {
+      "/api": {
         target: env[process.env.NODE_ENV],
         changeOrigin: true,
       },
