@@ -3,6 +3,7 @@ This module provides a controller for the User model in the
 Job-linker application.
 """
 
+import os
 from json import dumps, loads
 
 from flask import current_app
@@ -10,7 +11,9 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from marshmallow import ValidationError
+from werkzeug.utils import secure_filename
 
+from server.config import ApplicationConfig
 from server.controllers.schemas import (
         login_schema,
         registration_schema,
@@ -236,9 +239,13 @@ class UserController:
             if candidate:
                 user_data["candidate"] = {
                     "major": candidate.major.to_dict,
-                    "skills": [skill.to_dict for skill in candidate.skills],
+                    "skills": [
+                        skill.to_dict
+                        for skill in candidate.skills
+                        ],
                     "languages": [
-                        language.to_dict for language in candidate.languages
+                        language.to_dict
+                        for language in candidate.languages
                         ],
                     "applications": [
                         application.to_dict
@@ -294,7 +301,6 @@ class UserController:
             "profile_complete",
             "contact_info",
             "bio",
-            "image_url",
         ]
 
         # Validate data
@@ -321,6 +327,44 @@ class UserController:
 
         storage.save()
         return user
+
+    def upload_profile_image(self, user_id, file):
+        """
+        Uploads a profile image for a user and updates
+        their profile in the database.
+
+        Args:
+            user_id: The user's ID.
+            file: The image file.
+
+        Returns:
+            A message, file path (if successful), and HTTP status code.
+        """
+        if (
+            not file
+            or "." not in file.filename
+            or file.filename.rsplit(".", 1)[1].lower()
+            not in ApplicationConfig.ALLOWED_IMAGE_EXTENSIONS
+        ):
+            return "Unsupported file type", None, 400
+
+        if file.content_length > ApplicationConfig.MAX_IMAGE_CONTENT_LENGTH:
+            return "File size exceeds the maximum limit", None, 400
+
+        filename = secure_filename(file.filename)
+        filename = f"{user_id}_{filename}"
+        file_path = os.path.join(ApplicationConfig.UPLOAD_IMAGE, filename)
+        file.save(file_path)
+
+        # Update user profile with the image path
+        user = storage.get(User, user_id)
+        if not user:
+            return "User not found", None, 404
+
+        user.image_url = file_path
+        storage.save()
+
+        return "Image uploaded successfully", {"file_path": file_path}, 201
 
     def delete_current_user(self, user_id):
         """

@@ -16,7 +16,6 @@ from server.api.utils import make_response_
 from server.api.v1.views import app_views, user_controller
 from server.config import ApplicationConfig
 from server.decorators import handle_errors, verified_required
-from server.extensions import cache
 
 
 @app_views.route("/register", methods=["POST"])
@@ -196,6 +195,33 @@ def update_current_user():
         "User details updated successfully",
         {"id": user.id, "role": user.role},
     )
+
+
+@app_views.route("/upload_profile_image", methods=["POST"])
+@jwt_required()
+@verified_required
+@handle_errors
+def upload_profile_image():
+    """
+    Uploads a profile image for the current user.
+
+    Returns:
+        A response object with the status, message, and data if successful.
+        Otherwise, it returns an error message.
+    """
+    user_id = get_jwt_identity()
+    if "file" not in request.files:
+        return make_response_("error", "No file part"), 400
+
+    file = request.files["file"]
+    if file.filename == "":
+        return make_response_("error", "No selected file"), 400
+
+    message, data, status_code = user_controller.upload_profile_image(
+            user_id,
+            file
+            )
+    return make_response_("success", message, data), status_code
 
 
 @app_views.route("/@me", methods=["DELETE"])
