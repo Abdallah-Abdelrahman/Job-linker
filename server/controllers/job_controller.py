@@ -535,7 +535,7 @@ class JobController:
 
         return {"total_count": total_count, "major_counts": major_counts}
 
-    def search_jobs(self, location=None, title=None):
+    def search_jobs(self, location=None, title=None, sort=[]):
         """
         Search for jobs by location and title.
 
@@ -568,7 +568,8 @@ class JobController:
                 matched_jobs[k] = v
 
         jobs = list(matched_jobs.values())
-        jobs.sort(key=lambda job: job.created_at, reverse=True)
+        if 'date' in sort:
+            jobs.sort(key=lambda job: job.created_at, reverse=True)
 
         jobs = [job.to_dict for job in jobs]
 
