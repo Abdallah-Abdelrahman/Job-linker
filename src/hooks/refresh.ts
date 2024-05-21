@@ -6,6 +6,8 @@ function useRefresh() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    let ignore = false;
+
     const reloadHandler = (evt: Event) => {
       evt.preventDefault();
       // refresh token
@@ -15,15 +17,19 @@ function useRefresh() {
         headers: { 'X-CSRF-TOKEN': document.cookie.split('=')[1] }
       })
         .then(resp => {
-          dispatch(setCredentials({ isRefreshing: true, isRefreshed: resp.ok }));
+          if (!ignore) {
+            dispatch(setCredentials({ isRefreshing: true, isRefreshed: resp.ok }));
+          }
           return resp.json();
         })
         .then(({ data }) => {
-          console.log('----refresh---->', { data });
+          console.log('----useRefresh---->');
           dispatch(setCredentials({ ...data, isRefreshing: false }));
         })
         .catch(err => console.error({ err }))
-        .finally(() => dispatch(setCredentials({ isRefreshing: false })));
+        .finally(() => {
+          dispatch(setCredentials({ isRefreshing: false }));
+        });
     };
 
     window.addEventListener('load', reloadHandler);
@@ -31,6 +37,7 @@ function useRefresh() {
     // cleanup
     return () => {
       window.removeEventListener('load', reloadHandler);
+      ignore = true;
     };
   }, [dispatch]);
 }

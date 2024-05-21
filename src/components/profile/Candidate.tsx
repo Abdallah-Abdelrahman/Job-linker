@@ -1,60 +1,9 @@
 import { Text, Heading, Box, Stack } from '@chakra-ui/react';
 import MyIcon from '../Icon';
+import * as T from './types';
 
-type Education = {
-  degree: string;
-  institute: string;
-  start_date: Date;
-  end_date: Date;
-  description: string;
-}
 
-type Experience = {
-  title: string,
-  company: string,
-  start_date: Date,
-  end_date: Date,
-  description: string
-}
-type Application = {
-  title: string,
-  company: string,
-  start_date: Date,
-  end_date: Date,
-  description: string
-}
-type Skill = {
-  id: string,
-  name: string
-}
-type Contact = {
-  address: string,
-  linkded: string,
-  github: string,
-  phone: string,
-  whatsapp: string
-}
-type Language = { id: string, name: string }
-type Data = {
-  name: string,
-  email: string,
-  image_url: string,
-  contact_info: Contact,
-  bio: string,
-  candidate: {
-    major: { name: string },
-    skills: Skill[],
-    languages: Language[],
-    applications: Application[],
-    experiences: Experience[],
-    education: Education[]
-  },
-}
-interface CandidateProp {
-  data: Data
-}
-
-function Candidate({ data }: CandidateProp) {
+function Candidate({ data }: T.CandidateProp) {
   return (
     <Box className='grid grid-cols-4 gap-6 container mt-4 mx-auto sm:grid-cols-12'>
       <Box className='col-span-4 bg-white flex p-6 flex-col items-center gap-2 rounded-md shadow-md sm:col-span-4'>
@@ -111,23 +60,35 @@ function Candidate({ data }: CandidateProp) {
           <Box as='ul' className='flex flex-col gap-4'>
             {data.candidate.experiences.map((xp, idx) =>
               <Box key={idx} as='li'>
-                <Box className='flex justify-between flex-wrap gap-3 w-full'>
-                  <Heading as='h6' size='md' className='capitalize'>{xp.title}</Heading>
-                  <Box>
-                    <span className='mr-2'>at {xp.company}</span>
-                    <span className='span-gray-500'>
-                      {formateDate(xp.start_date)} - {formateDate(xp.end_date)}
-                    </span>
+                <Box className='flex flex-col gap-3 w-full'>
+                  <Heading as='h6' size='md' className='capitalize'>{xp.title.toLowerCase()}</Heading>
+                  <Box className='space-y-2'>
+                    <Box className='flex gap-2'>
+                      <Box className='flex gap-1'>
+                        <MyIcon href='/sprite.svg#company' className='w-5 h-5 fill-gray-500' />
+                        <Text className='text-gray-500' children='at' />
+                      </Box>
+                      <Text className='capitalize font-semibold' children={xp.company.toLowerCase()} />
+                    </Box>
+                    <Box className='flex gap-2'>
+                      <Box className='flex gap-1 text-gray-500'>
+                        <MyIcon href='/sprite.svg#date' className='w-5 h-5 fill-gray-500' />
+                        <Text children='date' />
+                      </Box>
+                      <Text
+                        className='font-semibold'
+                        children={`${formateDate(xp.start_date)} - ${formateDate(xp.end_date)}`}
+                      />
+                    </Box>
                   </Box>
                 </Box>
-                {/* TODO: use dangerousely html to handle bullet-points */}
                 <Text className='mt-2'>{xp.description}</Text>
               </Box>
 
             )}
           </Box>
         </Box>
-	{/*Education*/}
+        {/*Education*/}
         <Box>
           <Heading as='h4' mb='4' size='lg' className='capitalize'>
             education
@@ -135,18 +96,40 @@ function Candidate({ data }: CandidateProp) {
           <Box as='ul' className='flex flex-col gap-4'>
             {data.candidate.education.map((ed, idx) => (
               <Box key={idx} as='li'>
-                <Box className='flex justify-between flex-wrap gap-3 w-full'>
-                  <Heading as='h6' size='md' className='capitalize'>
-                    {ed.degree}
-                  </Heading>
-                  <Box>
-                    <span className='mr-2'>at {ed.institute}</span>
-                    <span className='span-gray-500'>
+                <Box className='flex flex-col gap-3 w-full'>
+                  <Box className='flex gap-2'>
+                    <Box className='flex gap-1'>
+                      <MyIcon
+                        href='/sprite.svg#field_of_study'
+                        className='w-5 h-5 fill-gray-500'
+                      />
+                      <Text className='text-gray-500'>field</Text>
+                    </Box>
+                    <Text className='font-semibold'>{ed.field_of_study}</Text>
+                  </Box>
+                  <Box className='flex gap-2'>
+                    <Box className='flex gap-1'>
+                      <MyIcon
+                        href='/sprite.svg#degree'
+                        className='w-5 h-5 fill-gray-500'
+                      />
+                      <Text className='text-gray-500'>degree</Text>
+                    </Box>
+                    <Text className='font-semibold'>{ed.degree}</Text>
+                  </Box>
+                  <Box className='flex gap-2'>
+                    <Box className='flex gap-1'>
+                      <MyIcon
+                        href='/sprite.svg#date'
+                        className='w-5 h-5 fill-gray-500'
+                      />
+                      <Text className='text-gray-500'>date</Text>
+                    </Box>
+                    <Text className='font-semibold'>
                       {formateDate(ed.start_date)} - {formateDate(ed.end_date)}
-                    </span>
+                    </Text>
                   </Box>
                 </Box>
-		<Text className='mt-2'>{ed.description}</Text>
               </Box>
             ))}
           </Box>
@@ -157,7 +140,7 @@ function Candidate({ data }: CandidateProp) {
 
 }
 
-function Contact_info({ data }: { data: Contact }) {
+export function Contact_info({ data }: { data: Contact }) {
   if (!data) {
     return (null);
   }

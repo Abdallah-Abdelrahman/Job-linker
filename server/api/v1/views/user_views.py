@@ -151,12 +151,13 @@ def logout_user():
 
 
 @app_views.route("/@me")
+@app_views.route("/@me/<id>")
 @jwt_required()
 # @cache.cached(timeout=10)
 @verified_required
 @handle_errors
 @swag_from("docs/app_views/get_current_user.yaml")
-def get_current_user():
+def get_current_user(id=None):
     """
     Fetches the current user"s details.
 
@@ -166,7 +167,7 @@ def get_current_user():
         Otherwise, it returns an error message.
     """
     user_id = get_jwt_identity()
-    user_data = user_controller.get_current_user(user_id)
+    user_data = user_controller.get_current_user(id or user_id)
     return make_response_(
         "success",
         "User details fetched successfully",

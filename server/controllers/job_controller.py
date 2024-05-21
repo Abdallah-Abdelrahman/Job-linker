@@ -139,6 +139,7 @@ class JobController:
             # candidates names and emails
             applied_candidates = [
                 {
+                    "id": app.candidate.user.id,
                     "name": app.candidate.user.name,
                     "email": app.candidate.user.email,
                     "application_status": app.application_status,
@@ -150,10 +151,13 @@ class JobController:
                 "id": job.id,
                 "job_title": job.job_title,
                 "job_description": job.job_description,
+                "location": job.location,
+                "salary": job.salary,
                 "applied_candidates": applied_candidates,
                 "created_at": job.created_at,
                 "application_deadline": job.application_deadline,
                 "is_open": job.is_open,
+                'responsibilities': job.responsibilities
             }
 
         # If the user is a candidate, add a count displays the number
@@ -178,7 +182,8 @@ class JobController:
                 "is_open": job.is_open,
                 "responsibilities": job.responsibilities,
             }
-        raise ValueError("Recruiter not found")
+        # raise ValueError("Recruiter not found")
+        return job.to_dict
 
     def update_job(self, user_id, job_id, data):
         """
@@ -562,7 +567,10 @@ class JobController:
             if location_score > 70 and title_score > 70:
                 matched_jobs[k] = v
 
-        jobs = [job.to_dict for job in matched_jobs.values()]
+        jobs = list(matched_jobs.values())
+        jobs.sort(key=lambda job: job.created_at, reverse=True)
+
+        jobs = [job.to_dict for job in jobs]
 
         return jobs
 
