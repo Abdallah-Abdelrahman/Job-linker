@@ -90,9 +90,9 @@ export const jobApi = api.injectEndpoints({
       query: () => "jobs/all",
     }),
     searchJobs: builder.query<Job[], { location?: string; title?: string }>({
-      query: ({ location, title }) => ({
+      query: (params) => ({
         url: "jobs/search",
-        params: { location, title },
+        params,
       }),
     }),
     getJobCounts: builder.query<
@@ -115,6 +115,6 @@ export const {
   useGetRecommendedCandidatesQuery,
   useGetAllJobsSortedByDateQuery,
   useGetAllJobsSortedByMajorQuery,
-  useSearchJobsQuery,
+  useLazySearchJobsQuery,
   useGetJobCountsQuery,
 } = jobApi;

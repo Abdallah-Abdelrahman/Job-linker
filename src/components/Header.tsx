@@ -49,6 +49,7 @@ function Header() {
                     .unwrap()
                     .then(_ => {
                       dispatch(unsetCredentials());
+                      navigate('/');
                     })
                     .catch(err => console.error({ err }));
                 } else {
