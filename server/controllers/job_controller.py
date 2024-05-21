@@ -12,6 +12,7 @@ from server.controllers.schemas import job_schema
 from server.email_templates import (
     rejection_email,
     shortlisted_candidates_email,
+    no_shortlisted_candidates_email,
     shortlisted_email,
 )
 from server.exception import UnauthorizedError
@@ -237,37 +238,49 @@ class JobController:
         """Handle Job Closing Process and email notifications"""
         applications = storage.get_all_by_attr(Application, "job_id", job.id)
         shortlisted_candidates = []
+        company_name = json.loads(
+                recruiter.user.contact_info
+                ).get("company_name")
+        job_title = job.job_title
         for application in applications:
             candidate = storage.get(Candidate, application.candidate_id)
             email = candidate.user.email
             name = candidate.user.name
             contact_info = candidate.user.contact_info
-            company_name = json.loads(
-                    recruiter.user.contact_info
-                    ).get("company_name")
-            job_title = job.job_title
 
             if application.match_score > self.MATCH_SCORE_THRESHOLD:
                 application.application_status = self.STATUS_SHORTLISTED
                 template = shortlisted_email(name, company_name, job_title)
+                subject = "Job Application Shortlisted"
                 shortlisted_candidates.append((name, email, contact_info))
             else:
                 application.application_status = self.STATUS_REJECTED
                 template = rejection_email(name, company_name, job_title)
+                subject = "Job Application Status"
 
-            self.email_service.send_mail(template, email, name)
+            self.email_service.send_mail(template, email, name, subject)
             storage.save()
 
         recruiter_email = recruiter.user.email
-        shortlisted_template = shortlisted_candidates_email(
-            recruiter.user.name,
-            company_name,
-            job_title,
-            shortlisted_candidates
-        )
+        if shortlisted_candidates:
+            shortlisted_template = shortlisted_candidates_email(
+                    recruiter.user.name,
+                    company_name,
+                    job_title,
+                    shortlisted_candidates
+                    )
+            subject = "Shortlisted Candidates"
+        else:
+            shortlisted_template = no_shortlisted_candidates_email(
+                    recruiter.user.name,
+                    company_name,
+                    job_title
+                    )
+            subject = "No Candidates Shortlisted"
+
         self.email_service.send_mail(
                 shortlisted_template,
-                recruiter_email, "Recruiter"
+                recruiter_email, "Recruiter", subject
                 )
 
     def delete_job(self, user_id, job_id):
