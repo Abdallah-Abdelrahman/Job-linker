@@ -3,7 +3,7 @@ import MyIcon from './Icon';
 
 const CONTACTS = [
   { icon: 'phone', details: '+1-123-456-7890' },
-  { icon: 'email', details: 'support@joblinker.com' },
+  { icon: 'email-address', details: 'support@joblinker.com' },
   { icon: 'location', details: 'Sillicon Valley' },
 ];
 const TEAM_MEMBERS = [

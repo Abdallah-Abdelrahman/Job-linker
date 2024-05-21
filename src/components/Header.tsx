@@ -1,9 +1,10 @@
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../hooks/store';
 import { useLogoutMutation } from '../app/services/auth';
 import { useRefresh } from '../hooks';
 import { selectCurrentUser } from '../features/auth';
 import { unsetCredentials } from '../features/auth/authSlice';
+import { Text } from '@chakra-ui/react';
 
 function Header() {
   const user = useAppSelector(selectCurrentUser);
@@ -13,10 +14,14 @@ function Header() {
   // token refresher
   useRefresh();
 
-  // TODO: logout should be a button not a page
   return (
     <header className='container mx-auto mt-4 pt-4 border-t border-x bg-white rounded-lg'>
-      <nav className='nav flex justify-center gap-4 md:gap-10'>
+      <nav className='nav flex  gap-4 md:gap-10'>
+        <Link
+          to='/'
+          className='py-3 px-3 md:px-5'
+          children='joblinker'
+        />
         <NavLink className='py-3 px-4 md:px-5' to='/'>
           home
         </NavLink>

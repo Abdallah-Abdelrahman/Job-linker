@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import _404 from '../assets/404-0x01.gif';
+import _404 from '../assets/404.gif';
 import { Heading, Text } from '@chakra-ui/react';
 
 function ErrorPage() {
@@ -10,7 +10,7 @@ function ErrorPage() {
       </Heading>
       <img src={_404} alt='lost walking person' />
       <Text> looks like you got lost! go to
-        <Link to='/' className='mx-2 text-teal-500'>home</Link>
+        <Link to='/' className='mx-2 text-sky-500'>home</Link>
       </Text>
     </main>
   );

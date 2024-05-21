@@ -1,49 +1,18 @@
-import { Text, Heading, Box, Stack, Button, useDisclosure, Skeleton, SkeletonText } from '@chakra-ui/react';
+import { Text, Heading, Box, Stack, Button, useDisclosure, SkeletonText, Collapse } from '@chakra-ui/react';
 import MyIcon from '../Icon';
 import MyModal from '../MyModal';
 import { AddJob } from '../job';
 import { useState } from 'react';
+import * as T from './types';
+import { Contact_info } from './Candidate';
+import { Link, Outlet, useMatch } from 'react-router-dom';
 
-type Job = {
-  id: string;
-  application_deadline: Date | null;
-  exper_years: string;
-  is_open: boolean;
-  job_description: string;
-  job_title: string;
-  location: string;
-  major: string;
-  salary: number;
-  skills: string[];
-}
-
-type Recruiter = {
-  jobs: Job[];
-}
-
-type ContactInfo = {
-  company_address: string;
-  company_email: string;
-  company_name: string;
-}
-
-type Data = {
-  bio: string | null;
-  contact_info: ContactInfo;
-  email: string;
-  image_url: string | null;
-  name: string;
-  recruiter: Recruiter;
-}
-
-interface RecruiterProp {
-  data: Data;
-}
-
-function Recruiter({ data }: RecruiterProp) {
+function Recruiter({ data }: T.RecruiterProp) {
   const { isOpen, onClose, onOpen } = useDisclosure();
   const [isLoading, setLoading] = useState(false);
-  const [isUninitialized, setInitialized] = useState(true);
+  const [isUninitialized, setUnInitialized] = useState(true);
+  const match = useMatch('@me/jobs/:job_id');
+
 
   return (
     <Box className='grid grid-cols-4 gap-6 container mt-4 mx-auto sm:grid-cols-12'>
@@ -65,45 +34,84 @@ function Recruiter({ data }: RecruiterProp) {
           <Heading as='h4' mb='4' size='lg' className='capitalize'>
             Jobs
           </Heading>
-          <Button
-            className='!absolute !right-0 !top-0 hover:border-sky-300'
-            onClick={onOpen}
-          >
-            {/* job modal */}
-            <MyModal
-              title='add new job'
-              isOpen={isOpen}
-              onClose={onClose}
-              body={isUninitialized
-                ? <AddJob setLoading={setLoading} setInitialized={setInitialized} />
-                : <SkeletonText isLoaded={!isLoading}>
-                  <Text className='text-gray-300'>your file has been parsed successfully</Text>
-                </SkeletonText>
-              }
-              confirm={<Button type='submit' form='job'>add</Button>}
-            />
-            <MyIcon href='/sprite.svg#plus' className='w-6 h-6' />
-          </Button>
+          {match
+            ? <Link
+              to='/@me'
+              className='!flex !absolute !right-0 !top-0 hover:border-sky-300'
+            >
+              <MyIcon href='/sprite.svg#back' className='w-6 h-6' />
+              <Text as='span'>back</Text>
+            </Link>
+            : <Button
+              className='!absolute !right-0 !top-0 hover:border-sky-300'
+              onClick={onOpen}
+            >
+              {/* job modal */}
+              <MyModal
+                title='add new job'
+                isOpen={isOpen}
+                onClose={()=>{
+                  onClose();
+                  setUnInitialized(true);
+                  setLoading(false);
+                }}
+                body={isUninitialized
+                  ? <AddJob setLoading={setLoading} setUnInitialized={setUnInitialized} />
+                  : <SkeletonText isLoaded={!isLoading}>
+                    <Text className='text-teal-500'>your file has been parsed successfully</Text>
+                  </SkeletonText>
+                }
+                confirm={
+                  <Button
+                    isLoading={isLoading}
+                    type='submit'
+                    form='job'
+                    disabled={isLoading}
+                    className='!bg-sky-400 !text-white'
+                  >
+                    add
+                  </Button>
+                }
+              />
+              <MyIcon href='/sprite.svg#plus' className='w-6 h-6' />
+            </Button>}
 
           {data.recruiter.jobs.length > 0
-            ? <Box as='ul' className='flex flex-col gap-4'>
-              {data.recruiter.jobs.map((job, idx) =>
-                <Box key={idx} as='li'>
-                  <Box className='flex justify-between flex-wrap gap-3 w-full'>
-                    <Heading as='h6' size='md' className='capitalize'>{job.job_title}</Heading>
-                    <Box>
-                      <span className='mr-2'>Location: {job.location}</span>
-                      <span className='span-gray-500'>
-                        Salary: {job.salary}
-                      </span>
+            ? (<Box as='ul' className='flex flex-col gap-4'>
+              {match
+                ? <Box as='li'>
+                  <Outlet />
+                </Box>
+                : data.recruiter.jobs.map((job, idx) => {
+                  return (
+                    <Box key={idx} as='li' className='p-2 ring-1 ring-gray-300  rounded-md'>
+                      <Box className='space-y-2'>
+                        <Heading as='h6' size='md' className='capitalize'>{job.job_title}</Heading>
+                        <Box className='flex gap-2'>
+                          <Box className='flex gap-1 items-start'>
+                            <MyIcon href='/sprite.svg#location' className='w-6 h-6 fill-gray-300' />
+                            <Text className='text-gray-500'>Location</Text>
+                          </Box>
+                          <Text>{job.location}</Text>
+                        </Box>
+                        <Box className='flex gap-2'>
+                          <Box className='flex items-end gap-1'>
+                            <MyIcon href='/sprite.svg#money' className='w-6 h-6 fill-gray-300' />
+                            <Text className='text-gray-500 leading-snug'>salary</Text>
+                          </Box>
+                          <Text>{job.salary}</Text>
+                        </Box>
+                        <JobDesc desc={job.job_description} id={job.id} />
+                      </Box>
                     </Box>
-                  </Box>
-                  <Text className='mt-2'>{job.job_description}</Text>
-                </Box>)}
-            </Box>
-            : <>
-              <Text>you haven't created any job yet, hit the plus sign to add new one</Text>
-            </>}
+                  );
+                }
+                )
+              }
+            </Box>)
+            : (<>
+              <Text color='gray.500'>you haven't created any job yet, hit the plus sign to add new one</Text>
+            </>)}
 
         </Box>
       </Box>
@@ -111,27 +119,27 @@ function Recruiter({ data }: RecruiterProp) {
   );
 }
 
-function Contact_info({ data }: { data: ContactInfo }) {
-  if (!data) {
-    return (null);
-  }
+type DescProps = {
+  desc: string
+  id: string
+}
+function JobDesc({ id, desc }: DescProps) {
+  const desc_sub = desc.substring(0, 200);
 
   return (
-    <Box as='section' className='flex flex-col gap-4'>
-      <Heading as='h4' mb='2' size='lg' className='capitalize'>contact info</Heading>
-      {Object.entries(data).map(([k, v]) => {
-        if (!v) return (null);
-        return (<Box key={k} className='flex gap-3'>
-          <MyIcon href={`/sprite.svg#${k}`} className='w-5 h-5' />
-          {k == 'linkedin' || k == 'github'
-            ? <a href={v} target='_blank' className='text-sky-500'>{k}</a>
-            : <Text>{v}</Text>}
-        </Box>
-        );
-      }
-      )}
+    <Box>
+      <Text>
+        {desc.length > 200
+          ? desc_sub + '...'
+          : desc + '...'
+        }
+        <Link className='text-sky-500' to={`jobs/${id}`}>
+          see more
+        </Link>
+      </Text>
     </Box>
   );
 }
+
 
 export default Recruiter;

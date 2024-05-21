@@ -9,18 +9,18 @@ function Private() {
   const navigate = useNavigate();
   const isAuthenticated = user.jwt || user.isRefreshed;
 
+  // if user not authenticated redirect to login page
   useEffect(() => {
     if (!user.isRefreshing && !user.isRefreshed) {
       navigate('/login', { replace: true, state: user });
     }
   }, [user, navigate]);
 
-  if (isAuthenticated) {
-    return <Outlet />;
-  }
-  if (user.isRefreshing)
-    return <SkeletonText mt='4' noOfLines={4} spacing='4' skeletonHeight='2' />;
-  return null;
+  return (
+    <SkeletonText spacing={4}  isLoaded={!user.isRefreshing}>
+      {isAuthenticated ? <Outlet /> : null}
+    </SkeletonText>
+  );
 }
 
 export default Private;

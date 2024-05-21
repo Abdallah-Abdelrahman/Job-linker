@@ -38,6 +38,7 @@ CANDID_PROMPT = """\
     - If the 'end_date' is 'present' set it to the current date.
     - Skills: Extract the skills listed in the CV. Each skill should be represented by a string and listed in an array. Each skill should not exceed 100 characters.
     - Each language should be represented by a string containing the language name.
+    - The description for each experience must not include any bullet points, remove them if any exists in the text.
     """
 
 JOB_PROMPT = """\
@@ -57,7 +58,7 @@ Guidelines:
 2. Experience Years: Extract the number of years of experience required. If not specified, set the value to 'None'.
 3. Skills: Extract the required skills and list them as strings within an array. Each skill should not exceed 100 characters. If not specified, set the value to an empty list.
 4. Location: Extract the job location. If not specified, set the value to 'None'.
-5. Job Description: Provide a detailed description of the job as mentioned in the text.
+5. Job Description: Provide a detailed description of the job as mentioned in the text, in raw text without any bullet points.
 6. Application Deadline: Extract the application deadline in ISO 8601 format (e.g., "2024-05-11T08:06:13.000000"). If not specified, set its value to 'None'.
 7. Responsibilities: Extract the job responsibilities and list them as strings within an array. Each responsibility should not exceed 200 characters. If not specified, set the value to an empty list.  # Add this line
 8. Format: Ensure each property is enclosed in double quotes and the structure of the dictionary is maintained.
@@ -97,8 +98,11 @@ Guidelines:
    - Contact Information: Presence of phone number, email, LinkedIn profile, and other relevant contact details.
 
 3. Scoring:
-   - The 'ats_score' should be a float between 0.0 and 1.0, where 1.0 indicates a perfectly ATS-friendly CV and 0.0 indicates it is not ATS-friendly at all.
-   - The score should reflect the overall quality and ATS-friendliness based on the provided criteria.
+    The 'ats_score' should be a float between 0.0 and 1.0.
+    The score must follow these guidelines.
+    For example:
+    If a CV does not strictly meet the evaluation criteria, its score should be below 0.3.
+    If a CV is rich in relevant content, its score should be above 0.4.
 
 4. Suggestions:
    - Provide specific and actionable suggestions to improve the CV’s ATS-friendliness.

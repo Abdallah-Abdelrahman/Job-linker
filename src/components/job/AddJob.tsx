@@ -8,9 +8,9 @@ import { useAppSelector } from '../../hooks/store';
 import { selectCurrentUser } from '../../features/auth';
 
 type Props = {
-  [k in 'setLoading' | 'setInitialized']: React.Dispatch<React.SetStateAction<boolean>>
+  [k in 'setLoading' | 'setUnInitialized']: React.Dispatch<React.SetStateAction<boolean>>
 }
-function AddJob({ setLoading, setInitialized }: Props) {
+function AddJob({ setLoading, setUnInitialized }: Props) {
   const user = useAppSelector(selectCurrentUser);
   const [uploadJOB] = useUploadMutation();
   const [add_major] = useCreateMajorMutation();
@@ -34,7 +34,7 @@ function AddJob({ setLoading, setInitialized }: Props) {
         .unwrap()
         .then(data => {
           setLoading(true);
-          setInitialized(false);
+          setUnInitialized(false);
           formdata.append('major_id', (data.data.id));
           uploadJOB(formdata)
             .unwrap()
