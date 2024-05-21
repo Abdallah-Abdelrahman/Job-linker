@@ -11,13 +11,13 @@ function Private() {
 
   // if user not authenticated redirect to login page
   useEffect(() => {
-    if (!user.isRefreshing && !user.isRefreshed) {
+    if (!isAuthenticated && !user.isRefreshing) {
       navigate('/login', { replace: true, state: user });
     }
-  }, [user, navigate]);
+  }, [user, navigate, isAuthenticated]);
 
   return (
-    <SkeletonText spacing={4}  isLoaded={!user.isRefreshing}>
+    <SkeletonText spacing={4} isLoaded={!user.isRefreshing}>
       {isAuthenticated ? <Outlet /> : null}
     </SkeletonText>
   );

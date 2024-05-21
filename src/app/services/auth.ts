@@ -179,6 +179,7 @@ export const {
   useLoginMutation,
   useRegisterMutation,
   useVerfiyQuery,
+  useLazyVerfiyQuery,
   useMeQuery,
   useUploadMutation,
   useRefreshMutation,
