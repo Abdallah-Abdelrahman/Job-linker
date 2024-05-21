@@ -124,8 +124,8 @@ def shortlisted_candidates_email(recruiter_name, company_name, job_title, candid
         address = contact_info_dict.get("address", "N/A")
         linkedin = contact_info_dict.get("linkedin", "N/A")
         github = contact_info_dict.get("github", "N/A")
-        candidates_list += f"<li>Name: {name}, Email: {email}, Phone Number: {
-            phone}, Address: {address}, LinkedIn: {linkedin}, GitHub: {github}</li>"
+        candidates_list += f"""<li>Name: {name}, Email: {email}, Phone Number: {
+            phone}, Address: {address}, LinkedIn: {linkedin}, GitHub: {github}</li>"""
 
     return f"""
     <html>

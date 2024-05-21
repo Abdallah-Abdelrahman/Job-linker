@@ -12,11 +12,10 @@ function Verify() {
   const token = parmas.get('token');
   const { data, isLoading, isError, isSuccess, isUninitialized } = useVerfiyQuery({ token });
   const dispatch = useAppDispatch();
-  console.log({token})
 
   useEffect(() => {
     if (isSuccess) {
-      dispatch(setCredentials(data));
+      dispatch(setCredentials(data.data));
       navigate('/@me');
     }
     if (isError) {
