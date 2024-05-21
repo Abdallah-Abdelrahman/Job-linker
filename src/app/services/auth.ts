@@ -174,6 +174,22 @@ export const api = createApi({
       }),
       invalidatesTags: ['refresh', 'candidates', 'recruiters'],
     }),
+    uploadProfileImage: builder.mutation<UserResponse, FormData>({
+      query: (formdata) => {
+        return {
+          url: 'upload_profile_image',
+          method: 'POST',
+          body: formdata,
+        };
+      },
+      invalidatesTags: ['me']
+    }),
+    getUploadedFile: builder.query<Blob, { file_type: string, filename: string }>({
+      query: ({ file_type, filename }) => ({
+        url: `uploads/${file_type}/${filename}`,
+        responseHandler: (response) => response.blob(),
+      }),
+    }),
   }),
 });
 
@@ -190,5 +206,7 @@ export const {
   useDeleteMeMutation,
   useUpdatePasswordMutation,
   useLogoutMutation,
-  useInsightsMutation
+  useInsightsMutation,
+  useUploadProfileImageMutation,
+  useGetUploadedFileQuery,
 } = api;

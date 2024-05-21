@@ -35,5 +35,6 @@ _database.dbs
 reset_candid.sql
 server/jobs/2024*
 clean_candidate.py
-server/cv/2024*
+server/cvs/2024*
 deploy.sh
+server/images/*
