@@ -214,9 +214,10 @@ class ApplicationsController:
         job_title = job.job_title
 
         template = application_submission_email(name, company_name, job_title)
+        subject = "Application Submitted Successfully for {}".format(job_title)
 
         # Send the email
-        self.email_service.send_mail(template, email, name)
+        self.email_service.send_mail(template, email, name, subject)
 
         return new_application
 
