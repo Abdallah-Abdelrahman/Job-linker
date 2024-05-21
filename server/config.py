@@ -65,12 +65,24 @@ class ApplicationConfig:
 
     # Set the lifespan of refresh tokens to 1 day
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
-    UPLOAD_JOB = f"{os.getcwd()}/server/jobs"
-    UPLOAD_CV = f"{os.getcwd()}/server/cv"
-    UPLOAD_TEMP = f"{os.getcwd()}/server/temp"
+
+    BASE_UPLOAD_PATH = os.path.join(os.getcwd(), "server")
+    UPLOAD_JOB = os.path.join(BASE_UPLOAD_PATH, "jobs")
+    UPLOAD_CV = os.path.join(BASE_UPLOAD_PATH, "cvs")
+    UPLOAD_IMAGE = os.path.join(BASE_UPLOAD_PATH, "images")
+    UPLOAD_TEMP = os.path.join(BASE_UPLOAD_PATH, "temp")
     ALLOWED_EXTENSIONS = {"pdf"}
+    ALLOWED_IMAGE_EXTENSIONS = {"jpg", "jpeg", "png"}
+    MAX_IMAGE_CONTENT_LENGTH = 2 * 1024 * 1024
     MAX_CONTENT_LENGTH = 2 * 1000 * 1000
 
+    UPLOADED_IMAGE_DEST = "server/images"
+    UPLOADED_CV_DEST = "server/cvs"
+    UPLOADED_JOB_DEST = "server/jobs"
+
+    for path in [UPLOAD_JOB, UPLOAD_CV, UPLOAD_IMAGE, UPLOAD_TEMP]:
+        os.makedirs(path, exist_ok=True)
+
     # Configure Caching
-    CACHE_TYPE = 'simple'
+    CACHE_TYPE = "simple"
     CACHE_DEFAULT_TIMEOUT = 300
