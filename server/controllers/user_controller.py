@@ -89,7 +89,8 @@ class UserController:
             token (str): The verification token.
         """
         template = verification_email(name, token)
-        self.email_service.send_mail(template, email, name)
+        subject = "Email Verification for Joblinker"
+        self.email_service.send_mail(template, email, name, subject)
 
     def verify_email(self, token):
         """
