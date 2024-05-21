@@ -1,7 +1,20 @@
-import { Box, Button, Heading, Input, InputGroup, InputLeftElement, ListItem, Menu, MenuButton, MenuItem, MenuItemOption, MenuList, MenuOptionGroup, Text, Skeleton, UnorderedList } from "@chakra-ui/react";
-import { useGetAllJobsSortedByDateQuery } from "../app/services/job";
-import { MyIcon } from "../components";
-import { Link, Outlet, useMatch } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Heading,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Menu,
+  MenuButton,
+  MenuItemOption,
+  MenuList,
+  MenuOptionGroup,
+  Text,
+} from '@chakra-ui/react';
+import { useGetAllJobsSortedByDateQuery } from '../app/services/job';
+import { MyIcon } from '../components';
+import { Link, Outlet, useMatch } from 'react-router-dom';
 
 function Explore() {
   const { data = { data: [] }, isSuccess } = useGetAllJobsSortedByDateQuery();
@@ -35,7 +48,7 @@ function Explore() {
             filters
           </MenuButton>
           <MenuList>
-            <MenuOptionGroup title='Sort' type='checkbox' onChange={(val)=>console.log({val})}>
+            <MenuOptionGroup title='Sort' type='checkbox' onChange={(val) => console.log({ val })}>
               <MenuItemOption value='date'>date</MenuItemOption>
               <MenuItemOption value='name'>name</MenuItemOption>
             </MenuOptionGroup>
