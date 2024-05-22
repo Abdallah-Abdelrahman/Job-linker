@@ -3,6 +3,7 @@ This module provides views for the Job model in the Job-linker application.
 """
 
 from json import loads
+
 from flasgger.utils import swag_from
 from flask import request
 from flask_jwt_extended import get_jwt_identity, jwt_required
@@ -86,6 +87,7 @@ def update_job(job_id):
             "id": job.id,
             "job_title": job.job_title,
             "job_description": job.job_description,
+            "is_open": job.is_open,
         },
     )
 
@@ -244,7 +246,7 @@ def search_jobs():
     """
     location = request.args.get("location")
     title = request.args.get("title")
-    sort = (request.args.get("sort"))
+    sort = request.args.get("sort")
     jobs = job_controller.search_jobs(location, title, sort)
     return make_response_("success", "Fetched jobs", jobs), 200
 

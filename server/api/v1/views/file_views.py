@@ -1,9 +1,10 @@
 """Hanlde uploaded pdf files"""
 
+import mimetypes
 import os
 
 from flasgger.utils import swag_from
-from flask import abort, request, send_from_directory
+from flask import make_response, request, send_from_directory, url_for
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from werkzeug.exceptions import NotFound
 
@@ -77,6 +78,56 @@ def count_cv_files():
 @handle_errors
 def uploaded_file(file_type, filename):
     """
+    Returns a URL that points to the user-uploaded file based
+    on file type and name.
+
+    Args:
+        file_type (str): 'images', 'cvs', or 'jobs'.
+        filename (str): Name of the file.
+
+    Returns:
+        URL to the file or error message in JSON format.
+    """
+    if file_type not in ["images", "cvs", "jobs"]:
+        return make_response_("error", "Invalid file type", {}), 404
+
+    directory = None
+    if file_type == "images":
+        directory = os.path.abspath(ApplicationConfig.UPLOADED_IMAGE_DEST)
+    elif file_type == "cvs":
+        directory = os.path.abspath(ApplicationConfig.UPLOADED_CV_DEST)
+    elif file_type == "jobs":
+        directory = os.path.abspath(ApplicationConfig.UPLOADED_JOB_DEST)
+
+    if directory:
+        try:
+            # Check if the file exists
+            if os.path.isfile(os.path.join(directory, filename)):
+                # Return a URL that points to the file
+                return make_response_(
+                    "success",
+                    "File found",
+                    {
+                        "url": url_for(
+                            "app_views.download_file",
+                            file_type=file_type,
+                            filename=filename,
+                            _external=True,
+                        )
+                    },
+                )
+            else:
+                return make_response_("error", "File not found", {}), 404
+        except NotFound:
+            return make_response_("error", "File not found", {}), 404
+    else:
+        return make_response_("error", "Invalid file type", {}), 404
+
+
+@app_views.route("/download/<file_type>/<filename>")
+@handle_errors
+def download_file(file_type, filename):
+    """
     Serves user-uploaded files based on file type and name.
 
     Args:
@@ -99,7 +150,15 @@ def uploaded_file(file_type, filename):
 
     if directory:
         try:
-            return send_from_directory(directory, filename)
+            # Get the file path
+            file_path = os.path.join(directory, filename)
+            # Determine the MIME type of the file
+            mime_type = mimetypes.guess_type(file_path)[0]
+            # Send the file with the correct MIME type
+            response = make_response(send_from_directory(directory, filename))
+            response.headers.set("Content-Type", mime_type)
+            print("-------------> download <------------")
+            return response
         except NotFound:
             return make_response_("error", "File not found", {}), 404
     else:
