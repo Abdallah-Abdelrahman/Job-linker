@@ -6,9 +6,12 @@ import {
   Button,
   useDisclosure,
   SkeletonText,
-  Collapse,
   useToast,
+  Badge,
+  Switch,
+  Tag,
 } from '@chakra-ui/react';
+import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
 import React from 'react';
 import MyIcon from '../Icon';
 import MyModal from '../MyModal';
@@ -184,11 +187,30 @@ function Recruiter({ data }: T.RecruiterProp) {
                     <Box
                       key={idx}
                       as='li'
-                      className='p-2 ring-1 ring-gray-300  rounded-md'
+                      className='p-2 ring-1 ring-gray-300 rounded-md relative'
                     >
+                      <Badge
+                        position='absolute'
+                        top='2'
+                        right='2'
+                        colorScheme='fill-gray-300'
+                        variant='outline'
+                      >
+                        {job.application_count} Applications
+                      </Badge>
                       <Box className='space-y-2'>
                         <Heading as='h6' size='md' className='capitalize'>
                           {job.job_title}
+
+                          {job.is_open ? (
+                            <Tag size='lg' variant='solid' colorScheme='green' opacity='0.8'>
+                              Open
+                            </Tag>
+                          ) : (
+                            <Tag size='lg' variant='solid' colorScheme='red' opacity='0.8'>
+                              Closed
+                            </Tag>
+                          )}
                         </Heading>
                         <Box className='flex gap-2'>
                           <Box className='flex gap-1 items-start'>

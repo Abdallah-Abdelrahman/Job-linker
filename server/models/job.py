@@ -48,6 +48,11 @@ class Job(BaseModel, Base):
     )
 
     @property
+    def application_count(self):
+        """Return the number of applications for this job"""
+        return len(self.applications)
+
+    @property
     def to_dict(self):
         """Return a dictionary reppresentation of Job"""
         dict_ = super().to_dict
@@ -56,6 +61,7 @@ class Job(BaseModel, Base):
         dict_["application_deadline"] = self.application_deadline
         dict_["is_open"] = self.is_open
         dict_["responsibilities"] = self.responsibilities
+        dict_["application_count"] = self.application_count
         return dict_
 
     def __repr__(self):
