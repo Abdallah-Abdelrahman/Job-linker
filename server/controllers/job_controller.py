@@ -10,9 +10,9 @@ from marshmallow import ValidationError
 
 from server.controllers.schemas import job_schema
 from server.email_templates import (
+    no_shortlisted_candidates_email,
     rejection_email,
     shortlisted_candidates_email,
-    no_shortlisted_candidates_email,
     shortlisted_email,
 )
 from server.exception import UnauthorizedError
@@ -80,8 +80,7 @@ class JobController:
                 "job_description"
                 ]:
             raise ValueError(
-                    "A job with the same title and description already exists"
-                    )
+                "A job with the same title and description already exists")
 
         # Create new job
         new_job = Job(
@@ -113,31 +112,24 @@ class JobController:
             The job.
 
         Raises:
-            ValueError: If the job is not found or the user is not a recruiter.
-            UnauthorizedError: If the user is not a recruiter.
+            ValueError: If the job is not found.
         """
-        # Check if user is a recruiter
-        recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
-
         # Get job
         job = storage.get(Job, job_id)
         if not job:
-            raise ValueError("Job not found")
-        if recruiter and job.recruiter_id != recruiter.id:
             raise ValueError("Job not found")
 
         # Get applications for the job
         applications = []
         if job:
             applications = storage.get_all_by_attr(
-                    Application,
-                    "job_id",
-                    job.id
-                    )
+                Application, "job_id", job.id)
 
-        if recruiter:
-            # If the user is a recruiter, provide a list of the applied
-            # candidates names and emails
+        # Check if user is a recruiter
+        recruiter = storage.get_by_attr(Recruiter, "user_id", user_id)
+        if recruiter and recruiter.id == job.recruiter_id:
+            # If the user is a recruiter and the job is posted by him,
+            # provide a list of the applied candidates names and emails
             applied_candidates = [
                 {
                     "id": app.candidate.user.id,
@@ -158,33 +150,31 @@ class JobController:
                 "created_at": job.created_at,
                 "application_deadline": job.application_deadline,
                 "is_open": job.is_open,
-                'responsibilities': job.responsibilities
+                "responsibilities": job.responsibilities,
             }
 
-        # If the user is a candidate, add a count displays the number
+        # If the user is a candidate or a visitor, add a count displays
+        # the number
         # of the candidates who applied for this job
         rec_user = storage.get_by_attr(Recruiter, "id", job.recruiter_id)
         if rec_user:
             company_name = json.loads(
-                    rec_user.user.contact_info
-                    ).get("company_name")
-            return {
-                "id": job.id,
-                "job_title": job.job_title,
-                "created_at": job.created_at,
-                "job_description": job.job_description,
-                "applications_count": len(applications),
-                "company_name": company_name,
-                "location": job.location,
-                "salary": job.salary,
-                "exper_years": job.exper_years,
-                "skills": [skill.name for skill in job.skills],
-                "application_deadline": job.application_deadline,
-                "is_open": job.is_open,
-                "responsibilities": job.responsibilities,
-            }
-        # raise ValueError("Recruiter not found")
-        return job.to_dict
+                rec_user.user.contact_info).get("company_name")
+        return {
+            "id": job.id,
+            "job_title": job.job_title,
+            "created_at": job.created_at,
+            "job_description": job.job_description,
+            "applications_count": len(applications),
+            "company_name": company_name if rec_user else None,
+            "location": job.location,
+            "salary": job.salary,
+            "exper_years": job.exper_years,
+            "skills": [skill.name for skill in job.skills],
+            "application_deadline": job.application_deadline,
+            "is_open": job.is_open,
+            "responsibilities": job.responsibilities,
+        }
 
     def update_job(self, user_id, job_id, data):
         """
@@ -239,8 +229,7 @@ class JobController:
         applications = storage.get_all_by_attr(Application, "job_id", job.id)
         shortlisted_candidates = []
         company_name = json.loads(
-                recruiter.user.contact_info
-                ).get("company_name")
+            recruiter.user.contact_info).get("company_name")
         job_title = job.job_title
         for application in applications:
             candidate = storage.get(Candidate, application.candidate_id)
@@ -264,24 +253,21 @@ class JobController:
         recruiter_email = recruiter.user.email
         if shortlisted_candidates:
             shortlisted_template = shortlisted_candidates_email(
-                    recruiter.user.name,
-                    company_name,
-                    job_title,
-                    shortlisted_candidates
-                    )
+                recruiter.user.name,
+                company_name,
+                job_title,
+                shortlisted_candidates
+            )
             subject = "Shortlisted Candidates"
         else:
             shortlisted_template = no_shortlisted_candidates_email(
-                    recruiter.user.name,
-                    company_name,
-                    job_title
-                    )
+                recruiter.user.name, company_name, job_title
+            )
             subject = "No Candidates Shortlisted"
 
         self.email_service.send_mail(
-                shortlisted_template,
-                recruiter_email, "Recruiter", subject
-                )
+            shortlisted_template, recruiter_email, "Recruiter", subject
+        )
 
     def delete_job(self, user_id, job_id):
         """
@@ -447,9 +433,7 @@ class JobController:
                 )
                 for job in jobs
                 if (recruiter := storage.get_by_attr(
-                    Recruiter,
-                    "id",
-                    job.recruiter_id
+                    Recruiter, "id", job.recruiter_id
                     ))
                 is not None
             ]
@@ -517,11 +501,10 @@ class JobController:
             )
             for job in jobs
             if (recruiter := storage.get_by_attr(
-                Recruiter,
-                "id",
-                job.recruiter_id
+                Recruiter, "id", job.recruiter_id
                 ))
             is not None
+            and job.is_open
         ]
 
     def get_job_counts(self):
@@ -563,6 +546,9 @@ class JobController:
         matched_jobs = {}
 
         for k, v in jobs_dict.items():
+            # Skip if the job is not open
+            if not v.is_open:
+                continue
             # Calculate match scores for location and title
             location_score = (
                 fuzz.token_set_ratio(location.lower(), v.location.lower())
@@ -581,7 +567,7 @@ class JobController:
                 matched_jobs[k] = v
 
         jobs = list(matched_jobs.values())
-        if 'date' in sort:
+        if "date" in sort:
             jobs.sort(key=lambda job: job.created_at, reverse=True)
 
         jobs = [job.to_dict for job in jobs]
@@ -597,7 +583,8 @@ class JobController:
         """
         jobs_dict = storage.all(Job)
 
-        jobs = list(jobs_dict.values())
+        # Filter out closed jobs
+        jobs = [job for job in jobs_dict.values() if job.is_open]
 
         # Sort jobs by created_at
         jobs.sort(key=lambda job: job.created_at, reverse=True)
