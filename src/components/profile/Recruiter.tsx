@@ -10,6 +10,7 @@ import {
   Badge,
   Switch,
   Tag,
+  Input,
 } from '@chakra-ui/react';
 import React from 'react';
 import MyIcon from '../Icon';
@@ -21,8 +22,10 @@ import { Contact_info } from './Candidate';
 import {
   useUploadProfileImageMutation,
   useGetUploadedFileQuery,
+  useUpdateMeMutation,
 } from '../../app/services/auth';
 import { Link, Outlet, useMatch } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 
 function Recruiter({ data }: T.RecruiterProp) {
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -32,6 +35,53 @@ function Recruiter({ data }: T.RecruiterProp) {
   const [uploadProfileImage] = useUploadProfileImageMutation();
   const filename = data.image_url?.split('/').pop();
   const toast = useToast();
+  const [updateMe] = useUpdateMeMutation();
+  const [editField, setEditField] = useState(null);
+  const [name, setName] = useState(data.name);
+
+  const [companyName, setCompanyName] = useState(
+    data.contact_info.company_name,
+  );
+  const [companyAddress, setCompanyAddress] = useState(
+    data.contact_info.company_address,
+  );
+  const [companyEmail, setCompanyEmail] = useState(
+    data.contact_info.company_email,
+  );
+
+  const handleFieldClick = (fieldName) => {
+    setEditField(fieldName);
+  };
+
+  const handleApplyClick = () => {
+    // Call the API to update the field
+    updateMe({
+      [editField]:
+        editField === 'name' ? name : { [editField]: eval(editField) },
+    })
+      .unwrap()
+      .then((response) => {
+        // Handle successful update
+        toast({
+          title: 'Profile updated successfully',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+        setEditField(null);
+      })
+      .catch((error) => {
+        // Handle failed update
+        toast({
+          title: 'Profile update failed',
+          description: error.message,
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      });
+  };
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -112,7 +162,46 @@ function Recruiter({ data }: T.RecruiterProp) {
         <Text className='tracking-wide'>{data.contact_info.company_name}</Text>
         <hr className='w-full' />
         <Stack className='w-full mt-2 space-y-6'>
-          <Contact_info data={data.contact_info} />
+          {editField === 'name' ? (
+            <Input value={name} onChange={(e) => setName(e.target.value)} />
+          ) : (
+            <Text onClick={() => handleFieldClick('name')}>{name}</Text>
+          )}
+          {editField === 'contact_info.company_name' ? (
+            <Input
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+            />
+          ) : (
+            <Text onClick={() => handleFieldClick('contact_info.company_name')}>
+              {companyName}
+            </Text>
+          )}
+          {editField === 'contact_info.company_address' ? (
+            <Input
+              value={companyAddress}
+              onChange={(e) => setCompanyAddress(e.target.value)}
+            />
+          ) : (
+            <Text
+              onClick={() => handleFieldClick('contact_info.company_address')}
+            >
+              {companyAddress}
+            </Text>
+          )}
+          {editField === 'contact_info.company_email' ? (
+            <Input
+              value={companyEmail}
+              onChange={(e) => setCompanyEmail(e.target.value)}
+            />
+          ) : (
+            <Text
+              onClick={() => handleFieldClick('contact_info.company_email')}
+            >
+              {companyEmail}
+            </Text>
+          )}
+          {editField && <Button onClick={handleApplyClick}>Apply</Button>}
         </Stack>
       </Box>
 
@@ -203,7 +292,11 @@ function Recruiter({ data }: T.RecruiterProp) {
                         </Heading>
                         <Text
                           className={`py-1 px-2 absolute bottom-0 right-0 rounded-md
-                            ${job.is_open ? 'bg-teal-100 text-teal-700' : 'bg-purple-100 text-purple-700'}`}
+                            ${
+                              job.is_open
+                                ? 'bg-teal-100 text-teal-700'
+                                : 'bg-purple-100 text-purple-700'
+                            }`}
                         >
                           {job.is_open ? 'open' : 'closed'}
                         </Text>
