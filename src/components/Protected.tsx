@@ -11,7 +11,7 @@ function Private() {
 
   // if user not authenticated redirect to login page
   useEffect(() => {
-    //console.log({user});
+//    //console.log({user});
     if (!isAuthenticated && !isRefreshing) {
       navigate('/login');
     }
