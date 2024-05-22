@@ -40,7 +40,7 @@ def verification_email(name, token):
                 Thank you for registering with Joblinker. We're excited to have you on board.
                 To get started, please verify your email address by clicking the button below.
             </p>
-            <a href='http://localhost:5173/verify?token={token}' class="button">Verify Email</a>
+            <a href='http://web-02.abdallah.tech/verify?token={token}' class="button">Verify Email</a>
             <p>
                 If you didn't create an account with Joblinker, you can safely ignore this email.
             </p>
