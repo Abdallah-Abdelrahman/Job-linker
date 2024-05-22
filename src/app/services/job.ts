@@ -1,4 +1,4 @@
-import { api } from "./auth";
+import { api } from './auth';
 
 export interface Job {
   major_id: string;
@@ -8,6 +8,7 @@ export interface Job {
   exper_years: string;
   salary: number;
   application_deadline: string;
+  application_count: number;
   is_open: boolean;
   skills: string[];
 }
@@ -30,8 +31,8 @@ export const jobApi = api.injectEndpoints({
   endpoints: (builder) => ({
     createJob: builder.mutation<JobResponse, Partial<Job>>({
       query: (job) => ({
-        url: "jobs",
-        method: "POST",
+        url: 'jobs',
+        method: 'POST',
         body: job,
       }),
     }),
@@ -44,14 +45,14 @@ export const jobApi = api.injectEndpoints({
     >({
       query: ({ job_id, updates }) => ({
         url: `jobs/${job_id}`,
-        method: "PUT",
+        method: 'PUT',
         body: updates,
       }),
     }),
     deleteJob: builder.mutation<void, { job_id: string }>({
       query: ({ job_id }) => ({
         url: `jobs/${job_id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
     addSkillToJob: builder.mutation<
@@ -60,7 +61,7 @@ export const jobApi = api.injectEndpoints({
     >({
       query: ({ job_id, skill_id }) => ({
         url: `jobs/${job_id}/skills`,
-        method: "POST",
+        method: 'POST',
         body: { skill_id },
       }),
     }),
@@ -70,11 +71,11 @@ export const jobApi = api.injectEndpoints({
     >({
       query: ({ job_id, skill_id }) => ({
         url: `jobs/${job_id}/skills/${skill_id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
     getJobs: builder.query<Job[], void>({
-      query: () => "jobs",
+      query: () => 'jobs',
     }),
     getRecommendedCandidates: builder.query<
       RecommendedCandidateResponse,
@@ -84,14 +85,14 @@ export const jobApi = api.injectEndpoints({
     }),
 
     getAllJobsSortedByDate: builder.query<Job[], void>({
-      query: () => "jobs/all/sorted",
+      query: () => 'jobs/all/sorted',
     }),
     getAllJobsSortedByMajor: builder.query<Job[], void>({
-      query: () => "jobs/all",
+      query: () => 'jobs/all',
     }),
     searchJobs: builder.query<Job[], { location?: string; title?: string }>({
       query: (params) => ({
-        url: "jobs/search",
+        url: 'jobs/search',
         params,
       }),
     }),
@@ -99,7 +100,7 @@ export const jobApi = api.injectEndpoints({
       { total_count: number; major_counts: Record<string, number> },
       void
     >({
-      query: () => "jobs/counts",
+      query: () => 'jobs/counts',
     }),
   }),
 });
