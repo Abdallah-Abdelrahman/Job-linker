@@ -43,7 +43,7 @@ function Explore() {
     evt.preventDefault();
     const formdata = new FormData(evt.currentTarget);
     formdata.append('sort', JSON.stringify(sort));
-    console.log({ form: Object.fromEntries(formdata) });
+//    console.log({ form: Object.fromEntries(formdata) });
     searchJobs(Object.fromEntries(formdata));
   };
 
