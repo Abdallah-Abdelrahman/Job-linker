@@ -6,8 +6,10 @@ import {
   Button,
   useDisclosure,
   SkeletonText,
-  Collapse,
   useToast,
+  Badge,
+  Switch,
+  Tag,
 } from '@chakra-ui/react';
 import React from 'react';
 import MyIcon from '../Icon';
@@ -30,7 +32,6 @@ function Recruiter({ data }: T.RecruiterProp) {
   const [uploadProfileImage] = useUploadProfileImageMutation();
   const filename = data.image_url?.split('/').pop();
   const toast = useToast();
-  const [imageUrl, setImageUrl] = useState<string | undefined>();
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -61,32 +62,18 @@ function Recruiter({ data }: T.RecruiterProp) {
       });
   };
 
-  // Fetch the image file
   const {
-    data: imageBlob,
+    data: image_data = { data: {} },
     isLoading,
     error,
   } = useGetUploadedFileQuery({
     file_type: 'images',
     filename: filename,
   });
-
-  // Convert the image Blob to a URL
-  React.useEffect(() => {
-    if (imageBlob) {
-      setImageUrl(URL.createObjectURL(imageBlob));
-    } else if (error && error.message === 'File not found') {
-      setImageUrl('https://placehold.co/600x400');
-    }
-  }, [imageBlob, error]);
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
-  //if (error && error.message !== 'File not found') {
-  //  return <div>Error: {error.message}</div>;
-  //}
+  const imageUrl = image_data.data.url;
 
   return (
     <Box className='grid grid-cols-4 gap-6 container mt-4 mx-auto sm:grid-cols-12'>
@@ -199,12 +186,27 @@ function Recruiter({ data }: T.RecruiterProp) {
                     <Box
                       key={idx}
                       as='li'
-                      className='p-2 ring-1 ring-gray-300  rounded-md'
+                      className='p-2 ring-1 ring-gray-300 rounded-md relative'
                     >
-                      <Box className='space-y-2'>
+                      <Badge
+                        position='absolute'
+                        top='2'
+                        right='2'
+                        colorScheme='fill-gray-300'
+                        variant='outline'
+                      >
+                        {job.application_count} Applications
+                      </Badge>
+                      <Box className='relative space-y-2'>
                         <Heading as='h6' size='md' className='capitalize'>
                           {job.job_title}
                         </Heading>
+                        <Text
+                          className={`py-1 px-2 absolute bottom-0 right-0 rounded-md
+                            ${job.is_open ? 'bg-teal-100 text-teal-700' : 'bg-purple-100 text-purple-700'}`}
+                        >
+                          {job.is_open ? 'open' : 'closed'}
+                        </Text>
                         <Box className='flex gap-2'>
                           <Box className='flex gap-1 items-start'>
                             <MyIcon

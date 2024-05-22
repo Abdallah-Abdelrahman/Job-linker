@@ -118,10 +118,12 @@ function MyForm({ onSubmit, role, isLoading }) {
     <form
       autoComplete='off'
       onSubmit={handleSubmit}
-      className='w-full p-6 space-y-4 bg-white rounded-lg shadow-md'
+      className='flex flex-col w-full p-6 space-y-4 bg-white rounded-lg shadow-md'
     >
       {role == 'candidate' ? candidateJSX : recruiterJSX}
-      <Button type='submit' isLoading={isLoading}>Create Profile</Button>
+      <Button
+      className='ml-auto !bg-sky-500 !text-white'
+      type='submit' isLoading={isLoading}>Create Profile</Button>
     </form>
   );
 }
