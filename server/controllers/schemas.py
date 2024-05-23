@@ -115,7 +115,7 @@ class MajorSchema(Schema):
     """
 
     id = fields.Str(required=False)
-    name = fields.Str(required=True)
+    name = fields.Str(required=False)
 
 
 major_schema = MajorSchema()
@@ -127,7 +127,7 @@ class SkillSchema(Schema):
     """
 
     id = fields.Str(required=False)
-    name = fields.Str(required=True)
+    name = fields.Str(required=False)
 
 
 skill_schema = SkillSchema()
@@ -139,7 +139,7 @@ class LanguageSchema(Schema):
     """
 
     id = fields.Str(required=False)
-    name = fields.Str(required=True)
+    name = fields.Str(required=False)
 
 
 language_schema = LanguageSchema()
@@ -151,8 +151,8 @@ class WorkExperienceSchema(Schema):
     """
 
     id = fields.Str(required=False)
-    title = fields.Str(required=True)
-    company = fields.Str(required=True)
+    title = fields.Str(required=False)
+    company = fields.Str(required=False)
     location = fields.Str()
     start_date = fields.DateTime()
     end_date = fields.DateTime()
@@ -174,8 +174,7 @@ class ApplicationSchema(Schema):
     application_status = fields.Str(
         required=False,
         validate=validate.OneOf(
-            ["applied", "shortlisted", "rejected", "hired"]
-            ),
+            ["applied", "shortlisted", "rejected", "hired"]),
         default="applied",
     )
     match_score = fields.Float(required=False)
