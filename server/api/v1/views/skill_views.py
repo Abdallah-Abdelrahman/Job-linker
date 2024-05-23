@@ -58,7 +58,7 @@ def create_skill():
 
 @app_views.route("/skills/<skill_id>", methods=["PUT"])
 @jwt_required()
-#@handle_errors
+@handle_errors
 @swag_from("docs/app_views/update_skill.yaml")
 def update_skill(skill_id):
     """

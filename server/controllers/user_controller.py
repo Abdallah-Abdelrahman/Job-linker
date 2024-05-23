@@ -6,7 +6,7 @@ Job-linker application.
 import os
 from json import dumps, loads
 
-from flask import current_app
+from flask import current_app, url_for
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
@@ -80,7 +80,9 @@ class UserController:
         Returns:
             str: The verification token.
         """
-        serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+        serializer = URLSafeTimedSerializer(
+                current_app.config["SECRET_KEY"]
+                )
         return serializer.dumps(email, salt="email-verification")
 
     def send_verification_email(self, email, name, token):
@@ -105,17 +107,15 @@ class UserController:
         Raises:
             ValueError: If the token is invalid or expired.
         """
-        serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+        serializer = URLSafeTimedSerializer(
+                current_app.config["SECRET_KEY"]
+                )
         try:
             email = serializer.loads(
-                    token,
-                    salt="email-verification",
-                    max_age=3600
-                    )
+                token, salt="email-verification", max_age=3600)
         except (BadSignature, SignatureExpired):
             raise ValueError(
-                    "The verification link is invalid or has expired."
-                    )
+                "The verification link is invalid or has expired.")
 
         user = storage.get_by_attr(User, "email", email)
         if not user:
@@ -200,10 +200,7 @@ class UserController:
 
             # Send verification email
             self.send_verification_email(
-                    user.email,
-                    user.name,
-                    verification_token
-                    )
+                user.email, user.name, verification_token)
 
             raise UnauthorizedError("Verify your email")
         access_token = create_access_token(identity=user.id)
@@ -239,13 +236,9 @@ class UserController:
             if candidate:
                 user_data["candidate"] = {
                     "major": candidate.major.to_dict,
-                    "skills": [
-                        skill.to_dict
-                        for skill in candidate.skills
-                        ],
+                    "skills": [skill.to_dict for skill in candidate.skills],
                     "languages": [
-                        language.to_dict
-                        for language in candidate.languages
+                        language.to_dict for language in candidate.languages
                         ],
                     "applications": [
                         application.to_dict
@@ -317,11 +310,8 @@ class UserController:
 
         for key, value in data.items():
             if key in ALLOWED_UPDATE_FIELDS:
-                setattr(
-                        user,
-                        key,
-                        dumps(value) if key == "contact_info" else value
-                        )
+                setattr(user, key, dumps(value) if key ==
+                        "contact_info" else value)
             else:
                 raise ValueError(f"Cannot update field: {key}")
 
@@ -356,15 +346,27 @@ class UserController:
         file_path = os.path.join(ApplicationConfig.UPLOAD_IMAGE, filename)
         file.save(file_path)
 
-        # Update user profile with the image path
+        # Update user profile with the image URL
         user = storage.get(User, user_id)
         if not user:
             return "User not found", None, 404
 
-        user.image_url = file_path
+        # Generate the URL for the image
+        image_url = url_for(
+            "app_views.uploaded_file",
+            file_type="images",
+            filename=filename,
+            _external=True,
+        )
+
+        user.image_url = image_url
         storage.save()
 
-        return "Image uploaded successfully", {"file_path": file_path}, 201
+        return (
+            "Image uploaded successfully",
+            {"file_path": file_path, "url": image_url},
+            201,
+        )
 
     def delete_current_user(self, user_id):
         """
