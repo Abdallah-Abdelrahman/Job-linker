@@ -80,9 +80,7 @@ class UserController:
         Returns:
             str: The verification token.
         """
-        serializer = URLSafeTimedSerializer(
-                current_app.config["SECRET_KEY"]
-                )
+        serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
         return serializer.dumps(email, salt="email-verification")
 
     def send_verification_email(self, email, name, token):
@@ -107,9 +105,7 @@ class UserController:
         Raises:
             ValueError: If the token is invalid or expired.
         """
-        serializer = URLSafeTimedSerializer(
-                current_app.config["SECRET_KEY"]
-                )
+        serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
         try:
             email = serializer.loads(
                 token, salt="email-verification", max_age=3600)
@@ -249,8 +245,7 @@ class UserController:
                         for experience in candidate.experiences
                     ],
                     "education": [
-                        education.to_dict
-                        for education in candidate.educations
+                        education.to_dict for education in candidate.educations
                     ],
                 }
         elif user.role == "recruiter":
@@ -353,7 +348,7 @@ class UserController:
 
         # Generate the URL for the image
         image_url = url_for(
-            "app_views.uploaded_file",
+            "app_views.download_file",
             file_type="images",
             filename=filename,
             _external=True,
