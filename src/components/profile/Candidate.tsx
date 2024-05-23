@@ -10,6 +10,7 @@ import { useUpdateMeMutation, useUploadProfileImageMutation } from '../../app/se
 import { useUpdateMajorMutation } from '../../app/services/major';
 import { college_majors } from '../../constants';
 import Photo from './Photo';
+import { type Education, useUpdateEducationForCurrentCandidateMutation } from '../../app/services/candidate';
 
 type ActionType = 'reset' | 'contact_info' | undefined
 type S = Omit<T.CandidateProp['data'], 'candidate' | 'bio'> & { major: string }
@@ -236,6 +237,27 @@ function Candidate({ data }: T.CandidateProp) {
   );
 }
 
+interface EducationProps extends Education { }
+function Education({ id, degree, end_date, start_date, institute, field_of_study }: Education) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [update, { isLoading }] = useUpdateEducationForCurrentCandidateMutation();
+  const [state, dispatch] = useReducer(
+    (prevState, newState) => ({ ...prevState, ...newState }),
+    {
+      degree,
+      institute,
+      field_of_study,
+      start_date,
+      end_date
+    });
+  const handleUpdate = () => {
+    update({ educationId: id, updates: state })
+      .unwrap()
+      .then(_ => setIsEditing(false))
+      .catch(err => console.log({ err }))
+  }
+  return (null);
+}
 type BioProps = {
   bio: string
 }
