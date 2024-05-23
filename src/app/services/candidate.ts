@@ -1,13 +1,65 @@
-import {api} from './auth';
+import { api } from './auth';
+
+export interface Education {
+  candidate_id: string;
+  created_at: string;
+  degree: string;
+  description: string;
+  end_date: string;
+  field_of_study: string;
+  id: string;
+  institute: string;
+  start_date: string;
+  updated_at: string;
+}
+
+export interface Language {
+  created_at: string;
+  id: string;
+  name: string;
+  updated_at: string;
+}
+
+export interface Major {
+  created_at: string;
+  id: string;
+  name: string;
+  updated_at: string;
+}
+
+export interface Skill {
+  created_at: string;
+  id: string;
+  name: string;
+  updated_at: string;
+}
+
+export interface WorkExperience {
+  candidate_id: string;
+  company: string;
+  created_at: string;
+  description: string;
+  end_date: string;
+  id: string;
+  location: string;
+  start_date: string;
+  title: string;
+  updated_at: string;
+}
 
 export interface Candidate {
-  major_id: string;
-  skills: string[];
-  languages: string[];
+  id: string;
+  educations: Education[];
+  languages: Language[];
+  major: Major;
+  skills: Skill[];
+  work_experiences: WorkExperience[];
 }
 
 export interface CandidateResponse {
-  candidate: Candidate;
+  data: Candidate;
+  message: string;
+  status: string;
 }
 
 export interface RecommendedJobsResponse {
@@ -87,6 +139,64 @@ export const candApi = api.injectEndpoints({
         method: 'DELETE',
       }),
     }),
+    addWorkExperienceToCurrentCandidate: builder.mutation<
+      CandidateResponse,
+      Partial<WorkExperience>
+    >({
+      query: (workExperience) => ({
+        url: 'candidates/@me/work_experiences',
+        method: 'POST',
+        body: workExperience,
+      }),
+    }),
+    updateWorkExperienceForCurrentCandidate: builder.mutation<
+      CandidateResponse,
+      { workExperienceId: string; updates: Partial<WorkExperience> }
+    >({
+      query: ({ workExperienceId, updates }) => ({
+        url: `candidates/@me/work_experiences/${workExperienceId}`,
+        method: 'PUT',
+        body: updates,
+      }),
+    }),
+    deleteWorkExperienceForCurrentCandidate: builder.mutation<
+      void,
+      { workExperienceId: string }
+    >({
+      query: ({ workExperienceId }) => ({
+        url: `candidates/@me/work_experiences/${workExperienceId}`,
+        method: 'DELETE',
+      }),
+    }),
+    addEducationToCurrentCandidate: builder.mutation<
+      CandidateResponse,
+      Partial<Education>
+    >({
+      query: (education) => ({
+        url: 'candidates/@me/educations',
+        method: 'POST',
+        body: education,
+      }),
+    }),
+    updateEducationForCurrentCandidate: builder.mutation<
+      CandidateResponse,
+      { educationId: string; updates: Partial<Education> }
+    >({
+      query: ({ educationId, updates }) => ({
+        url: `candidates/@me/educations/${educationId}`,
+        method: 'PUT',
+        body: updates,
+      }),
+    }),
+    deleteEducationForCurrentCandidate: builder.mutation<
+      void,
+      { educationId: string }
+    >({
+      query: ({ educationId }) => ({
+        url: `candidates/@me/educations/${educationId}`,
+        method: 'DELETE',
+      }),
+    }),
     deleteCurrentCandidate: builder.mutation<void, void>({
       query: () => ({
         url: 'candidates/@me',
@@ -105,5 +215,11 @@ export const {
   useRemoveSkillFromCurrentCandidateMutation,
   useAddLanguageToCurrentCandidateMutation,
   useRemoveLanguageFromCurrentCandidateMutation,
+  useAddWorkExperienceToCurrentCandidateMutation,
+  useUpdateWorkExperienceForCurrentCandidateMutation,
+  useDeleteWorkExperienceForCurrentCandidateMutation,
+  useAddEducationToCurrentCandidateMutation,
+  useUpdateEducationForCurrentCandidateMutation,
+  useDeleteEducationForCurrentCandidateMutation,
   useDeleteCurrentCandidateMutation,
 } = candApi;
