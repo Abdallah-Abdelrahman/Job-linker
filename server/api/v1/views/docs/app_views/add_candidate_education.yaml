@@ -1,0 +1,67 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Candidates
+summary: Add an education entry to the current candidate's profile
+description: Endpoint to add an education entry to the current candidate's profile. The education data should be provided in the request body.
+operationId: addCandidateEducation
+security:
+  - bearerAuth: []
+parameters:
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        degree:
+          type: string
+          description: The degree of the education entry
+        institution:
+          type: string
+          description: The institution of the education entry
+        field_of_study:
+          type: string
+          description: The field of study of the education entry
+        start_date:
+          type: string
+          format: date
+          description: The start date of the education entry
+        end_date:
+          type: string
+          format: date
+          description: The end date of the education entry
+responses:
+  200:
+    description: Education entry added successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Education entry added successfully",
+          "data":
+            {
+              "education":
+                {
+                  "id": "education1",
+                  "degree": "Bachelor of Science",
+                  "institution": "University XYZ",
+                  "field_of_study": "Computer Science",
+                  "start_date": "2010-09-01",
+                  "end_date": "2014-06-01",
+                },
+            },
+        }
+  401:
+    description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
+  400:
+    description: Invalid input
+    examples:
+      application/json:
+        { "status": "error", "message": "Invalid input", "data": {} }

@@ -1,0 +1,67 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Candidates
+summary: Add a work experience to the current candidate's profile
+description: Endpoint to add a work experience to the current candidate's profile. The work experience data should be provided in the request body.
+operationId: addCandidateWorkExperience
+security:
+  - bearerAuth: []
+parameters:
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title of the work experience
+        company:
+          type: string
+          description: The company of the work experience
+        start_date:
+          type: string
+          format: date
+          description: The start date of the work experience
+        end_date:
+          type: string
+          format: date
+          description: The end date of the work experience
+        description:
+          type: string
+          description: The description of the work experience
+responses:
+  200:
+    description: Work experience added successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Work experience added successfully",
+          "data":
+            {
+              "work_experience":
+                {
+                  "id": "experience1",
+                  "title": "Software Engineer",
+                  "company": "Company XYZ",
+                  "start_date": "2015-01-01",
+                  "end_date": "2018-01-01",
+                  "description": "Developed software applications.",
+                },
+            },
+        }
+  401:
+    description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
+  400:
+    description: Invalid input
+    examples:
+      application/json:
+        { "status": "error", "message": "Invalid input", "data": {} }
