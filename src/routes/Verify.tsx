@@ -14,14 +14,14 @@ function Verify() {
   useEffect(() => {
     const parmas = new URLSearchParams(window.location.search);
     const token = parmas.get('token')!;
-    console.log('-----token------>', { token });
+//    console.log('-----token------>', { token });
     if (isUninitialized) {
       dispatch(setCredentials({ isRefreshing: true }));
     }
     verify({ token })
       .unwrap()
       .then(data => {
-        console.log('------verify--------->', { data });
+//        console.log('------verify--------->', { data });
         dispatch(setCredentials(
           {
             ...data.data,
