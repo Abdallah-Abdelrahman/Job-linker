@@ -42,14 +42,15 @@ function Recruiter({ data }: T.RecruiterProp) {
   const [isEditing, setIsEditing] = useState(false);
   const [state, dispatch] = useReducer<RecReducer>(
     (prevState, newState) => {
-      return ({ ...prevState, ...newState });
+      return { ...prevState, ...newState };
     },
     {
       company_name: data.contact_info.company_name ?? '',
       company_address: data.contact_info.company_address ?? '',
       company_email: data.contact_info.company_email ?? '',
-      user_name: data.name ?? ''
-    });
+      user_name: data.name ?? '',
+    },
+  );
 
   // handlers
   const handleApplyClick = () => {
@@ -118,6 +119,46 @@ function Recruiter({ data }: T.RecruiterProp) {
 
   const imageUrl = image_data.data.url;
 
+  const FileLinks = ({ user_files }) => {
+    const fileLinks = user_files
+      .map((file) => {
+        const { filename, original_filename } = file;
+        const { data: file_data, error } = useGetUploadedFileQuery({
+          file_type: 'jobs',
+          filename: filename.split('/').pop(),
+        });
+
+        if (error) {
+          return null;
+        }
+
+        const fileUrl = file_data?.data?.url;
+        if (!fileUrl) {
+          return null;
+        }
+
+        return (
+          <li key={file.id}>
+            <a href={fileUrl} target='_blank' rel='noopener noreferrer'>
+              {original_filename}
+            </a>
+          </li>
+        );
+      })
+      .filter(Boolean);
+
+    return (
+      <Box className='w-full mt-6'>
+        <Heading as='h3' size='md' mb={2}>
+          My Files
+        </Heading>
+        <ul className='list-disc list-inside'>
+          {fileLinks.length > 0 ? fileLinks : <Text>No files available</Text>}
+        </ul>
+      </Box>
+    );
+  };
+
   return (
     <Box className='grid grid-cols-4 gap-6 container mt-4 mx-auto sm:grid-cols-12'>
       <Box className='relative col-span-4 bg-white flex p-6 flex-col items-center gap-2 rounded-md shadow-md sm:col-span-4'>
@@ -157,16 +198,16 @@ function Recruiter({ data }: T.RecruiterProp) {
             className='hidden'
           />
         </Box>
-        {isEditing
-          ? <Input
+        {isEditing ? (
+          <Input
             value={state.user_name}
             onChange={(e) => dispatch({ user_name: e.target.value })}
           />
-          : (
-            <Heading as='h2' size='lg' className='capitalize'>
-              {data.name}
-            </Heading>
-          )}
+        ) : (
+          <Heading as='h2' size='lg' className='capitalize'>
+            {data.name}
+          </Heading>
+        )}
         <hr className='w-full' />
         <Stack className='w-full mt-2 space-y-6'>
           {isEditing ? (
@@ -175,9 +216,7 @@ function Recruiter({ data }: T.RecruiterProp) {
               onChange={(e) => dispatch({ company_name: e.target.value })}
             />
           ) : (
-            <Text>
-              {data.contact_info.company_name}
-            </Text>
+            <Text>{data.contact_info.company_name}</Text>
           )}
           {isEditing ? (
             <Input
@@ -185,9 +224,7 @@ function Recruiter({ data }: T.RecruiterProp) {
               onChange={(e) => dispatch({ company_address: e.target.value })}
             />
           ) : (
-            <Text>
-              {data.contact_info.company_address}
-            </Text>
+            <Text>{data.contact_info.company_address}</Text>
           )}
           {isEditing ? (
             <Input
@@ -195,17 +232,17 @@ function Recruiter({ data }: T.RecruiterProp) {
               onChange={(e) => dispatch({ company_email: e.target.value })}
             />
           ) : (
-            <Text>
-              {data.contact_info.company_email}
-            </Text>
+            <Text>{data.contact_info.company_email}</Text>
           )}
-          {isEditing &&
+          {isEditing && (
             <ButtonGroup>
               <Button onClick={handleApplyClick}>update</Button>
               <Button onClick={() => setIsEditing(false)}>cancel</Button>
             </ButtonGroup>
-          }
+          )}
         </Stack>
+        {/* User files */}
+        <FileLinks user_files={data.user_files} />
       </Box>
 
       {/*Jobs*/}
@@ -295,9 +332,10 @@ function Recruiter({ data }: T.RecruiterProp) {
                         </Heading>
                         <Text
                           className={`py-1 px-2 absolute bottom-0 right-0 rounded-md
-                            ${job.is_open
-                              ? 'bg-teal-100 text-teal-700'
-                              : 'bg-purple-100 text-purple-700'
+                            ${
+                              job.is_open
+                                ? 'bg-teal-100 text-teal-700'
+                                : 'bg-purple-100 text-purple-700'
                             }`}
                         >
                           {job.is_open ? 'open' : 'closed'}
