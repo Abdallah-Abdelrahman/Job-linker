@@ -8,8 +8,7 @@ function useRefresh() {
   useEffect(() => {
     let ignore = false;
 
-    const reloadHandler = (evt: Event) => {
-      evt.preventDefault();
+    const reloadHandler = () => {
       // refresh token
       fetch('/api/v1/refresh', {
         method: 'POST',
@@ -23,7 +22,7 @@ function useRefresh() {
           return resp.json();
         })
         .then(({ data }) => {
-//          //console.log('----useRefresh---->');
+          // console.log('----useRefresh---->');
           dispatch(setCredentials({ ...data, isRefreshing: false }));
         })
         .catch(err => console.error({ err }))
@@ -32,11 +31,21 @@ function useRefresh() {
         });
     };
 
-    window.addEventListener('load', reloadHandler);
+    /**
+     * For more info on why handling browser reloading this way,
+     * see https://rb.gy/dbwngc
+     */
+    if (document.readyState === 'loading') {
+      // Loading hasn't finished yet
+      document.addEventListener('DOMContentLoaded', reloadHandler);
+    } else {
+      // `DOMContentLoaded` has already fired
+      reloadHandler();
+    }
 
     // cleanup
     return () => {
-      window.removeEventListener('load', reloadHandler);
+      document.removeEventListener('DOMContentLoaded', reloadHandler);
       ignore = true;
     };
   }, [dispatch]);

@@ -1,4 +1,4 @@
-import { api } from "./auth";
+import { api } from './auth';
 
 export interface WorkExperience {
   id: string;
@@ -21,8 +21,8 @@ export const workExperienceApi = api.injectEndpoints({
       Partial<WorkExperience>
     >({
       query: (work_experience) => ({
-        url: "work_experiences",
-        method: "POST",
+        url: 'work_experiences',
+        method: 'POST',
         body: work_experience,
       }),
     }),
@@ -35,13 +35,14 @@ export const workExperienceApi = api.injectEndpoints({
     }),
     updateWorkExperience: builder.mutation<
       WorkExperienceResponse,
-      { work_experience_id: string; updates: Partial<WorkExperience> }
+      { work_experience_id: string; xp: Partial<WorkExperience> }
     >({
-      query: ({ work_experience_id, updates }) => ({
+      query: ({ work_experience_id, xp }) => ({
         url: `work_experiences/${work_experience_id}`,
-        method: "PUT",
-        body: updates,
+        method: 'PUT',
+        body: xp,
       }),
+      invalidatesTags: ['me'],
     }),
     deleteWorkExperience: builder.mutation<
       void,
@@ -49,12 +50,12 @@ export const workExperienceApi = api.injectEndpoints({
     >({
       query: ({ work_experience_id }) => ({
         url: `work_experiences/${work_experience_id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
     getWorkExperiences: builder.query<WorkExperience[], { major_id?: string }>({
       query: ({ major_id }) =>
-        major_id ? `work_experiences/${major_id}` : "work_experiences",
+        major_id ? `work_experiences/${major_id}` : 'work_experiences',
     }),
   }),
 });

@@ -4,7 +4,7 @@ import { useLogoutMutation } from '../app/services/auth';
 import { useRefresh } from '../hooks';
 import { selectCurrentUser } from '../features/auth';
 import { unsetCredentials } from '../features/auth/authSlice';
-import { Box, IconButton, Menu, MenuButton, MenuItem, MenuList } from '@chakra-ui/react';
+import { Box, IconButton, Menu, MenuButton, MenuItem, MenuList, useToast } from '@chakra-ui/react';
 import MyIcon from './Icon';
 import logo from '../assets/logo.png';
 
@@ -13,6 +13,7 @@ function Header() {
   const dispatch = useAppDispatch();
   const [logout] = useLogoutMutation();
   const navigate = useNavigate();
+  const toast = useToast();
   const isAuthenticated = user.jwt || user.isRefreshed;
   // token refresher
   useRefresh();
@@ -53,6 +54,13 @@ function Header() {
                   logout()
                     .unwrap()
                     .then(_ => {
+                      toast({
+                        title: 'logged out',
+                        status: 'info',
+                        variant: 'left-accent',
+                        position: 'top',
+                        isClosable: true,
+                      });
                       dispatch(unsetCredentials());
                       navigate('/');
                     })
