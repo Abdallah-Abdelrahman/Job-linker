@@ -9,6 +9,7 @@ import server.models as models
 from server.models.application import Application
 from server.models.base_model import Base
 from server.models.candidate import Candidate
+from server.models.education import Education
 from server.models.job import Job
 from server.models.language import Language
 from server.models.major import Major
@@ -29,6 +30,7 @@ classes = {
     "Language": Language,
     "Application": Application,
     "UserFile": UserFile,
+    "Education": Education,
 }
 
 

@@ -1,0 +1,82 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Candidates
+summary: Update a work experience in the current candidate's profile
+description: Endpoint to update a work experience in the current candidate's profile. The work experience data should be provided in the request body.
+operationId: updateCandidateWorkExperience
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: work_experience_id
+    required: true
+    schema:
+      type: string
+    description: The ID of the work experience to be updated
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title of the work experience
+        company:
+          type: string
+          description: The company of the work experience
+        start_date:
+          type: string
+          format: date
+          description: The start date of the work experience
+        end_date:
+          type: string
+          format: date
+          description: The end date of the work experience
+        description:
+          type: string
+          description: The description of the work experience
+responses:
+  200:
+    description: Work experience updated successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Work experience updated successfully",
+          "data":
+            {
+              "work_experience":
+                {
+                  "id": "experience1",
+                  "title": "Senior Software Engineer",
+                  "company": "Company XYZ",
+                  "start_date": "2015-01-01",
+                  "end_date": "2019-01-01",
+                  "description": "Developed and led software projects.",
+                },
+            },
+        }
+  401:
+    description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
+  404:
+    description: Work experience not found
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Work experience not found",
+          "data": {},
+        }
+  400:
+    description: Invalid input
+    examples:
+      application/json:
+        { "status": "error", "message": "Invalid input", "data": {} }

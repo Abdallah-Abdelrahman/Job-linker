@@ -1,0 +1,44 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Candidates
+summary: Delete a work experience from the current candidate's profile
+description: Endpoint to delete a work experience from the current candidate's profile. The work experience ID should be provided as a path parameter.
+operationId: deleteCandidateWorkExperience
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: work_experience_id
+    required: true
+    schema:
+      type: string
+    description: The ID of the work experience to be deleted
+responses:
+  200:
+    description: Work experience deleted successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Work experience deleted successfully",
+          "data": {},
+        }
+  401:
+    description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
+  404:
+    description: Work experience not found
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Work experience not found",
+          "data": {},
+        }
