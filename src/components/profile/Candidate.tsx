@@ -1,8 +1,12 @@
-import { Text, Heading, Box, Stack, Button, ButtonGroup, Input, InputGroup, InputLeftElement, Textarea, FormControl } from '@chakra-ui/react';
+import { Text, Heading, Box, Stack, Button, ButtonGroup, Input, InputGroup, InputLeftElement, Textarea, FormControl, List, ListItem, IconButton } from '@chakra-ui/react';
 import MyIcon from '../Icon';
 import * as T from './types';
-import { Reducer, useReducer, useState } from 'react';
+import { Reducer, useEffect, useReducer, useRef, useState } from 'react';
 import { useUpdateSkillMutation } from '../../app/services/skill';
+import { useUpdateLanguageMutation } from '../../app/services/language';
+import { useUpdateWorkExperienceMutation } from '../../app/services/work_experience';
+import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
+import { useUpdateMeMutation } from '../../app/services/auth';
 
 type ActionType = 'contact_info' | undefined
 type S = Omit<T.CandidateProp['data'], 'candidate'> & { major: string }
@@ -96,16 +100,11 @@ function Candidate({ data }: T.CandidateProp) {
           <Box as='section' className='flex flex-col gap-4'>
             {/*Languages*/}
             <Heading as='h4' mb='2' size='lg' className='capitalize'>languages</Heading>
-            <Box as='ul' className='flex flex-wrap gap-4 max-h-40 overflow-auto'>
+            <List as='ul' className='flex flex-wrap gap-4 max-h-40 overflow-auto'>
               {data.candidate.languages.map((l, idx) =>
-                <Box
-                  key={idx}
-                  as='li'
-                  className='p-2 bg-orange-50 text-orange-500 rounded-tl-lg rounded-br-lg'
-                >
-                  {l.name}
-                </Box>)}
-            </Box>
+                <Language key={idx} language={l} />
+              )}
+            </List>
           </Box>
         </Stack>
         {isEditingInfo &&
@@ -124,59 +123,22 @@ function Candidate({ data }: T.CandidateProp) {
 
       <Box className=' col-span-4 bg-white flex flex-col rounded-md shadow-md p-6 gap-4 sm:col-span-8 sm:max-h-[900px] sm:overflow-auto'>
         {/*About*/}
-        <Box>
+        <Box className='relative'>
           <Heading as='h4' mb='2' size='lg' className='capitalize'>
             About me
           </Heading>
-          {isEditingInfo
-            ? <FormControl
-              size='lg'
-              children={
-                <Textarea
-                  value={state.bio}
-                  onChange={(e) => dispatch(actionCreator({ bio: e.target.value }))}
-                />}
-            />
-            : <Text>
-              {data.bio}
-            </Text>}
-
+          <Bio bio={data.bio} />
         </Box>
         {/*Experience*/}
         <Box>
           <Heading as='h4' mb='4' size='lg' className='capitalize'>
             experience
           </Heading>
-          <Box as='ul' className='flex flex-col gap-4'>
+          <List as='ul' className='flex flex-col gap-4'>
             {data.candidate.experiences.map((xp, idx) =>
-              <Box key={idx} as='li'>
-                <Box className='flex flex-col gap-3 w-full'>
-                  <Heading as='h6' size='md' className='capitalize'>{xp.title.toLowerCase()}</Heading>
-                  <Box className='space-y-2'>
-                    <Box className='flex gap-2'>
-                      <Box className='flex gap-1'>
-                        <MyIcon href='/sprite.svg#company' className='w-5 h-5 fill-gray-500' />
-                        <Text className='text-gray-500' children='at' />
-                      </Box>
-                      <Text className='capitalize font-semibold' children={xp.company.toLowerCase()} />
-                    </Box>
-                    <Box className='flex gap-2'>
-                      <Box className='flex gap-1 text-gray-500'>
-                        <MyIcon href='/sprite.svg#date' className='w-5 h-5 fill-gray-500' />
-                        <Text children='date' />
-                      </Box>
-                      <Text
-                        className='font-semibold'
-                        children={`${formateDate(xp.start_date)} - ${formateDate(xp.end_date)}`}
-                      />
-                    </Box>
-                  </Box>
-                </Box>
-                <Text className='mt-2'>{xp.description}</Text>
-              </Box>
-
+              <Experience key={idx} xp={xp} />
             )}
-          </Box>
+          </List>
         </Box>
         {/*Education*/}
         <Box>
@@ -227,13 +189,214 @@ function Candidate({ data }: T.CandidateProp) {
       </Box>
     </Box>
   );
-
 }
 
+type BioProps = {
+  bio: string
+}
+function Bio({ bio }: BioProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [value, setValue] = useState(bio);
+  const [textareaH, setTextareaH] = useState(0);
+  const [update, { isLoading }] = useUpdateMeMutation();
+  const handleUpdate = () => {
+    update({ bio: value })
+      .unwrap()
+      .then(_ => setIsEditing(false))
+      .catch(err => console.log({ err }))
+  }
+
+  return (
+    isEditing
+      ? (/* render eiditing version */
+        <Stack>
+          <Textarea
+            ref={(el) => {
+              if (!el) return;
+              if (!textareaH) {
+                setTextareaH(el.scrollHeight);
+              }
+            }}
+            value={value}
+            onChange={(e) => {
+              setValue(e.target.value);
+              e.target.style.height = 'iherit';
+              e.target.style.height = `${e.target.scrollHeight}px`;
+            }}
+            resize='vertical'
+            h={textareaH + 'px'}
+          />
+
+          <ButtonGroup>
+            <IconButton
+              aria-label='button'
+              icon={<CloseIcon />}
+              onClick={() => {
+                setIsEditing(false);
+                setValue(bio);
+              }}
+            />
+            <IconButton
+              aria-label='button'
+              isLoading={isLoading}
+              icon={<CheckIcon />}
+              onClick={handleUpdate}
+            />
+          </ButtonGroup>
+        </Stack>
+      )
+      : (/* render normal version */
+        <>
+          <Button
+            className='!absolute !px-1 top-0 right-0'
+            onClick={() => setIsEditing(true)}
+          >
+            <MyIcon href='/sprite.svg#edit' className='w-5 h-5' />
+          </Button>
+          <Text>{bio}</Text>
+        </>
+      )
+  );
+
+}
+type ExperProps = {
+  xp: T.Experience
+}
+function Experience({ xp }: ExperProps) {
+  const [textareaH, setTextareaH] = useState(0);
+  const [isEditing, setIsEditing] = useState(false);
+  const [state, dispatch] = useReducer(
+    (prevState, newState) => {
+      if (newState.type === 'reset') return (prevState);
+      return ({ ...prevState, ...newState });
+    },
+    {
+      title: xp.title,
+      company: xp.company,
+      start_date: xp.start_date,
+      end_date: xp.end_date,
+      description: xp.description
+    });
+  const [update, { isLoading }] = useUpdateWorkExperienceMutation();
+  const handleUpdate = () => {
+    update({
+      work_experience_id: xp.id, xp: {
+        ...state,
+        start_date: new Date(state.start_date),
+        end_date: new Date(state.end_date)
+      }
+    })
+      .unwrap()
+      .then(_ => setIsEditing(false))
+      .catch(err => console.log({ err }))
+      .finally(() => { setIsEditing(false); });
+  };
+
+  return (
+    <ListItem>
+      {isEditing
+        ? (/* render editing fields */
+          <Stack>
+            <InputGroup>
+              <Input
+                value={state.title}
+                onChange={(e) => dispatch({ title: e.target.value })}
+              />
+            </InputGroup>
+            <InputGroup>
+              <InputLeftElement children={<MyIcon href='/sprite.svg#company' className='w-5 h-5 fill-gray-500' />} />
+              <Input
+                value={state.company}
+                onChange={(e) => dispatch({ company: e.target.value })}
+              />
+            </InputGroup>
+            <InputGroup>
+              <InputLeftElement children={<MyIcon href='/sprite.svg#date' className='w-5 h-5 fill-gray-500' />} />
+              <Input
+                type='datetime-local'
+                value={new Date(state.start_date).toISOString().slice(0, 16)}
+                onChange={(e) => dispatch({ start_date: e.target.value })}
+              />
+            </InputGroup>
+            <InputGroup>
+              <InputLeftElement children={<MyIcon href='/sprite.svg#date' className='w-5 h-5 fill-gray-500' />} />
+              <Input
+                type='datetime-local'
+                value={new Date(state.end_date).toISOString().slice(0, 16)}
+                onChange={(e) => dispatch({ end_date: e.target.value })}
+              />
+            </InputGroup>
+            <InputGroup>
+              <Textarea
+                ref={(el) => {
+                  if (!el) return;
+                  if (!textareaH) {
+                    setTextareaH(el.scrollHeight);
+                  }
+                }}
+                value={state.description}
+                onChange={(e) => {
+                  dispatch({ description: e.target.value });
+                  e.target.style.height = 'iherit';
+                  e.target.style.height = `${e.target.scrollHeight}px`;
+                }}
+                resize='vertical'
+                h={textareaH + 'px'}
+              />
+            </InputGroup>
+            <ButtonGroup>
+              <IconButton aria-label='button' icon={<CloseIcon />} onClick={() => {
+                setIsEditing(false);
+                dispatch({ type: 'reset' });
+              }} />
+              <IconButton
+                aria-label='button'
+                isLoading={isLoading}
+                icon={<CheckIcon />}
+                onClick={handleUpdate}
+              />
+            </ButtonGroup>
+          </Stack>
+        )
+        : (/* render normal fields */
+          <>
+            <Box className='relative flex flex-col gap-3 w-full'>
+              <Button onClick={() => setIsEditing(true)} className='!absolute !px-1 top-0 right-0'>
+                <MyIcon href='/sprite.svg#edit' className='w-5 h-5' />
+              </Button>
+              <Heading as='h6' size='md' className='capitalize max-w-[80%]'>{xp.title.toLowerCase()}</Heading>
+              <Box className='space-y-2'>
+                <Box className='flex gap-2'>
+                  <Box className='flex gap-1'>
+                    <MyIcon href='/sprite.svg#company' className='w-5 h-5 fill-gray-500' />
+                    <Text className='text-gray-500' children='at' />
+                  </Box>
+                  <Text className='!max-w-[70%] capitalize font-semibold' children={xp.company.toLowerCase()} />
+                </Box>
+                <Box className='flex gap-2'>
+                  <Box className='flex gap-1 text-gray-500'>
+                    <MyIcon href='/sprite.svg#date' className='w-5 h-5 fill-gray-500' />
+                    <Text children='date' />
+                  </Box>
+                  <Text
+                    className='font-semibold'
+                    children={`${formateDate(xp.start_date)} - ${formateDate(xp.end_date)}`}
+                  />
+                </Box>
+              </Box>
+            </Box>
+            <Text className='mt-2'>{xp.description}</Text>
+
+          </>
+        )
+      }
+    </ListItem>
+
+  );
+}
 type SkillProps = {
   skill: T.Skill
 }
-
 function Skill({ skill }: SkillProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(skill.name);
@@ -247,7 +410,6 @@ function Skill({ skill }: SkillProps) {
 
   return (
     <li className='relative p-2 pr-4 bg-teal-50 text-teal-500 rounded-tl-lg rounded-br-lg'>
-
       {isEditing
         ? <>
           <Input className='!w-max' value={value} onChange={(e) => setValue(e.target.value)} />
@@ -276,6 +438,61 @@ function Skill({ skill }: SkillProps) {
 
     </li>
 
+  );
+}
+
+type LangaugeProps = {
+  language: T.Language
+}
+function Language({ language }: LangaugeProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [value, setValue] = useState(language.name);
+  const [update, { isLoading }] = useUpdateLanguageMutation();
+
+  const handleUpdate = () => {
+    update({ language_id: language.id, language: { name: value } })
+      .unwrap()
+      .then(_ => setIsEditing(false))
+      .catch(err => console.log({ err }))
+      .finally(() => {
+        setIsEditing(false)
+      });
+  };
+
+  return (
+    <ListItem
+      className='relative p-2 bg-orange-50 text-orange-500 rounded-tl-lg rounded-br-lg'
+    >
+      {isEditing
+        ? (/* render input field to edit value */
+          <>
+            <Input className='!w-max' value={value} onChange={(e) => setValue(e.target.value)} />
+            <ButtonGroup>
+              <Button
+                size='sm'
+                children='udpate'
+                isLoading={isLoading}
+                onClick={handleUpdate}
+              />
+              <Button
+                size='sm'
+                children='cancel'
+                onClick={() => setIsEditing(false)}
+              />
+            </ButtonGroup>
+          </>
+        )
+        : (/* render normal text component */
+          <>
+            <MyIcon
+              href='/sprite.svg#edit' className='absolute top-0 right-0 w-3 h-3 cursor-pointer'
+              onClick={() => setIsEditing(true)}
+            />
+            <Text>{value}</Text>
+          </>
+        )
+      }
+    </ListItem>
   );
 }
 type ContactProps = {
