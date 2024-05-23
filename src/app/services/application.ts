@@ -1,4 +1,4 @@
-import { api } from "./auth";
+import { api } from './auth';
 
 export interface Application {
   job_id: string;
@@ -11,6 +11,10 @@ export interface ApplicationResponse {
   application: Application;
 }
 
+export interface HiredCountResponse {
+  count: number;
+}
+
 export const applicationApi = api.injectEndpoints({
   endpoints: (builder) => ({
     createApplication: builder.mutation<
@@ -18,8 +22,8 @@ export const applicationApi = api.injectEndpoints({
       Partial<Application>
     >({
       query: (application) => ({
-        url: "applications",
-        method: "POST",
+        url: 'applications',
+        method: 'POST',
         body: application,
       }),
     }),
@@ -29,7 +33,7 @@ export const applicationApi = api.injectEndpoints({
     >({
       query: ({ application_id, updates }) => ({
         url: `applications/${application_id}`,
-        method: "PUT",
+        method: 'PUT',
         body: updates,
       }),
     }),
@@ -38,13 +42,16 @@ export const applicationApi = api.injectEndpoints({
       { application_id?: string }
     >({
       query: ({ application_id }) =>
-        application_id ? `applications/${application_id}` : "applications",
+        application_id ? `applications/${application_id}` : 'applications',
     }),
     deleteApplication: builder.mutation<void, { application_id: string }>({
       query: ({ application_id }) => ({
         url: `applications/${application_id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
+    }),
+    getHiredCount: builder.query<HiredCountResponse, void>({
+      query: () => 'applications/hired_count',
     }),
   }),
 });
@@ -54,4 +61,5 @@ export const {
   useUpdateApplicationMutation,
   useGetApplicationQuery,
   useDeleteApplicationMutation,
+  useGetHiredCountQuery,
 } = applicationApi;
