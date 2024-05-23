@@ -35,8 +35,6 @@ class User(BaseModel, Base, UserMixin):
         dict_copy = super().to_dict
 
         # Add file path to the dictionary
-        dict_copy["user_files"] = [
-                file.original_filename for file in self.user_files
-                ]
+        dict_copy["user_files"] = [file.to_dict for file in self.user_files]
 
         return dict_copy
