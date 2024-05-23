@@ -1,0 +1,82 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Candidates
+summary: Update an education entry in the current candidate's profile
+description: Endpoint to update an education entry in the current candidate's profile. The education data should be provided in the request body.
+operationId: updateCandidateEducation
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: education_id
+    required: true
+    schema:
+      type: string
+    description: The ID of the education entry to be updated
+  - in: body
+    name: body
+    schema:
+      type: object
+      properties:
+        degree:
+          type: string
+          description: The degree of the education entry
+        institution:
+          type: string
+          description: The institution of the education entry
+        field_of_study:
+          type: string
+          description: The field of study of the education entry
+        start_date:
+          type: string
+          format: date
+          description: The start date of the education entry
+        end_date:
+          type: string
+          format: date
+          description: The end date of the education entry
+responses:
+  200:
+    description: Education entry updated successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Education entry updated successfully",
+          "data":
+            {
+              "education":
+                {
+                  "id": "education1",
+                  "degree": "Master of Science",
+                  "institution": "University XYZ",
+                  "field_of_study": "Software Engineering",
+                  "start_date": "2015-09-01",
+                  "end_date": "2017-06-01",
+                },
+            },
+        }
+  401:
+    description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
+  404:
+    description: Education entry not found
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Education entry not found",
+          "data": {},
+        }
+  400:
+    description: Invalid input
+    examples:
+      application/json:
+        { "status": "error", "message": "Invalid input", "data": {} }
