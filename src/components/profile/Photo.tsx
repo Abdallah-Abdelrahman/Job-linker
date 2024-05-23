@@ -11,7 +11,8 @@ type Props = {
 
 function Photo({ imageUrl, setFile, isLoading, disabled }: Props) {
   const ref = useRef();
-  const filePath = 'http://localhost:5000' + imageUrl;
+  const fileName = imageUrl.split('/').pop();
+  const filePath = 'http://localhost:5000/api/v1/download/images/' + fileName;
 
   console.log({ disabled })
   return (
