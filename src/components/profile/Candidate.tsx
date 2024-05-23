@@ -1,15 +1,18 @@
-import { Text, Heading, Box, Stack, Button, ButtonGroup, Input, InputGroup, InputLeftElement, Textarea, FormControl, List, ListItem, IconButton } from '@chakra-ui/react';
+import { Text, Heading, Box, Stack, Button, ButtonGroup, Input, InputGroup, InputLeftElement, Textarea, FormControl, List, ListItem, IconButton, Select } from '@chakra-ui/react';
 import MyIcon from '../Icon';
 import * as T from './types';
-import { Reducer, useEffect, useReducer, useRef, useState } from 'react';
+import { Reducer, useReducer, useState } from 'react';
 import { useUpdateSkillMutation } from '../../app/services/skill';
 import { useUpdateLanguageMutation } from '../../app/services/language';
 import { useUpdateWorkExperienceMutation } from '../../app/services/work_experience';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
-import { useUpdateMeMutation } from '../../app/services/auth';
+import { useUpdateMeMutation, useUploadProfileImageMutation } from '../../app/services/auth';
+import { useUpdateMajorMutation } from '../../app/services/major';
+import { college_majors } from '../../constants';
+import Photo from './Photo';
 
-type ActionType = 'contact_info' | undefined
-type S = Omit<T.CandidateProp['data'], 'candidate'> & { major: string }
+type ActionType = 'reset' | 'contact_info' | undefined
+type S = Omit<T.CandidateProp['data'], 'candidate' | 'bio'> & { major: string }
 type A = {
   type?: ActionType,
   payload: Partial<S>
@@ -21,13 +24,19 @@ const actionCreator = (payload: A['payload'], type?: A['type']) => ({ payload, t
 
 
 function Candidate({ data }: T.CandidateProp) {
-  const [isEditingInfo, setIsEditiing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [file, setFile] = useState<File|null>(null);
   const [state, dispatch] = useReducer<Reducer<S, A>>(
     (state, action) => {
       const { type, payload } = action;
       if (!type) {
         return { ...state, ...payload };
       }
+      if (type === 'reset') {
+        const { candidate, bio, ...rest } = data;
+        return ({ ...rest, major: candidate.major.name });
+      }
+
       return ({
         ...state,
         contact_info: { ...state.contact_info, ...payload }
@@ -38,10 +47,34 @@ function Candidate({ data }: T.CandidateProp) {
       email: data.email ?? '',
       image_url: data.image_url ?? '',
       contact_info: data.contact_info ?? '',
-      bio: data.bio ?? '',
       major: data.candidate.major.name ?? ''
     }
   );
+  const [update, { isLoading: isLoading_MME }] = useUpdateMeMutation();
+  const [update_major, { isLoading: isLoading_MMAJOR }] = useUpdateMajorMutation();
+  const [upload, {isLoading: isLoading_MUPLOAD}] = useUploadProfileImageMutation();
+  const handleUpdate = () => {
+    const { major, image_url, email, ...rest } = state;
+    console.log({ state })
+      const formdata = new FormData();
+    formdata.append('file', file)
+    
+        Promise.all([
+          update(rest)
+            .unwrap(),
+          update_major({
+            major_id: data.candidate.major.id,
+            major: { name: major }
+          }).unwrap(),
+          upload(formdata).unwrap
+        ])
+          .then(_ => setIsEditing(false))
+          .catch(err => console.log({ err }))
+          .finally(() => {
+            setIsEditing(false);
+          })
+    
+  };
 
   return (
     <Box className='grid grid-cols-4 gap-6 container mt-4 mx-auto sm:grid-cols-12'>
@@ -51,17 +84,17 @@ function Candidate({ data }: T.CandidateProp) {
       >
         <Button
           className='!absolute top-6 right-6'
-          onClick={() => setIsEditiing(true)}
+          onClick={() => setIsEditing(true)}
         >
           <MyIcon href='/sprite.svg#edit' className='w-6 h-6' />
         </Button>
-        <Box className='w-32 h-32 min-h-32 bg-red-200 rounded-full overflow-hidden'>
-          <img
-            src='https://placehold.co/600x400'
-            className='w-full h-full object-cover'
-          />
-        </Box>
-        {isEditingInfo
+        <Photo
+          disabled={!isEditing}
+          isLoading={isLoading_MUPLOAD}
+          imageUrl={data.image_url}
+          setFile={setFile}
+        />
+        {isEditing
           ?
           <FormControl size='lg'>
             <Input
@@ -69,25 +102,48 @@ function Candidate({ data }: T.CandidateProp) {
               onChange={(e) => dispatch(actionCreator({ name: e.target.value }))}
             />
           </FormControl>
-          : <Heading as='h2' size='lg' className='capitalize'>{data.name}</Heading>}
+          : <Heading as='h2' size='lg' className='capitalize'>{data.name}</Heading>
+        }
 
-        {isEditingInfo
+        {isEditing
           ? <FormControl size='lg'>
-            <Input
+            <Select
               value={state.major}
               onChange={(e) => dispatch(actionCreator({ major: e.target.value }))}
-            />
+            >
+              {college_majors.map((m, idx) => <option key={idx} value={m} children={m} />)}
+            </Select>
           </FormControl>
-          : <Text className='tracking-wide'>{data.candidate.major.name}</Text>}
-
+          : <Text className='tracking-wide'>{data.candidate.major.name}</Text>
+        }
         <hr className='w-full' />
         <Stack className='w-full mt-2 space-y-6'>
           <Contact_info
-            isEditingInfo={isEditingInfo}
+            isEditing={isEditing}
             dispatch={dispatch}
             data={data.contact_info}
             state={state}
           />
+          {isEditing
+            && (
+              <ButtonGroup>
+                <IconButton
+                  aria-label='button'
+                  icon={<CloseIcon />}
+                  onClick={() => {
+                    setIsEditing(false);
+                    dispatch({ type: 'reset' });
+                  }}
+                />
+                <IconButton
+                  aria-label='button'
+                  isLoading={isLoading_MME || isLoading_MMAJOR}
+                  icon={<CheckIcon />}
+                  onClick={handleUpdate}
+                />
+              </ButtonGroup>
+            )
+          }
           <Box as='section' className='flex flex-col gap-4'>
             {/*Skills*/}
             <Heading as='h4' mb='2' size='lg' className='capitalize'>skills</Heading>
@@ -107,17 +163,6 @@ function Candidate({ data }: T.CandidateProp) {
             </List>
           </Box>
         </Stack>
-        {isEditingInfo &&
-          <ButtonGroup className='ml-auto'>
-            <Button
-              children='update'
-            />
-            <Button
-              onClick={() => setIsEditiing(false)}
-              children='cancel'
-            />
-          </ButtonGroup>
-        }
 
       </Box>
 
@@ -498,10 +543,10 @@ function Language({ language }: LangaugeProps) {
 type ContactProps = {
   data: Record<'address' | 'github' | 'linkedin' | 'whatsapp' | 'phone', string>,
   dispatch: React.Dispatch<A>,
-  isEditingInfo: boolean,
+  isEditing: boolean,
   state: S
 }
-export function Contact_info({ data, isEditingInfo, state, dispatch }: ContactProps) {
+export function Contact_info({ data, isEditing, state, dispatch }: ContactProps) {
   if (!data) {
     return (null);
   }
@@ -513,7 +558,7 @@ export function Contact_info({ data, isEditingInfo, state, dispatch }: ContactPr
         if (!v) return (null);
         return (
           <Box key={k} className='flex gap-3'>
-            {isEditingInfo
+            {isEditing
               ? (
                 <>
                   <InputGroup>
