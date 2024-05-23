@@ -11,15 +11,16 @@ type Props = {
 
 function Photo({ imageUrl, setFile, isLoading, disabled }: Props) {
   const ref = useRef();
-  const fileName = imageUrl.split('/').pop();
-  const filePath = 'http://localhost:5000/api/v1/download/images/' + fileName;
+/**
+ *   const fileName = imageUrl.split('/').pop();
+ *   const filePath = 'http://localhost:5000/api/v1/download/images/' + fileName;
+ */
 
-  console.log({ disabled })
   return (
     <Box className='w-32 min-h-32 h-32 rounded-full overflow-hidden relative'>
       <SkeletonCircle w='100%' h='100%' isLoaded={!isLoading}>
         <img
-          src={filePath || 'https://placehold.co/600x400'}
+          src={imageUrl || 'https://placehold.co/600x400'}
           className='w-full h-full object-cover'
         />
       </SkeletonCircle>
