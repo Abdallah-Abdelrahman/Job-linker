@@ -242,7 +242,7 @@ function Recruiter({ data }: T.RecruiterProp) {
           )}
         </Stack>
         {/* User files */}
-        <FileLinks user_files={data.user_files} />
+        {/*<FileLinks user_files={data.user_files} />*/}
       </Box>
 
       {/*Jobs*/}
