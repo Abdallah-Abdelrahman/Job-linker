@@ -25,7 +25,7 @@ const actionCreator = (payload: A['payload'], type?: A['type']) => ({ payload, t
 
 function Candidate({ data }: T.CandidateProp) {
   const [isEditing, setIsEditing] = useState(false);
-  const [file, setFile] = useState<File|null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [state, dispatch] = useReducer<Reducer<S, A>>(
     (state, action) => {
       const { type, payload } = action;
@@ -52,28 +52,28 @@ function Candidate({ data }: T.CandidateProp) {
   );
   const [update, { isLoading: isLoading_MME }] = useUpdateMeMutation();
   const [update_major, { isLoading: isLoading_MMAJOR }] = useUpdateMajorMutation();
-  const [upload, {isLoading: isLoading_MUPLOAD}] = useUploadProfileImageMutation();
+  const [upload, { isLoading: isLoading_MUPLOAD }] = useUploadProfileImageMutation();
   const handleUpdate = () => {
     const { major, image_url, email, ...rest } = state;
-    console.log({ state })
-      const formdata = new FormData();
+    //console.log({ state })
+    const formdata = new FormData();
     formdata.append('file', file)
-    
-        Promise.all([
-          update(rest)
-            .unwrap(),
-          update_major({
-            major_id: data.candidate.major.id,
-            major: { name: major }
-          }).unwrap(),
-          upload(formdata).unwrap
-        ])
-          .then(_ => setIsEditing(false))
-          .catch(err => console.log({ err }))
-          .finally(() => {
-            setIsEditing(false);
-          })
-    
+
+    Promise.all([
+      update(rest)
+        .unwrap(),
+      update_major({
+        major_id: data.candidate.major.id,
+        major: { name: major }
+      }).unwrap(),
+      upload(formdata).unwrap
+    ])
+      .then(_ => setIsEditing(false))
+      .catch(err => console.log({ err }))
+      .finally(() => {
+        setIsEditing(false);
+      })
+
   };
 
   return (
