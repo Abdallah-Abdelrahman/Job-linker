@@ -14,16 +14,15 @@ class UserFile(BaseModel, Base):
     __tablename__ = "user_files"
 
     user_id = Column(String(60), ForeignKey("users.id"), nullable=False)
-    filename = Column(String(200), nullable=False)
+    file_url = Column(String(200), nullable=False)
     original_filename = Column(String(200), nullable=False)
     upload_date = Column(DateTime, default=datetime.utcnow)
 
     # Relationship with User
     user = relationship(
-            "User",
-            backref=backref("user_files", cascade="all, delete-orphan")
-            )
+        "User", backref=backref("user_files", cascade="all, delete-orphan")
+    )
 
     def __repr__(self):
         """Return a string representation of the UserFile instance"""
-        return f"[{self.__class__.__name__}] ({self.id}) {self.filename}"
+        return f"[{self.__class__.__name__}] ({self.id}) {self.file_url}"

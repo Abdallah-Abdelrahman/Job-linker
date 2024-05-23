@@ -69,9 +69,11 @@ class FileController:
                 ApplicationConfig.UPLOAD_CV,
                 os.path.basename(file_path),
             )
+            file_type = "cvs"
             os.rename(file_path, new_file_path)
             self.user_file.create_user_file(
-                user_id, new_file_path, original_filename)
+                user_id, new_file_path, original_filename, file_type
+            )
             return (
                 "File uploaded and profile created successfully",
                 {"size": size, "candidate_id": candidate.get("id")},
@@ -88,9 +90,11 @@ class FileController:
                 ApplicationConfig.UPLOAD_JOB,
                 os.path.basename(file_path),
             )
+            file_type = "jobs"
             os.rename(file_path, new_file_path)
             self.user_file.create_user_file(
-                user_id, new_file_path, original_filename)
+                user_id, new_file_path, original_filename, file_type
+            )
             return (
                 "File uploaded and job created successfully",
                 {"size": size, "job_id": job.id},
