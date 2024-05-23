@@ -133,10 +133,12 @@ function Home() {
         </Box>
       </Box>
       {/* Jobs Counts */}
+      {/*
       <Box as='section' className='job-counts py-20 w-full bg-white'>
         <Heading as='h2' className='mb-8 capitalize text-center text-gray-600'>
           Explore. Discover. Achieve.
         </Heading>
+        
         {isLoading || isHiredCountLoading ? (
           <Text>Loading...</Text>
         ) : jobCounts && jobCounts.data.major_counts && hiredCount ? (
@@ -169,6 +171,7 @@ function Home() {
           <Text>Error loading job counts.</Text>
         )}
       </Box>
+      */}
       {/* FAQS section */}
       <Box as='section' className='py-20'>
         <Heading as='h2' className='mb-8 capitalize text-center text-gray-600'>
