@@ -11,21 +11,27 @@ import {
   Switch,
   Tag,
   Input,
+  Skeleton,
+  SkeletonCircle,
+  ButtonGroup,
 } from '@chakra-ui/react';
-import React from 'react';
+import React, { Reducer, useReducer } from 'react';
 import MyIcon from '../Icon';
 import MyModal from '../MyModal';
 import { AddJob } from '../job';
 import { useState } from 'react';
 import * as T from './types';
-import { Contact_info } from './Candidate';
 import {
   useUploadProfileImageMutation,
   useGetUploadedFileQuery,
   useUpdateMeMutation,
 } from '../../app/services/auth';
 import { Link, Outlet, useMatch } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+
+type RecReducer = Reducer<
+  T.RecruiterProp['data']['contact_info'] & { user_name: string },
+  T.RecruiterProp['data']['contact_info'] & { user_name: string }
+>;
 
 function Recruiter({ data }: T.RecruiterProp) {
   const { isOpen, onClose, onOpen } = useDisclosure();
@@ -36,29 +42,22 @@ function Recruiter({ data }: T.RecruiterProp) {
   const filename = data.image_url?.split('/').pop();
   const toast = useToast();
   const [updateMe] = useUpdateMeMutation();
-  const [editField, setEditField] = useState(null);
-  const [name, setName] = useState(data.name);
+  const [isEditing, setIsEditing] = useState(false);
+  const [state, dispatch] = useReducer<RecReducer>(
+    (prevState, newState) => {
+      return ({ ...prevState, ...newState });
+    },
+    {
+      company_name: data.contact_info.company_name ?? '',
+      company_address: data.contact_info.company_address ?? '',
+      company_email: data.contact_info.company_email ?? '',
+      user_name: data.name ?? ''
+    });
 
-  const [companyName, setCompanyName] = useState(
-    data.contact_info.company_name,
-  );
-  const [companyAddress, setCompanyAddress] = useState(
-    data.contact_info.company_address,
-  );
-  const [companyEmail, setCompanyEmail] = useState(
-    data.contact_info.company_email,
-  );
-
-  const handleFieldClick = (fieldName) => {
-    setEditField(fieldName);
-  };
-
+  // handlers
   const handleApplyClick = () => {
     // Call the API to update the field
-    updateMe({
-      [editField]:
-        editField === 'name' ? name : { [editField]: eval(editField) },
-    })
+    updateMe({ ...state, name: state.user_name })
       .unwrap()
       .then((response) => {
         // Handle successful update
@@ -81,10 +80,9 @@ function Recruiter({ data }: T.RecruiterProp) {
         });
       });
   };
-
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    if (!file?.name) return;
 
     const formData = new FormData();
     formData.append('file', file);
@@ -120,19 +118,25 @@ function Recruiter({ data }: T.RecruiterProp) {
     file_type: 'images',
     filename: filename,
   });
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+
   const imageUrl = image_data.data.url;
 
   return (
     <Box className='grid grid-cols-4 gap-6 container mt-4 mx-auto sm:grid-cols-12'>
-      <Box className='col-span-4 bg-white flex p-6 flex-col items-center gap-2 rounded-md shadow-md sm:col-span-4'>
+      <Box className='relative col-span-4 bg-white flex p-6 flex-col items-center gap-2 rounded-md shadow-md sm:col-span-4'>
+        <Button
+          className='!absolute top-6 right-6'
+          onClick={() => setIsEditing(true)}
+        >
+          <MyIcon href='/sprite.svg#edit' className='w-6 h-6' />
+        </Button>
         <Box className='w-32 h-32 rounded-full overflow-hidden relative'>
-          <img
-            src={imageUrl || 'https://placehold.co/600x400'}
-            className='w-full h-full object-cover'
-          />
+          <SkeletonCircle w='100%' h='100%' isLoaded={!isLoading}>
+            <img
+              src={imageUrl || 'https://placehold.co/600x400'}
+              className='w-full h-full object-cover'
+            />
+          </SkeletonCircle>
           <label
             htmlFor='file-upload'
             className='absolute inset-0 w-full h-full flex items-center justify-center opacity-0 cursor-pointer hover:opacity-80 transition duration-500 bg-white bg-opacity-30'
@@ -156,57 +160,59 @@ function Recruiter({ data }: T.RecruiterProp) {
             className='hidden'
           />
         </Box>
-        <Heading as='h2' size='lg' className='capitalize'>
-          {data.name}
-        </Heading>
-        <Text className='tracking-wide'>{data.contact_info.company_name}</Text>
+        {isEditing
+          ? <Input
+            value={state.user_name}
+            onChange={(e) => dispatch({ user_name: e.target.value })}
+          />
+          : (
+            <Heading as='h2' size='lg' className='capitalize'>
+              {data.name}
+            </Heading>
+          )}
         <hr className='w-full' />
         <Stack className='w-full mt-2 space-y-6'>
-          {editField === 'name' ? (
-            <Input value={name} onChange={(e) => setName(e.target.value)} />
-          ) : (
-            <Text onClick={() => handleFieldClick('name')}>{name}</Text>
-          )}
-          {editField === 'contact_info.company_name' ? (
+          {isEditing ? (
             <Input
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
+              value={state.company_name}
+              onChange={(e) => dispatch({ company_name: e.target.value })}
             />
           ) : (
-            <Text onClick={() => handleFieldClick('contact_info.company_name')}>
-              {companyName}
+            <Text>
+              {data.contact_info.company_name}
             </Text>
           )}
-          {editField === 'contact_info.company_address' ? (
+          {isEditing ? (
             <Input
-              value={companyAddress}
-              onChange={(e) => setCompanyAddress(e.target.value)}
+              value={state.company_address}
+              onChange={(e) => dispatch({ company_address: e.target.value })}
             />
           ) : (
-            <Text
-              onClick={() => handleFieldClick('contact_info.company_address')}
-            >
-              {companyAddress}
+            <Text>
+              {data.contact_info.company_address}
             </Text>
           )}
-          {editField === 'contact_info.company_email' ? (
+          {isEditing ? (
             <Input
-              value={companyEmail}
-              onChange={(e) => setCompanyEmail(e.target.value)}
+              value={state.company_email}
+              onChange={(e) => dispatch({ company_email: e.target.value })}
             />
           ) : (
-            <Text
-              onClick={() => handleFieldClick('contact_info.company_email')}
-            >
-              {companyEmail}
+            <Text>
+              {data.contact_info.company_email}
             </Text>
           )}
-          {editField && <Button onClick={handleApplyClick}>Apply</Button>}
+          {isEditing &&
+            <ButtonGroup>
+              <Button onClick={handleApplyClick}>update</Button>
+              <Button onClick={() => setIsEditing(false)}>cancel</Button>
+            </ButtonGroup>
+          }
         </Stack>
       </Box>
 
+      {/*Jobs*/}
       <Box className='col-span-4 bg-white flex flex-col rounded-md shadow-md p-6 gap-4 sm:col-span-8'>
-        {/*Jobs*/}
         <Box className='relative'>
           <Heading as='h4' mb='4' size='lg' className='capitalize'>
             Jobs
@@ -292,10 +298,9 @@ function Recruiter({ data }: T.RecruiterProp) {
                         </Heading>
                         <Text
                           className={`py-1 px-2 absolute bottom-0 right-0 rounded-md
-                            ${
-                              job.is_open
-                                ? 'bg-teal-100 text-teal-700'
-                                : 'bg-purple-100 text-purple-700'
+                            ${job.is_open
+                              ? 'bg-teal-100 text-teal-700'
+                              : 'bg-purple-100 text-purple-700'
                             }`}
                         >
                           {job.is_open ? 'open' : 'closed'}
