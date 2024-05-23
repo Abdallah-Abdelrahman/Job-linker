@@ -59,7 +59,7 @@ class UserFileController:
         # Create new user file record
         new_user_file = UserFile(
             user_id=user_id,
-            filename=file_url,
+            file_url=file_url,
             original_filename=original_filename,
         )
         storage.new(new_user_file)
