@@ -3,14 +3,15 @@ import { useGetJobQuery, useUpdateJobMutation } from '../../app/services/job';
 import {
   Box,
   Button,
+  Flex,
   Heading,
   ListItem,
   Skeleton,
   Text,
   UnorderedList,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
-import { useState } from 'react';
 import MyIcon from '../Icon';
 import { useAppSelector } from '../../hooks/store';
 import { selectCurrentUser } from '../../features/auth';
@@ -29,13 +30,32 @@ function Job() {
   const [apply, { isLoading, applySuccess, error }] =
     useCreateApplicationMutation();
   const [updateJob, { isLoading: toggleLoading }] = useUpdateJobMutation();
+  const toast = useToast();
 
   const handleApply = () => {
     apply({ job_id })
       .unwrap()
+      .then(_ => toast({
+        title: 'application',
+        description: 'your application has been sent successfuly, check your email',
+        status: 'success',
+        isClosable: true,
+        position: 'top',
+        variant: 'left-accent'
+      }))
       .catch((err) => {
         if (err.status == 401) {
           onOpen();
+        }
+        else {
+          toast({
+            title: 'application error',
+            description: err.data.message,
+            status: 'error',
+            isClosable: true,
+            position: 'top',
+            variant: 'left-accent'
+          });
         }
       });
   };
@@ -83,6 +103,19 @@ function Job() {
               <ListItem key={idx} children={re} />
             ))}
           </UnorderedList>
+          <Box>
+            <Flex alignItems='center' gap='1' mb='1'>
+              <MyIcon href='/sprite.svg#deadline' className='w-6 h-6' />
+              <Text
+                className='capitalize font-semibold leading-none'
+                children='deadline'
+              />
+            </Flex>
+            <Text
+              className=''
+              children={job.data.application_deadline}
+            />
+          </Box>
         </Box>
         <MyModal
           title='error'

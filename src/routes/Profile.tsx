@@ -34,7 +34,7 @@ const Profile = () => {
   const { role } = useAppSelector(selectCurrentUser);
 
   const handleCandidateFormSubmit = async (formdata: FormData) => {
-    console.log(formdata.get('file'));
+//    console.log(formdata.get('file'));
     try {
       addMajor({ name: formdata.get('major') })
         .unwrap()
@@ -46,12 +46,12 @@ const Profile = () => {
                 .unwrap()
                 .then(_ => {
                   updateUser({ profile_complete: true })
-                    .then(_ => console.log('----------profile completed-------->'))
-                    .catch(err => console.log('------not completed---->', { err }));
+//                    .then(_ => console.log('----------profile completed-------->'))
+//                    .catch(err => console.log('------not completed---->', { err }));
                 })
                 .catch()
             })
-            .catch((err) => console.log({ err }));
+//            .catch((err) => console.log({ err }));
         })
         .catch((err) => console.error({ err }));
     } catch (error) {
@@ -70,8 +70,8 @@ const Profile = () => {
             .unwrap()
             .then(_ => {
               updateUser({ profile_complete: true })
-                .then(_ => console.log('----------profile completed-------->'))
-                .catch(err => console.log('------not completed---->', { err }));
+//                .then(_ => console.log('----------profile completed-------->'))
+//                .catch(err => console.log('------not completed---->', { err }));
             })
             .catch((error) => {
               console.error(error);

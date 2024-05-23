@@ -58,7 +58,7 @@ const baseQueryWithReauth: BaseQueryFn<
   let result = await baseQuery(args, api, extraOptions);
 
   if (result.error && result.error.status === 401) {
-    console.log('-------token expires------->');
+//    console.log('-------token expires------->');
     api.dispatch(setCredentials({ isRefreshing: true }));
 
     // try to get a new token
