@@ -136,6 +136,9 @@ class JobController:
                     "name": app.candidate.user.name,
                     "email": app.candidate.user.email,
                     "application_status": app.application_status,
+                    "cv_url": app.candidate.user.user_files[0].file_url
+                    if app.candidate.user.user_files
+                    else None,
                 }
                 for app in applications
                 if app.candidate and app.candidate.user
@@ -253,10 +256,8 @@ class JobController:
         recruiter_email = recruiter.user.email
         if shortlisted_candidates:
             shortlisted_template = shortlisted_candidates_email(
-                recruiter.user.name,
-                company_name,
-                job_title,
-                shortlisted_candidates
+                recruiter.user.name, company_name,
+                job_title, shortlisted_candidates
             )
             subject = "Shortlisted Candidates"
         else:
@@ -314,7 +315,9 @@ class JobController:
             UnauthorizedError: If the user is not a recruiter.
         """
         if not user_id or not job_id or not skill_id:
-            raise ValueError("User ID, Job ID and Skill ID must be provided")
+            raise ValueError(
+                    "User ID, Job ID and Skill ID must be provided"
+                    )
 
         user = storage.get(User, user_id)
         if not user or user.role != "recruiter":
