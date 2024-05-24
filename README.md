@@ -82,4 +82,6 @@ Explore the platform, and if it meets your expectations, consider starring our r
 
 ## 📄 License
 
-(Section to be completed)
+This project is licensed under the terms of the MIT License. This means you are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, under the condition that you include the original copyright notice and a copy of the MIT License in all copies or substantial portions of the software.
+
+For more details, see the LICENSE file in the repository.
