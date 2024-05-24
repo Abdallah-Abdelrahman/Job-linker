@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Button,
   FormControl,
@@ -11,6 +11,7 @@ import {
   AlertIcon,
   InputGroup,
   InputLeftElement,
+  Text
 } from "@chakra-ui/react";
 import { useRegisterMutation } from "../app/services/auth";
 import { MyIcon } from "../components";
@@ -25,7 +26,7 @@ function Register() {
   const [role, setRole] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  const user = useAppSelector(selectCurrentUser); 
+  const user = useAppSelector(selectCurrentUser);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
@@ -134,6 +135,14 @@ function Register() {
         >
           Register
         </Button>
+        <Text className='flex gap-1'>
+          have an account?
+          <Link
+            to='/login'
+            className='text-sky-600'
+            children=' sign in'
+          />
+        </Text>
       </form>
     </Box>
   );

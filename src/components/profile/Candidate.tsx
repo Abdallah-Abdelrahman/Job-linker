@@ -2,15 +2,16 @@ import { Text, Heading, Box, Stack, Button, ButtonGroup, Input, InputGroup, Inpu
 import MyIcon from '../Icon';
 import * as T from './types';
 import { Fragment, Reducer, useReducer, useState } from 'react';
-import { useCreateSkillMutation, useUpdateSkillMutation } from '../../app/services/skill';
-import { useCreateLanguageMutation, useDeleteLanguageMutation, useUpdateLanguageMutation } from '../../app/services/language';
+import { useCreateSkillMutation } from '../../app/services/skill';
+import { useCreateLanguageMutation } from '../../app/services/language';
 import { useUpdateWorkExperienceMutation } from '../../app/services/work_experience';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
 import { useUpdateMeMutation, useUploadProfileImageMutation } from '../../app/services/auth';
-import { useCreateMajorMutation, useUpdateMajorMutation } from '../../app/services/major';
+import { useCreateMajorMutation } from '../../app/services/major';
 import { college_majors } from '../../constants';
 import Photo from './Photo';
 import { type Education, useUpdateEducationForCurrentCandidateMutation, useUpdateCurrentCandidateMutation, useAddLanguageToCurrentCandidateMutation, useRemoveLanguageFromCurrentCandidateMutation, useRemoveSkillFromCurrentCandidateMutation, useAddSkillToCurrentCandidateMutation } from '../../app/services/candidate';
+import UpdateOrCancel from './UpdateOrCancel';
 
 type ActionType = 'reset' | 'contact_info' | undefined
 type S = Omit<T.CandidateProp['data'], 'candidate' | 'bio'> & { major: string }
@@ -678,30 +679,6 @@ type ContactProps = {
   state: S
 }
 
-type UpdateOrCancelProps = {
-  cancel: () => void,
-  update: () => void,
-  isLoading: boolean
-} & { [k: string]: string }
-function UpdateOrCancel({ cancel, update, isLoading, ...props }: UpdateOrCancelProps) {
-  return (
-    <ButtonGroup>
-      <IconButton
-        aria-label='button'
-        icon={<CloseIcon />}
-        onClick={cancel}
-        {...props}
-      />
-      <IconButton
-        aria-label='button'
-        isLoading={isLoading}
-        icon={<CheckIcon />}
-        onClick={update}
-        {...props}
-      />
-    </ButtonGroup>
-  );
-}
 export function Contact_info({ data, isEditing, state, dispatch }: ContactProps) {
   if (!data) {
     return (null);

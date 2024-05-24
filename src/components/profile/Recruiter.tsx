@@ -11,6 +11,8 @@ import {
   Input,
   SkeletonCircle,
   ButtonGroup,
+  InputGroup,
+  InputLeftAddon,
 } from '@chakra-ui/react';
 import React, { Reducer, useReducer } from 'react';
 import MyIcon from '../Icon';
@@ -23,7 +25,9 @@ import {
   useGetUploadedFileQuery,
   useUpdateMeMutation,
 } from '../../app/services/auth';
-import { Link, Outlet, useMatch } from 'react-router-dom';
+import { Link, Outlet, useMatch, useNavigate } from 'react-router-dom';
+import UpdateOrCancel from './UpdateOrCancel';
+import Photo from './Photo';
 
 type RecReducer = Reducer<
   T.RecruiterProp['data']['contact_info'] & { user_name: string },
@@ -35,13 +39,17 @@ function Recruiter({ data }: T.RecruiterProp) {
   const [isUploading, setUploading] = useState(false);
   const [isUninitialized, setUnInitialized] = useState(true);
   const match = useMatch('@me/jobs/:job_id');
-  const [uploadProfileImage] = useUploadProfileImageMutation();
-  const filename = data.image_url?.split('/').pop();
-  const toast = useToast();
-  const [updateMe] = useUpdateMeMutation();
+  const [uploadProfileImage, { isLoading: isLoading_MUPLOAD }] = useUploadProfileImageMutation();
+  const navigate = useNavigate();
+  const [updateMe, { isLoading }] = useUpdateMeMutation();
   const [isEditing, setIsEditing] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
   const [state, dispatch] = useReducer<RecReducer>(
     (prevState, newState) => {
+      if (newState.type === 'reset') {
+        const { contact_info, name } = data;
+        return ({ ...contact_info, user_name: name });
+      }
       return { ...prevState, ...newState };
     },
     {
@@ -55,69 +63,18 @@ function Recruiter({ data }: T.RecruiterProp) {
   // handlers
   const handleApplyClick = () => {
     // Call the API to update the field
-    updateMe({ ...state, name: state.user_name })
-      .unwrap()
-      .then((response) => {
-        // Handle successful update
-        toast({
-          title: 'Profile updated successfully',
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-        });
-        setEditField(null);
-      })
-      .catch((error) => {
-        // Handle failed update
-        toast({
-          title: 'Profile update failed',
-          description: error.message,
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-        });
+    const formdata = new FormData();
+    formdata.append('file', file);
+    const { user_name: name, ...contact_info } = state;
+    Promise.allSettled([
+      updateMe({ contact_info, name }).unwrap(),
+      uploadProfileImage(formdata).unwrap()
+    ])
+      .catch(err => console.log({ err }))
+      .finally(() => {
+        setIsEditing(false);
       });
   };
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file?.name) return;
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    uploadProfileImage(formData)
-      .unwrap()
-      .then((response) => {
-        // Handle successful upload
-        toast({
-          title: 'File uploaded successfully',
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-        });
-      })
-      .catch((error) => {
-        // Handle failed upload
-        toast({
-          title: 'File upload failed',
-          description: error.message,
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-        });
-      });
-  };
-
-  const {
-    data: image_data = { data: {} },
-    isLoading,
-    error,
-  } = useGetUploadedFileQuery({
-    file_type: 'images',
-    filename: filename,
-  });
-
-  const imageUrl = image_data.data.url;
 
   const FileLinks = ({ user_files }) => {
     const fileLinks = user_files
@@ -168,41 +125,20 @@ function Recruiter({ data }: T.RecruiterProp) {
         >
           <MyIcon href='/sprite.svg#edit' className='w-6 h-6' />
         </Button>
-        <Box className='w-32 h-32 rounded-full overflow-hidden relative'>
-          <SkeletonCircle w='100%' h='100%' isLoaded={!isLoading}>
-            <img
-              src={imageUrl || 'https://placehold.co/600x400'}
-              className='w-full h-full object-cover'
-            />
-          </SkeletonCircle>
-          <label
-            htmlFor='file-upload'
-            className='absolute inset-0 w-full h-full flex items-center justify-center opacity-0 cursor-pointer hover:opacity-80 transition duration-500 bg-white bg-opacity-30'
-          >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              height='48px'
-              viewBox='0 0 24 24'
-              width='48px'
-              fill='#000000'
-            >
-              <path d='M0 0h24v24H0V0z' fill='none' />
-              <path d='M18 20H4V6h9V4H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-9h-2v9zm-7.79-3.17l-1.96-2.36L5.5 18h11l-3.54-4.71zM20 4V1h-2v3h-3c.01.01 0 2 0 2h3v2.99c.01.01 2 0 2 0V6h3V4h-3z' />
-            </svg>
-          </label>
-
-          <input
-            id='file-upload'
-            type='file'
-            onChange={handleFileUpload}
-            className='hidden'
-          />
-        </Box>
+        <Photo
+          isLoading={isLoading_MUPLOAD}
+          setFile={setFile}
+          disabled={!isEditing}
+          imageUrl={data.image_url}
+        />
         {isEditing ? (
-          <Input
-            value={state.user_name}
-            onChange={(e) => dispatch({ user_name: e.target.value })}
-          />
+          <InputGroup>
+            <InputLeftAddon children='user_name' />
+            <Input
+              value={state.user_name}
+              onChange={(e) => dispatch({ user_name: e.target.value })}
+            />
+          </InputGroup>
         ) : (
           <Heading as='h2' size='lg' className='capitalize'>
             {data.name}
@@ -211,34 +147,47 @@ function Recruiter({ data }: T.RecruiterProp) {
         <hr className='w-full' />
         <Stack className='w-full mt-2 space-y-6'>
           {isEditing ? (
+          <InputGroup>
+            <InputLeftAddon children='company' />
             <Input
               value={state.company_name}
               onChange={(e) => dispatch({ company_name: e.target.value })}
             />
+          </InputGroup>
           ) : (
             <Text>{data.contact_info.company_name}</Text>
           )}
           {isEditing ? (
+          <InputGroup>
+            <InputLeftAddon children='address' />
             <Input
               value={state.company_address}
               onChange={(e) => dispatch({ company_address: e.target.value })}
             />
+          </InputGroup>
           ) : (
             <Text>{data.contact_info.company_address}</Text>
           )}
           {isEditing ? (
+          <InputGroup>
+            <InputLeftAddon children='email' />
             <Input
               value={state.company_email}
               onChange={(e) => dispatch({ company_email: e.target.value })}
             />
+          </InputGroup>
           ) : (
             <Text>{data.contact_info.company_email}</Text>
           )}
           {isEditing && (
-            <ButtonGroup>
-              <Button onClick={handleApplyClick}>update</Button>
-              <Button onClick={() => setIsEditing(false)}>cancel</Button>
-            </ButtonGroup>
+            <UpdateOrCancel
+              isLoading={isLoading}
+              update={handleApplyClick}
+              cancel={() => {
+                setIsEditing(false);
+                dispatch({ type: 'reset' });
+              }}
+            />
           )}
         </Stack>
         {/* User files */}
@@ -252,13 +201,13 @@ function Recruiter({ data }: T.RecruiterProp) {
             Jobs
           </Heading>
           {match ? (
-            <Link
-              to='/@me'
+            <Button
               className='!flex !absolute !right-0 !top-0 hover:border-sky-300'
+              onClick={() => navigate('/@me')}
             >
               <MyIcon href='/sprite.svg#back' className='w-6 h-6' />
               <Text as='span'>back</Text>
-            </Link>
+            </Button>
           ) : (
             <Button
               className='!absolute !right-0 !top-0 hover:border-sky-300'
@@ -327,15 +276,14 @@ function Recruiter({ data }: T.RecruiterProp) {
                         {job.application_count} Applications
                       </Badge>
                       <Box className='relative space-y-2'>
-                        <Heading as='h6' size='md' className='capitalize'>
+                        <Heading as='h6' size='md' className='capitalize max-w-[80%]'>
                           {job.job_title}
                         </Heading>
                         <Text
-                          className={`py-1 px-2 absolute bottom-0 right-0 rounded-md
-                            ${
-                              job.is_open
-                                ? 'bg-teal-100 text-teal-700'
-                                : 'bg-purple-100 text-purple-700'
+                          className={`py-1 px-2 absolute top-4 right-0 rounded-md
+                            ${job.is_open
+                              ? 'bg-teal-100 text-teal-700'
+                              : 'bg-purple-100 text-purple-700'
                             }`}
                         >
                           {job.is_open ? 'open' : 'closed'}
@@ -392,7 +340,7 @@ function JobDesc({ id, desc }: DescProps) {
 
   return (
     <Box>
-      <Text>
+      <Text className='p-1'>
         {desc.length > 200 ? desc_sub + '...' : desc + '...'}
         <Link className='text-sky-500' to={`jobs/${id}`}>
           see more

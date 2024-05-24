@@ -16,13 +16,19 @@ import {
   Card,
   CardHeader,
 } from '@chakra-ui/react';
-import { Insights, MyIcon } from '../components';
+import { Insights, MyIcon, MyModal } from '../components';
 import { FAQS } from '../constants';
 import { useGetJobCountsQuery } from '../app/services/job';
 import { useGetHiredCountQuery } from '../app/services/application';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAppSelector } from '../hooks/store';
+import { selectCurrentUser } from '../features/auth';
 
 function Home() {
+  const user = useAppSelector(selectCurrentUser);
+  const navigate = useNavigate();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isOpenPost, onOpen: onOpenPost, onClose: onClosePost } = useDisclosure();
   const { data: jobCounts, isLoading } = useGetJobCountsQuery();
   const { data: hiredCount, isLoading: isHiredCountLoading } =
     useGetHiredCountQuery();
@@ -85,9 +91,25 @@ function Home() {
           <Button
             size={{ base: 'sm', sm: 'lg' }}
             className='w-40  rounded-md !bg-white !text-sky-600 !outline-sky-400'
+            onClick={() => {
+              if (user.role == 'recruiter') {
+                navigate('@me');
+              }
+              onOpenPost();
+            }}
           >
             post a job
           </Button>
+          <MyModal
+            title='Post a job'
+            isOpen={isOpenPost}
+            onClose={onClosePost}
+            body={
+              !user.jwt
+                ? <Text>you need to <Link to='login' className='text-sky-400' children='sign in ' /> as recruiter</Text>
+                : <Text>you need to be a recruiter to be able to post a job</Text>
+            }
+          />
         </Box>
       </Box>
       {/* How it works section */}

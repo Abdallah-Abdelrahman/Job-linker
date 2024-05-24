@@ -10,6 +10,7 @@ export type Job = {
   major: string;
   salary: number;
   skills: string[];
+  responsibilities: string[]
 }
 
 export type Recruiter = {

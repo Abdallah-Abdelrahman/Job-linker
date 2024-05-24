@@ -16,12 +16,13 @@ import {
 } from '@chakra-ui/react';
 import { useGetAllJobsSortedByDateQuery, useLazySearchJobsQuery } from '../app/services/job';
 import { MyIcon } from '../components';
-import { Link, Outlet, useMatch } from 'react-router-dom';
+import { Link, Outlet, useMatch, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { formatFromNow } from '../helpers';
 
 function Explore() {
   const match = useMatch('/find_jobs/:job_id');
+  const navigate = useNavigate();
   const [isLargeThan640] = useMediaQuery('(min-width: 640px)');
   const [sort, setSort] = useState([]);
   const {
@@ -33,6 +34,7 @@ function Explore() {
     searchJobs,
     { data: searchResults = { data: [] },
       isLoading: searchLoading,
+      isFetching,
       isSuccess: searchSuccess,
       isUninitialized
     }
@@ -109,7 +111,7 @@ function Explore() {
           type='submit'
           size='lg'
           className='!bg-sky-400 !text-white sm:basis-[25%]'
-          isLoading={searchLoading}
+          isLoading={searchLoading||isFetching}
         >
           search
         </Button>
@@ -117,13 +119,13 @@ function Explore() {
       {/* jobs crumbs */}
       <Box as='section' className='relative mt-8'>
         {!isLargeThan640 && match
-          ? <Link
-            to='/find_jobs'
-            className='!flex !absolute !right-0 !top-0 hover:border-sky-300'
+          ? <Button
+            onClick={()=> navigate('/find_jobs')}
+            className='!flex !bg-white z-10 !absolute !right-0 !top-0 hover:border-sky-300'
           >
             <MyIcon href='/sprite.svg#back' className='w-6 h-6' />
             <Text as='span'>back</Text>
-          </Link>
+          </Button>
           : null}
         {isLargeThan640
           ? ( /* desktop view */
