@@ -38,11 +38,11 @@ function AddJob({ setLoading, setUnInitialized }: Props) {
           formdata.append('major_id', (data.data.id));
           uploadJOB(formdata)
             .unwrap()
-            .then(d => console.log({ d }))
-            .catch(e => console.log('--------upload error------->', e))
+//            .then(d => console.log({ d }))
+//            .catch(e => console.log('--------upload error------->', e))
             .finally(_ => setLoading(false));
         })
-        .catch(e => console.log('--------add_major error------->', e))
+//        .catch(e => console.log('--------add_major error------->', e))
         
     }
   };

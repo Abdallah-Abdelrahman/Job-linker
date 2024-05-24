@@ -1,0 +1,1 @@
+export { formatFromNow } from './dates';

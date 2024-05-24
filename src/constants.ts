@@ -93,7 +93,7 @@ export const college_majors = [
 
 export const FAQS = [
   { 'how does job linker work for recruiter': 'Recruiters can easily post their job descriptions on Job Linker and our platform will match them with qualified candidates.' },
-  { 'Can candidates apply directly through Job Linker?': 'No, candidates cannot apply directly through Job Linker. They will be matched with job postings based on their qualifications.' },
+  { 'Can candidates apply directly through Job Linker?': 'Yes, candidates can apply directly through Job Linker. They will be matched with job postings based on their qualifications.' },
   { 'Is Job Linker free to use for both recruiters and candidates?': 'Yes, Job Linker is completely free for both recruiters and candidates to use.' },
   { 'How are candidates matched with job postings on Job Linker?': 'Candidates are matched based on their qualifications and the job requirements provided by the recruiters.' },
   { 'Can recruiters contact candidates directly through Job Linker?': "Yes, recruiters can contact matched candidates directly through Job Linker's messaging system." }

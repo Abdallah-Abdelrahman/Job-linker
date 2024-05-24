@@ -15,10 +15,10 @@ class MailService:
     __CONTEXT = ssl.create_default_context()
     __SENDER_EMAIL = "abdofola67@gmail.com"
 
-    def send_mail(self, template, receiver_email, name):
+    def send_mail(self, template, receiver_email, name, subject):
         '''send receiver_email to user'''
         message = MIMEMultipart('alternative')
-        message["Subject"] = ""
+        message["Subject"] = subject
         message["From"] = self.__SENDER_EMAIL
         message["To"] = receiver_email
 

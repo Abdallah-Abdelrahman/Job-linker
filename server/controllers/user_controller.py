@@ -3,14 +3,17 @@ This module provides a controller for the User model in the
 Job-linker application.
 """
 
+import os
 from json import dumps, loads
 
-from flask import current_app
+from flask import current_app, url_for
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, create_refresh_token
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from marshmallow import ValidationError
+from werkzeug.utils import secure_filename
 
+from server.config import ApplicationConfig
 from server.controllers.schemas import (
         login_schema,
         registration_schema,
@@ -89,7 +92,8 @@ class UserController:
             token (str): The verification token.
         """
         template = verification_email(name, token)
-        self.email_service.send_mail(template, email, name)
+        subject = "Email Verification for Joblinker"
+        self.email_service.send_mail(template, email, name, subject)
 
     def verify_email(self, token):
         """
@@ -104,14 +108,10 @@ class UserController:
         serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
         try:
             email = serializer.loads(
-                    token,
-                    salt="email-verification",
-                    max_age=3600
-                    )
+                token, salt="email-verification", max_age=3600)
         except (BadSignature, SignatureExpired):
             raise ValueError(
-                    "The verification link is invalid or has expired."
-                    )
+                "The verification link is invalid or has expired.")
 
         user = storage.get_by_attr(User, "email", email)
         if not user:
@@ -196,10 +196,7 @@ class UserController:
 
             # Send verification email
             self.send_verification_email(
-                    user.email,
-                    user.name,
-                    verification_token
-                    )
+                user.email, user.name, verification_token)
 
             raise UnauthorizedError("Verify your email")
         access_token = create_access_token(identity=user.id)
@@ -248,8 +245,7 @@ class UserController:
                         for experience in candidate.experiences
                     ],
                     "education": [
-                        education.to_dict
-                        for education in candidate.educations
+                        education.to_dict for education in candidate.educations
                     ],
                 }
         elif user.role == "recruiter":
@@ -293,7 +289,6 @@ class UserController:
             "profile_complete",
             "contact_info",
             "bio",
-            "image_url",
         ]
 
         # Validate data
@@ -310,16 +305,63 @@ class UserController:
 
         for key, value in data.items():
             if key in ALLOWED_UPDATE_FIELDS:
-                setattr(
-                        user,
-                        key,
-                        dumps(value) if key == "contact_info" else value
-                        )
+                setattr(user, key, dumps(value) if key ==
+                        "contact_info" else value)
             else:
                 raise ValueError(f"Cannot update field: {key}")
 
         storage.save()
         return user
+
+    def upload_profile_image(self, user_id, file):
+        """
+        Uploads a profile image for a user and updates
+        their profile in the database.
+
+        Args:
+            user_id: The user's ID.
+            file: The image file.
+
+        Returns:
+            A message, file path (if successful), and HTTP status code.
+        """
+        if (
+            not file
+            or "." not in file.filename
+            or file.filename.rsplit(".", 1)[1].lower()
+            not in ApplicationConfig.ALLOWED_IMAGE_EXTENSIONS
+        ):
+            return "Unsupported file type", None, 400
+
+        if file.content_length > ApplicationConfig.MAX_IMAGE_CONTENT_LENGTH:
+            return "File size exceeds the maximum limit", None, 400
+
+        filename = secure_filename(file.filename)
+        filename = f"{user_id}_{filename}"
+        file_path = os.path.join(ApplicationConfig.UPLOAD_IMAGE, filename)
+        file.save(file_path)
+
+        # Update user profile with the image URL
+        user = storage.get(User, user_id)
+        if not user:
+            return "User not found", None, 404
+
+        # Generate the URL for the image
+        image_url = url_for(
+            "app_views.download_file",
+            file_type="images",
+            filename=filename,
+            _external=True,
+        )
+
+        user.image_url = image_url
+        storage.save()
+
+        return (
+            "Image uploaded successfully",
+            {"file_path": file_path, "url": image_url},
+            201,
+        )
 
     def delete_current_user(self, user_id):
         """

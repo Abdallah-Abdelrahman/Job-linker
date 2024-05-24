@@ -32,7 +32,7 @@ a:hover {
   @apply inline-block;
 }
 .nav {
-    overflow: hidden;
+/*     overflow: hidden; */
 }
 .nav a.active {
     @apply relative shadow-inner bg-gray-100 rounded-t-xl text-gray-600;

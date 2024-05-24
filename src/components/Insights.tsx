@@ -4,13 +4,6 @@ import {
   Button,
   List,
   ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Skeleton,
   Progress,
   Heading
@@ -80,7 +73,12 @@ function Insights({ onClose, isOpen }: Props) {
             {isError
               ? <Box className='flex flex-col justify-center items-center gap-4'>
                 <Text className='w-full p-3 border border-l-4 border-l-red-400 bg-red-100 text-red-400 rounded-md rounded-tl-none rounded-bl-none'>
-                  {error?.data.message}
+                  {error.status === 413
+                    ? (
+                      'file is too large'
+                    )
+                    : (error.data.message)
+                  }
                 </Text>
                 <MyIcon href='/sprite.svg#upload-error' />
               </Box>
