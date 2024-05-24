@@ -100,6 +100,7 @@ export const candApi = api.injectEndpoints({
         method: 'PUT',
         body: updates,
       }),
+      invalidatesTags: ['me'],
     }),
     addSkillToCurrentCandidate: builder.mutation<
       CandidateResponse,
@@ -180,13 +181,14 @@ export const candApi = api.injectEndpoints({
     }),
     updateEducationForCurrentCandidate: builder.mutation<
       CandidateResponse,
-      { educationId: string; updates: Partial<Education> }
+      { education_id: string; education: Partial<Education> }
     >({
-      query: ({ educationId, updates }) => ({
-        url: `candidates/@me/educations/${educationId}`,
+      query: ({ education_id, education }) => ({
+        url: `candidates/@me/educations/${education_id}`,
         method: 'PUT',
-        body: updates,
+        body: education,
       }),
+      invalidatesTags: ['me']
     }),
     deleteEducationForCurrentCandidate: builder.mutation<
       void,
