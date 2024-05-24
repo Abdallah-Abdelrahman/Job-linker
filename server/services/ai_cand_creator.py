@@ -112,9 +112,8 @@ class AICandidateProfileCreator:
             },
         )
         process_fields(
-            self.experiences,
-            ["start_date", "end_date"],
-            {"location": "Not specified"}
+            self.experiences, ["start_date", "end_date"], {
+                "location": "Not specified"}
         )
 
     def _validate_data(self):
@@ -142,11 +141,11 @@ class AICandidateProfileCreator:
         for skill_name in self.skills:
             try:
                 skill = self.skill_controller.create_skill(
-                        {"name": skill_name}
-                        )
+                    {"name": skill_name})
             except Exception as e:
                 continue
-            self.candidate_controller.add_skill(candidate.user_id, skill.id)
+            self.candidate_controller.add_skill(
+                candidate.get("user_id"), skill.id)
 
     def _add_languages(self, candidate):
         """Adds languages to the candidate"""
@@ -158,21 +157,19 @@ class AICandidateProfileCreator:
             except Exception as e:
                 continue
             self.candidate_controller.add_language(
-                    candidate.user_id,
-                    language.id
-                    )
+                candidate.get("user_id"), language.id
+            )
 
     def _add_work_experiences(self, candidate):
         """Adds work experiences to the candidate"""
         for experience_data in self.experiences:
             self.work_experience_controller.create_work_experience(
-                candidate.user_id, experience_data
+                candidate.get("user_id"), experience_data
             )
 
     def _add_educations(self, candidate):
         """Adds educations to the candidate"""
         for education_data in self.educations:
             self.education_controller.create_education(
-                    candidate.id,
-                    education_data
-                    )
+                candidate.get("id"), education_data
+            )

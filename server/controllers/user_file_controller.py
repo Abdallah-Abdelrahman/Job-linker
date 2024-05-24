@@ -2,6 +2,9 @@
 This module provides a controller for the UserFile model in the
 Job-linker application.
 """
+import os
+
+from flask import url_for
 
 from server.models import storage
 from server.models.user import User
@@ -19,14 +22,18 @@ class UserFileController:
         """
         pass
 
-    def create_user_file(self, user_id, filename, original_filename):
+    def create_user_file(
+            self, user_id, file_path,
+            original_filename, file_type
+            ):
         """
         Creates a new user file record.
 
         Args:
             user_id: The ID of the user.
-            filename: The unique filename of the uploaded file.
+            file_path: The absolute path of the file.
             original_filename: The original filename of the uploaded file.
+            file_type: The type of the file ('cvs' or 'jobs').
 
         Returns:
             The created user file record.
@@ -39,10 +46,20 @@ class UserFileController:
         if not user:
             raise ValueError("User not found")
 
+        filename = os.path.basename(file_path)
+
+        # Generate the URL for the file
+        file_url = url_for(
+            "app_views.download_file",
+            file_type=file_type,
+            filename=filename,
+            _external=True,
+        )
+
         # Create new user file record
         new_user_file = UserFile(
             user_id=user_id,
-            filename=filename,
+            file_url=file_url,
             original_filename=original_filename,
         )
         storage.new(new_user_file)
