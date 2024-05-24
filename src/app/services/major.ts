@@ -16,6 +16,7 @@ export const majorApi = api.injectEndpoints({
         method: 'POST',
         body,
       }),
+      invalidatesTags: ['me'],
     }),
     updateMajor: builder.mutation<
       Major,
