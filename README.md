@@ -1,12 +1,16 @@
 # JobLinker: Your AI-Powered Recruitment Companion
 
 Welcome to JobLinker, a revolutionary platform that leverages the power of Artificial Intelligence to bridge the gap between recruiters and job seekers. Our application streamlines the recruitment process, providing advanced Applicant Tracking System (ATS) insights, facilitating the discovery of in-demand job opportunities, and simplifying the task of identifying qualified candidates.
-[Job Linker](https://ibb.co/Bcr7B7T)
+[![Job Linker](https://i.postimg.cc/8c93cJnn/Designer-8-removebg-preview.png)](https://postimg.cc/GTPzS2Rk)
+
 ## 🌟 Key Features
 
 - **ATS Insights**: Provides candidates with valuable feedback on their resumes, enhancing their visibility to potential employers.
 - **Job Discovery**: Connects job seekers with the most relevant job openings in the market, tailored to their skills and preferences.
 - **AI Recruitment**: Empowers recruiters with AI tools to efficiently identify the best-suited candidates for their vacancies.
+
+## Powered By:
+[![Gemini](https://i.postimg.cc/QC24hLH2/Gemini-SS-width-1300.jpg)](https://postimg.cc/PvMzQRby)
 
 ## 🛠️ Technologies Used
 
@@ -21,6 +25,8 @@ Welcome to JobLinker, a revolutionary platform that leverages the power of Artif
 
 - **Flask**: A lightweight WSGI web application framework for crafting elegant API services. [Flask](https://flask.palletsprojects.com/en/3.0.x/)
 - **SQLAlchemy**: A SQL toolkit and Object-Relational Mapping (ORM) system for Python, providing a full suite of well known enterprise-level persistence patterns. [SQLAlchemy](https://www.sqlalchemy.org/)
+
+[![Home Page](https://i.postimg.cc/tRM82wCt/Screenshot-2024-05-24-075939.png)](https://postimg.cc/hhVCGCmf)
 
 ## 🚀 Installation and Setup
 
