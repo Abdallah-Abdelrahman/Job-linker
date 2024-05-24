@@ -1,7 +1,7 @@
 # JobLinker: Your AI-Powered Recruitment Companion
 
 Welcome to JobLinker, a revolutionary platform that leverages the power of Artificial Intelligence to bridge the gap between recruiters and job seekers. Our application streamlines the recruitment process, providing advanced Applicant Tracking System (ATS) insights, facilitating the discovery of in-demand job opportunities, and simplifying the task of identifying qualified candidates.
-![Job Linker](https://ibb.co/Bcr7B7T)
+[Job Linker](https://ibb.co/Bcr7B7T)
 ## 🌟 Key Features
 
 - **ATS Insights**: Provides candidates with valuable feedback on their resumes, enhancing their visibility to potential employers.
