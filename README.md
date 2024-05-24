@@ -33,6 +33,9 @@ Welcome to JobLinker, a revolutionary platform that leverages the power of Artif
 ## Get Insights & ATS Friendliness score for your CV
 [![Get Insights](https://i.postimg.cc/gkRdRmq6/Screenshot-2024-05-24-081314.png)](https://postimg.cc/tYXLG0cX)
 
+## Build your Professional profile in seconds
+[![Build Profile.gif](https://i.postimg.cc/8C3fcTmn/Untitledvideo1-ezgif-com-video-to-gif-converter-1.gif)](https://postimg.cc/kVQgh3Zx)
+
 ## Apply with Just One Click
 [![Apply](https://i.postimg.cc/0ysv0FcX/Screenshot-2024-05-24-081755.png)](https://postimg.cc/tY28XS0F)
 
