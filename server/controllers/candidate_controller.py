@@ -6,16 +6,20 @@ Job-linker application.
 from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
 
+from server.controllers.education_controller import EducationController
 from server.controllers.schemas import candidate_schema
+from server.controllers.work_experience_controller import WorkExperienceController
 from server.exception import UnauthorizedError
 from server.models import storage
 from server.models.candidate import Candidate
+from server.models.education import Education
 from server.models.job import Job
 from server.models.language import Language
 from server.models.major import Major
 from server.models.recruiter import Recruiter
 from server.models.skill import Skill
 from server.models.user import User
+from server.models.work_experience import WorkExperience
 
 
 class CandidateController:
@@ -27,7 +31,8 @@ class CandidateController:
         """
         Initializes the CandidateController.
         """
-        pass
+        self.work_experience_controller = WorkExperienceController()
+        self.education_controller = EducationController()
 
     def create_candidate(self, user_id, data):
         """
@@ -53,7 +58,8 @@ class CandidateController:
         # Check if candidate already exists
         existing_candidate = storage.get_by_attr(Candidate, "user_id", user_id)
         if existing_candidate:
-            raise ValueError("Candidate already exists for this user")
+            # raise ValueError("Candidate already exists for this user")
+            return existing_candidate
 
         # Validate data
         try:
@@ -84,13 +90,14 @@ class CandidateController:
 
     def get_current_candidate(self, user_id):
         """
-        Gets the current candidate.
+        Gets the current candidate and all related information.
 
         Args:
             user_id: The ID of the user.
 
         Returns:
-            The current candidate.
+            A dictionary containing the candidate's information,
+            work experiences, and educations.
 
         Raises:
             ValueError: If the candidate is not found.
@@ -99,14 +106,39 @@ class CandidateController:
         # Check user role
         user = storage.get(User, user_id)
         if not user or user.role != "candidate":
-            raise UnauthorizedError()
+            raise UnauthorizedError("User is not authorized")
 
         # Get candidate
         candidate = storage.get_by_attr(Candidate, "user_id", user_id)
         if not candidate:
             raise ValueError("Candidate not found")
 
-        return candidate
+        # Get major
+        major = storage.get_by_attr(Major, "id", candidate.major_id)
+
+        # Get work experiences
+        work_experiences = storage.get_all_by_attr(
+            WorkExperience, "candidate_id", candidate.id
+        )
+
+        # Get education entries
+        educations = storage.get_all_by_attr(
+            Education, "candidate_id", candidate.id)
+
+        # Construct the response
+        candidate_data = {
+            "id": candidate.id,
+            "user_id": candidate.user_id,
+            "major": major.to_dict,
+            "skills": [skill.to_dict for skill in candidate.skills],
+            "languages": [
+                language.to_dict for language in candidate.languages
+                ],
+            "work_experiences": [we.to_dict for we in work_experiences],
+            "educations": [edu.to_dict for edu in educations],
+        }
+
+        return candidate_data
 
     def update_current_candidate(self, user_id, data):
         """
@@ -289,7 +321,8 @@ class CandidateController:
             raise ValueError("Language not found")
 
         if language in candidate.languages:
-            raise ValueError("Language already added")
+            # raise ValueError("Language already added")
+            return candidate
 
         try:
             candidate.languages.append(language)
@@ -387,7 +420,119 @@ class CandidateController:
                     for application in candidate.applications
                 )
                 recommended_jobs.append(
-                        {"job": job, "has_applied": has_applied}
-                        )
+                    {"job": job, "has_applied": has_applied})
 
         return recommended_jobs
+
+    def add_work_experience(self, user_id, data):
+        """
+        Adds a work experience to the candidate's profile.
+
+        Args:
+            user_id (str): The ID of the user.
+            data (dict): The data of the work experience to be added.
+
+        Returns:
+            WorkExperience: The created work experience object.
+        """
+        return self.work_experience_controller.create_work_experience(
+                user_id,
+                data
+                )
+
+    def update_work_experience(self, user_id, work_experience_id, data):
+        """
+        Updates a work experience in the candidate's profile.
+
+        Args:
+            user_id (str): The ID of the user.
+            work_experience_id (str): The ID of the work experience to
+            be updated.
+            data (dict): The data to update the work experience with.
+
+        Returns:
+            WorkExperience: The updated work experience object.
+        """
+        return self.work_experience_controller.update_work_experience(
+            user_id, work_experience_id, data
+        )
+
+    def delete_work_experience(self, user_id, work_experience_id):
+        """
+        Deletes a work experience from the candidate's profile.
+
+        Args:
+            user_id (str): The ID of the user.
+            work_experience_id (str): The ID of the work experience to
+            be deleted.
+
+        Raises:
+            ValueError: If the work experience is not found.
+            UnauthorizedError: If the user is not a candidate.
+        """
+        self.work_experience_controller.delete_work_experience(
+            user_id, work_experience_id
+        )
+
+    def add_education(self, user_id, data):
+        """
+        Adds an education entry to the candidate's profile.
+
+        Args:
+            user_id (str): The ID of the user.
+            data (dict): The data of the education to be added.
+
+        Returns:
+            Education: The created education object.
+        """
+        # Get candidate ID from user ID
+        candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+        if not candidate:
+            raise UnauthorizedError("You are not a candidate")
+
+        return self.education_controller.create_education(
+                candidate.id, data
+                )
+
+    def update_education(self, user_id, education_id, data):
+        """
+        Updates an education entry in the candidate's profile.
+
+        Args:
+            user_id (str): The ID of the user.
+            education_id (str): The ID of the education to be updated.
+            data (dict): The data to update the education with.
+
+        Returns:
+            Education: The updated education object.
+        """
+        # Get candidate ID from user ID
+        candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+        if not candidate:
+            raise UnauthorizedError("You are not a candidate")
+
+        return self.education_controller.update_education(
+            candidate.id, education_id, data
+        )
+
+    def delete_education(self, user_id, education_id):
+        """
+        Deletes an education entry from the candidate's profile.
+
+        Args:
+            user_id (str): The ID of the user.
+            education_id (str): The ID of the education to be deleted.
+
+        Raises:
+            ValueError: If the education entry is not found.
+            UnauthorizedError: If the user is not a candidate.
+        """
+        # Get candidate ID from user ID
+        candidate = storage.get_by_attr(Candidate, "user_id", user_id)
+        if not candidate:
+            raise UnauthorizedError("You are not a candidate")
+
+        self.education_controller.delete_education(
+                candidate.id,
+                education_id
+                )

@@ -1,19 +1,64 @@
+"""Contains the Email templates used in the app
+Attrs:
+    HOST: application host
+"""
 import json
+from os import getenv
+from dotenv import load_dotenv
 
-"""Contains the Email templates used in the app"""
+
+load_dotenv()
+
+HOST = 'http://web-02.abdallah.tech'\
+        if getenv('APP_ENV') == 'production' else 'http://localhost:5173'
 
 
 def verification_email(name, token):
     """User verfication template"""
     return f"""
     <html>
+    <head>
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f0f0f0;
+            }}
+            .container {{
+                width: 80%;
+                margin: auto;
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 4px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }}
+            .button {{
+                display: inline-block;
+                color: #fff;
+                background-color: #3498db;
+                padding: 10px 20px;
+                text-decoration: none;
+                border-radius: 4px;
+            }}
+        </style>
+    </head>
     <body>
-    Dear {name},<br><br>
-
-    Click the following link to <a href='http://localhost:5173/verify?token={token}'>Verify</a> your email.<br><br>
-
-    Best regards,<br>
-    Joblinker Team
+        <div class="container">
+            <h2>Dear {name},</h2>
+            <p>
+                Thank you for registering with Joblinker. We're excited to have you on board.
+                To get started, please verify your email address by clicking the button below.
+            </p>
+            <a href='{HOST}/verify?token={token}' class="button">Verify Email</a>
+            <p>
+                If you didn't create an account with Joblinker, you can safely ignore this email.
+            </p>
+            <p>
+                Best regards,<br>
+                The Joblinker Team
+            </p>
+        </div>
     </body>
     </html>
     """
@@ -103,6 +148,24 @@ def shortlisted_candidates_email(recruiter_name, company_name, job_title, candid
     </ul>
 
     <p>You may now proceed with scheduling interviews with these candidates.</p>
+
+    <p>Best regards,<br>
+    Joblinker Team</p>
+    </body>
+    </html>
+    """
+
+
+def no_shortlisted_candidates_email(recruiter_name, company_name, job_title):
+    """Notify the recruiter that no candidates have been shortlisted"""
+    return f"""
+    <html>
+    <body>
+    <p>Dear {recruiter_name},</p>
+
+    <p>The job posting for the position of <b>{job_title}</b> at <b>{company_name}</b> has been closed. Unfortunately, no candidates have been shortlisted for this position.</p>
+
+    <p>We encourage you to post new job openings to attract more candidates.</p>
 
     <p>Best regards,<br>
     Joblinker Team</p>

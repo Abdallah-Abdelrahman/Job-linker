@@ -9,6 +9,7 @@ import server.models as models
 from server.models.application import Application
 from server.models.base_model import Base
 from server.models.candidate import Candidate
+from server.models.education import Education
 from server.models.job import Job
 from server.models.language import Language
 from server.models.major import Major
@@ -29,6 +30,7 @@ classes = {
     "Language": Language,
     "Application": Application,
     "UserFile": UserFile,
+    "Education": Education,
 }
 
 
@@ -46,7 +48,7 @@ class DBStorage:
         #        JOBS_MYSQL_HOST = getenv("JOBS_MYSQL_HOST")
         #        JOBS_MYSQL_DB = getenv("JOBS_MYSQL_DB")
         #        JOBS_ENV = getenv("JOBS_ENV")
-        self.__engine = create_engine(engine, pool_size=10)
+        self.__engine = create_engine(engine, pool_size=30, max_overflow=5)
         # .format(
         #    JOBS_MYSQL_USER, JOBS_MYSQL_PWD, JOBS_MYSQL_HOST, JOBS_MYSQL_DB
         # )

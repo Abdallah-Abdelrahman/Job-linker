@@ -63,43 +63,38 @@ class FileController:
         if user and user.role == "candidate":
             ai_data = ai.to_dict(CANDID_PROMPT)
             creator = AICandidateProfileCreator(
-                    user_id,
-                    ai_data,
-                    self.bcrypt_instance
-                    )
+                user_id, ai_data, self.bcrypt_instance)
             candidate = creator.create_profile()
             new_file_path = os.path.join(
                 ApplicationConfig.UPLOAD_CV,
                 os.path.basename(file_path),
             )
+            file_type = "cvs"
             os.rename(file_path, new_file_path)
             self.user_file.create_user_file(
-                    user_id,
-                    new_file_path,
-                    original_filename
-                    )
+                user_id, new_file_path, original_filename, file_type
+            )
             return (
                 "File uploaded and profile created successfully",
-                {"size": size, "candidate_id": candidate.id},
+                {"size": size, "candidate_id": candidate.get("id")},
                 201,
             )
 
         elif user and user.role == "recruiter":
             ai_data = ai.to_dict(JOB_PROMPT)
-            ai_data['major_id'] = major_id
+            ai_data["major_id"] = major_id
             creator = AIJobCreator(user_id, ai_data)
             job = creator.create_job()
-            print('-----process_upload------->', job)
+            print("-----process_upload------->", job)
             new_file_path = os.path.join(
                 ApplicationConfig.UPLOAD_JOB,
                 os.path.basename(file_path),
             )
+            file_type = "jobs"
             os.rename(file_path, new_file_path)
             self.user_file.create_user_file(
-                    user_id,
-                    new_file_path,
-                    original_filename
-                    )
+                user_id, new_file_path, original_filename, file_type
+            )
             return (
                 "File uploaded and job created successfully",
                 {"size": size, "job_id": job.id},

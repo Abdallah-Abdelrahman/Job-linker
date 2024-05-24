@@ -30,9 +30,7 @@ def create_candidate():
     """
     user_id = get_jwt_identity()
     new_candidate = candidate_controller.create_candidate(
-            user_id,
-            request.json
-            )
+        user_id, request.json)
     return (
         make_response_(
             "success",
@@ -57,18 +55,21 @@ def get_current_candidate():
         Otherwise, it returns an error message.
     """
     user_id = get_jwt_identity()
-    candidate = candidate_controller.get_current_candidate(user_id)
+    candidate_data = candidate_controller.get_current_candidate(user_id)
+
+    candidate_info = {
+        "id": candidate_data["id"],
+        "major": candidate_data["major"],
+        "skills": candidate_data["skills"],
+        "languages": candidate_data["languages"],
+        "work_experiences": candidate_data["work_experiences"],
+        "educations": candidate_data["educations"],
+    }
+
     return make_response_(
         "success",
         "Candidate details fetched successfully",
-        {
-            "id": candidate.id,
-            "major_id": candidate.major_id,
-            "skills": [skill.name for skill in candidate.skills],
-            "languages": [
-                language.name for language in candidate.languages
-                ],
-        },
+        candidate_info,
     )
 
 
@@ -117,9 +118,7 @@ def update_current_candidate():
     """
     user_id = get_jwt_identity()
     candidate = candidate_controller.update_current_candidate(
-            user_id,
-            request.json
-            )
+        user_id, request.json)
     return make_response_(
         "success",
         "Candidate details updated successfully",
@@ -145,10 +144,8 @@ def add_skill_to_current_candidate():
     return make_response_(
         "success",
         "Skill added successfully",
-        {
-            "id": candidate.id,
-            "skills": [skill.name for skill in candidate.skills]
-            },
+        {"id": candidate.id, "skills": [
+            skill.name for skill in candidate.skills]},
     )
 
 
@@ -169,10 +166,8 @@ def remove_skill_from_current_candidate(skill_id):
     return make_response_(
         "success",
         "Skill removed successfully",
-        {
-            "id": candidate.id,
-            "skills": [skill.name for skill in candidate.skills]
-            },
+        {"id": candidate.id, "skills": [
+            skill.name for skill in candidate.skills]},
     )
 
 
@@ -223,6 +218,136 @@ def remove_language_from_current_candidate(lang_id):
             "languages": [language.name for language in candidate.languages],
         },
     )
+
+
+@app_views.route("/candidates/@me/work_experiences", methods=["POST"])
+@jwt_required()
+@handle_errors
+@swag_from("docs/app_views/add_candidate_work_experience.yaml")
+def add_candidate_work_experience():
+    """
+    Add a work experience to the current candidate's profile.
+    The work experience data should be provided in the request body.
+
+    Returns:
+        A success message and the created work experience.
+    """
+    user_id = get_jwt_identity()
+    work_experience = candidate_controller.add_work_experience(
+        user_id, request.json)
+    return make_response_(
+        "success",
+        "Work experience added successfully",
+        {"work_experience": work_experience.to_dict},
+    )
+
+
+@app_views.route(
+    "/candidates/@me/work_experiences/<work_experience_id>", methods=["PUT"]
+)
+@jwt_required()
+@handle_errors
+@swag_from("docs/app_views/update_candidate_work_experience.yaml")
+def update_candidate_work_experience(work_experience_id):
+    """
+    Update a work experience in the current candidate's profile.
+    The work experience data should be provided in the request body.
+
+    Returns:
+        A success message and the updated work experience.
+    """
+    user_id = get_jwt_identity()
+    work_experience = candidate_controller.update_work_experience(
+        user_id, work_experience_id, request.json
+    )
+    return make_response_(
+        "success",
+        "Work experience updated successfully",
+        {"work_experience": work_experience.to_dict},
+    )
+
+
+@app_views.route(
+    "/candidates/@me/work_experiences/<work_experience_id>", methods=["DELETE"]
+)
+@jwt_required()
+@handle_errors
+@swag_from("docs/app_views/delete_candidate_work_experience.yaml")
+def delete_candidate_work_experience(work_experience_id):
+    """
+    Delete a work experience from the current candidate's profile.
+    The work experience ID should be provided as a path parameter.
+
+    Returns:
+        A success message if the work experience was deleted.
+    """
+    user_id = get_jwt_identity()
+    candidate_controller.delete_work_experience(user_id, work_experience_id)
+    return make_response_("success", "Work experience deleted successfully")
+
+
+@app_views.route("/candidates/@me/educations", methods=["POST"])
+@jwt_required()
+@handle_errors
+@swag_from("docs/app_views/add_candidate_education.yaml")
+def add_candidate_education():
+    """
+    Add an education entry to the current candidate's profile.
+    The education data should be provided in the request body.
+
+    Returns:
+        A success message and the created education entry.
+    """
+    user_id = get_jwt_identity()
+    education = candidate_controller.add_education(user_id, request.json)
+    return make_response_(
+        "success",
+        "Education entry added successfully",
+        {"education": education.to_dict},
+    )
+
+
+@app_views.route("/candidates/@me/educations/<education_id>", methods=["PUT"])
+@jwt_required()
+@handle_errors
+@swag_from("docs/app_views/update_candidate_education.yaml")
+def update_candidate_education(education_id):
+    """
+    Update an education entry in the current candidate's profile.
+    The education data should be provided in the request body.
+
+    Returns:
+        A success message and the updated education entry.
+    """
+    user_id = get_jwt_identity()
+    education = candidate_controller.update_education(
+        user_id, education_id, request.json
+    )
+    return make_response_(
+        "success",
+        "Education entry updated successfully",
+        {"education": education.to_dict},
+    )
+
+
+@app_views.route(
+        "/candidates/@me/educations/<education_id>",
+        methods=["DELETE"]
+        )
+@jwt_required()
+@handle_errors
+@swag_from("docs/app_views/delete_candidate_education.yaml")
+def delete_candidate_education(education_id):
+    """
+    Delete an education entry from the current candidate's profile.
+    The education ID should be provided as a path parameter.
+
+    Returns:
+        A success message if the education entry was deleted.
+    """
+    user_id = get_jwt_identity()
+    candidate_controller.delete_education(user_id, education_id)
+    return make_response_("success", "Education entry deleted successfully")
 
 
 @app_views.route("/candidates/@me", methods=["DELETE"])

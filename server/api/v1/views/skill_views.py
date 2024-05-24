@@ -69,6 +69,7 @@ def update_skill(skill_id):
         if successful.
         Otherwise, it returns an error message.
     """
+    print('------json----->', request.json)
     skill = skill_controller.update_skill(skill_id, request.json)
     return make_response_(
         "success",

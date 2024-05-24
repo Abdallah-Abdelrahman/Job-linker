@@ -16,15 +16,16 @@ export const majorApi = api.injectEndpoints({
         method: 'POST',
         body,
       }),
+      invalidatesTags: ['me'],
     }),
     updateMajor: builder.mutation<
       Major,
-      { major_id: string; updates: Partial<Major> }
+      { major_id: string; major: Partial<Major> }
     >({
-      query: ({ major_id, updates }) => ({
+      query: ({ major_id, major }) => ({
         url: `majors/${major_id}`,
         method: 'PUT',
-        body: updates,
+        body: major,
       }),
     }),
     deleteMajor: builder.mutation<void, string>({

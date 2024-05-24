@@ -23,12 +23,12 @@ export const languageApi = api.injectEndpoints({
     }),
     updateLanguage: builder.mutation<
       LanguageResponse,
-      { language_id: string; updates: Partial<Language> }
+      { language_id: string; language: Partial<Language> }
     >({
-      query: ({ language_id, updates }) => ({
+      query: ({ language_id, language }) => ({
         url: `languages/${language_id}`,
         method: "PUT",
-        body: updates,
+        body: language,
       }),
     }),
     deleteLanguage: builder.mutation<void, { language_id: string }>({

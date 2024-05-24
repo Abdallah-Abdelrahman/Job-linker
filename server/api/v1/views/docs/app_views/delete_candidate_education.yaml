@@ -1,0 +1,44 @@
+securitySchemes:
+  bearerAuth:
+    type: http
+    scheme: bearer
+    bearerFormat: JWT
+
+tags:
+  - Candidates
+summary: Delete an education entry from the current candidate's profile
+description: Endpoint to delete an education entry from the current candidate's profile. The education ID should be provided as a path parameter.
+operationId: deleteCandidateEducation
+security:
+  - bearerAuth: []
+parameters:
+  - in: path
+    name: education_id
+    required: true
+    schema:
+      type: string
+    description: The ID of the education entry to be deleted
+responses:
+  200:
+    description: Education entry deleted successfully
+    examples:
+      application/json:
+        {
+          "status": "success",
+          "message": "Education entry deleted successfully",
+          "data": {},
+        }
+  401:
+    description: Unauthorized access
+    examples:
+      application/json:
+        { "status": "error", "message": "Unauthorized", "data": {} }
+  404:
+    description: Education entry not found
+    examples:
+      application/json:
+        {
+          "status": "error",
+          "message": "Education entry not found",
+          "data": {},
+        }

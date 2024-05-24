@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Navigate, RouterProvider } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './app/store.ts';
 import { ChakraProvider } from '@chakra-ui/react';
@@ -10,7 +10,7 @@ import {
   createRoutesFromElements,
 } from 'react-router-dom';
 import { ErrorPage, Layout, Private } from './components';
-import { Verify, Register, Login, Profile, Home } from './routes';
+import { Verify, Register, Login, Profile, Home, Explore } from './routes';
 import './index.css';
 import { Job } from './components/job';
 
@@ -18,9 +18,11 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<Layout />} errorElement={<ErrorPage />}>
       <Route index element={<Home />} />
+      <Route path='find_jobs' element={<Explore />}>
+        <Route path=':job_id' element={<Job />} />
+      </Route>
       <Route path='signup' element={<Register />} />
       <Route path='login' element={<Login />} />
-      <Route path='logout' element={<Navigate to='/' />} />
       <Route path='verify' element={<Verify />} />
       <Route element={<Private />}>
         <Route path='@me' element={<Profile />}>
