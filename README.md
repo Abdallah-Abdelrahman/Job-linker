@@ -1,6 +1,7 @@
 # JobLinker: Your AI-Powered Recruitment Companion
 
 Welcome to JobLinker, a revolutionary platform that leverages the power of Artificial Intelligence to bridge the gap between recruiters and job seekers. Our application streamlines the recruitment process, providing advanced Applicant Tracking System (ATS) insights, facilitating the discovery of in-demand job opportunities, and simplifying the task of identifying qualified candidates.
+
 [![Job Linker](https://i.postimg.cc/8c93cJnn/Designer-8-removebg-preview.png)](https://postimg.cc/GTPzS2Rk)
 
 ## 🌟 Key Features
@@ -78,10 +79,35 @@ Explore the platform, and if it meets your expectations, consider starring our r
 
 ## 💡 Inspiration
 
-(Section to be completed)
+The inspiration for JobLinker came from observing the challenges faced by both job seekers and recruiters in the Middle East. The traditional job hiring process can often be time-consuming, inefficient, and sometimes unprofessional, leading to frustration on both ends.
+
+For job seekers, finding a good job that matches their skills and career aspirations can be like finding a needle in a haystack. The process of searching for suitable jobs, tailoring resumes for each application, and waiting for responses can be daunting and exhausting.
+
+On the other hand, recruiters are inundated with a multitude of applications for each job posting, making it difficult to identify qualified candidates. The process of reviewing each application, shortlisting candidates, and coordinating interviews is labor-intensive and time-consuming.
+
+JobLinker was born out of the desire to make this process more efficient and professional. By leveraging AI technology, JobLinker streamlines the recruitment process, making it easier for job seekers to find suitable jobs and for recruiters to find qualified candidates. Our goal is to revolutionize the job market in the Middle East, making job hunting and recruitment a seamless and enjoyable experience.
 
 ## 📄 License
 
 This project is licensed under the terms of the MIT License. This means you are free to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, under the condition that you include the original copyright notice and a copy of the MIT License in all copies or substantial portions of the software.
 
 For more details, see the LICENSE file in the repository.
+
+
+## 🚶‍♀️ User Journey
+
+### Candidate
+
+1. **Registration and Login**: Upon first registration and login, an email is sent to the user to verify their email. After verification, the user is redirected to the home page to build their profile.
+2. **Profile Building**: The next step is for the user to choose a major and upload their CV file. The app extracts the text from the file and concatenates it with a professional prompt to instruct the Gemini API on how to extract the data correctly. After the response comes from the AI, the data is parsed, filtered, corrected, and then the profile is automatically populated with the candidate's data.
+
+### Recruiter
+
+1. **Registration and Login**: The process is the same as for the candidate. For the first login, the recruiter needs to enter their company name, email, and address.
+2. **Job Posting**: The recruiter can easily upload a job description file, which is processed by the AI, and then the job is published instantly.
+
+### Application Process
+
+When a candidate applies for a job, the application process involves gathering the candidate's education, work experiences, and skills and concatenating them together as candidate data. Then, the job description and responsibilities are concatenated together as job details. The job and candidate details are sent to the AI to calculate a matching score to be added to the application. Then, the candidate receives a notification email.
+
+When a recruiter decides to close a job, the app gathers all applications for the job, matching the match_score with a predefined value. For the candidates with a higher score, it sends a congratulations email and tells them to prepare for the interview. If the score is lower, a rejection email is sent to the candidate. Finally, the recruiter receives an email containing a list of the shortlisted candidates to begin scheduling the interviews.
