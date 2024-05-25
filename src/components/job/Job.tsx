@@ -53,11 +53,15 @@ function Job() {
         return (job.data);
       }
       if (newState.type === 'init') {
-        const { created_at, applied_candidates, id, is_open, ...rest } = newState.payload;
+        const { created_at,
+          applied_candidates,
+          id,
+          is_open,
+          ...rest
+        } = newState.payload;
         return (rest);
       }
       if (newState.type === 'responsibilities') {
-        /*         const oldResp = prevState.responsibilities.filter(idx => idx !== newState.payload.index); */
         let newResp = [...prevState.responsibilities];
         newResp[newState.payload.index] = newState.payload.value;
 
@@ -70,7 +74,7 @@ function Job() {
       location: job.data.location,
       salary: job.data.salary ?? 0,
       job_description: job.data.job_description,
-      /*       application_deadline: job.data.application_deadline, */
+      application_deadline: job.data.application_deadline,
       responsibilities: job.data.responsibilities
     },
     init
@@ -157,8 +161,9 @@ function Job() {
                   <InputLeftAddon children='salary' />
                   <Input
                     type='number'
-                    value={state.salary ?? 0}
-                    onChange={(e) => dispatch({ salary: e.target.value ?? 0 })}
+                    min='0'
+                    value={state.salary}
+                    onChange={(e) => dispatch({ salary: e.target.value })}
                   />
                 </InputGroup>
                 <Textarea
@@ -193,7 +198,6 @@ function Job() {
                     </ListItem>
                   )}
                 </List>
-                {/*
                 <InputGroup>
                   <InputLeftAddon children='deadline' />
                   <Input
@@ -201,7 +205,6 @@ function Job() {
                     value={new Date(state.application_deadline).toISOString().slice(0, 16)}
                     onChange={(e) => dispatch({ application_deadline: e.target.value })} />
                 </InputGroup>
-                */}
                 <UpdateOrCancel
                   isLoading={isLoading}
                   update={handleUpdate}
