@@ -4,9 +4,10 @@ import { MyIcon } from '.';
 
 type Props = {
   isError: boolean
+  label: string
 }
 
-function Upload(props:Props) {
+function Upload(props: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const boxRef = useRef<HTMLDivElement | null>(null);
   const [file, setFile] = useState<string>();
@@ -21,7 +22,7 @@ function Upload(props:Props) {
 
   return (
     <FormControl className='px-4 flex flex-col items-center gap-2'>
-      <FormLabel className='self-start text-gray-600 !text-base'>Upload your cv </FormLabel>
+      <FormLabel className='self-start text-gray-600 !text-base'>{props.label}</FormLabel>
       <Box
         ref={boxRef}
         tabIndex={0}
