@@ -23,7 +23,7 @@ import { useAppSelector } from '../../hooks/store';
 import { selectCurrentUser } from '../../features/auth';
 import { useCreateApplicationMutation } from '../../app/services/application';
 import MyModal from '../MyModal';
-import { useReducer, useRef, useState } from 'react';
+import { useReducer, useState } from 'react';
 import { type Job } from '../profile/types';
 import { UpdateOrCancel } from '../profile';
 

@@ -77,7 +77,7 @@ function MyForm({ onSubmit, role, isLoading }) {
         </Select>
       </FormControl>
       <Upload
-        label={role == 'recruiter' ? 'Upload your job description file' : 'Upload your cv'}
+        label='Upload your cv'
         isError={formError.candidate.file}
       />
     </>
@@ -115,7 +115,6 @@ function MyForm({ onSubmit, role, isLoading }) {
       onSubmit(formdata);
     }
   };
-
 
   return (
     <form
