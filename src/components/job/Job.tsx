@@ -126,17 +126,20 @@ function Job() {
 
   if (isSuccess && job.data.job_title && !state.job_title) {
     // update the state when promise resloved
-    dispatch({ type: 'init', payload: job.data })
+    dispatch({ type: 'init', payload: job.data });
   }
 
   //console.log({ state });
   return (
-    <Box>
+    <Box className='relative p-1'>
       <Skeleton isLoaded={isSuccess}>
-        <Box className='relative space-y-2'>
+        <Box className='space-y-2'>
           {!match
             && (
-              <Button onClick={() => setIsEditing(true)} className='!absolute !p-0 !m-0 top-0 right-0'>
+              <Button
+                onClick={() => setIsEditing(true)}
+                className='!absolute !p-0 !m-0 top-0 right-0'
+              >
                 <MyIcon href='/sprite.svg#edit' className='w-5 h-5' />
               </Button>
             )}
