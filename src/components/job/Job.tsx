@@ -29,7 +29,7 @@ import { UpdateOrCancel } from '../profile';
 
 const init = (data: Job) => {
   return (data);
-}
+};
 
 function Job() {
   const { job_id } = useParams();
