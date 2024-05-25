@@ -76,7 +76,10 @@ function MyForm({ onSubmit, role, isLoading }) {
           ))}
         </Select>
       </FormControl>
-      <Upload isError={formError.candidate.file} />
+      <Upload
+        label={role == 'recruiter' ? 'Upload your job description file' : 'Upload your cv'}
+        isError={formError.candidate.file}
+      />
     </>
   );
 
@@ -122,8 +125,8 @@ function MyForm({ onSubmit, role, isLoading }) {
     >
       {role == 'candidate' ? candidateJSX : recruiterJSX}
       <Button
-      className='ml-auto !bg-sky-500 !text-white'
-      type='submit' isLoading={isLoading}>Create Profile</Button>
+        className='ml-auto !bg-sky-500 !text-white'
+        type='submit' isLoading={isLoading}>Create Profile</Button>
     </form>
   );
 }
