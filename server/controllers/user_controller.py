@@ -295,7 +295,6 @@ class UserController:
         try:
             data = update_schema.load(data)
         except ValidationError as err:
-            print("------validation error(update_current_user)-------->")
             raise ValueError(err.messages)
 
         # Get user and update attributes
