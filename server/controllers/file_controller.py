@@ -33,7 +33,13 @@ class FileController:
         self.bcrypt_instance = Bcrypt(app)
 
     def handle_upload(self, file, directory):
-        """Handle file upload and return file path and name."""
+        """Handle file upload and return file path and name.
+        Ensure file extension, and prefix time to file name
+
+        Args:
+            file(Blob): file blob
+            directory(str): directory to save the fle in
+        """
         extension = file.filename.split(".")[-1].lower()
 
         if not file or extension not in ApplicationConfig.ALLOWED_EXTENSIONS:
@@ -53,7 +59,9 @@ class FileController:
             user_id,
             major_id=None
             ):
-        """Process the uploaded file based on the user's role."""
+        """Process the uploaded file based on the user's role.
+        It creates candidate profile or job from the uploaded file.
+        """
         ai = AIService(pdf=file_path)
 
         # This logic will work with authorized or Unauthorized users
@@ -85,7 +93,6 @@ class FileController:
             ai_data["major_id"] = major_id
             creator = AIJobCreator(user_id, ai_data)
             job = creator.create_job()
-            print("-----process_upload------->", job)
             new_file_path = os.path.join(
                 ApplicationConfig.UPLOAD_JOB,
                 os.path.basename(file_path),
