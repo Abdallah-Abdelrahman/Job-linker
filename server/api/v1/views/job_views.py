@@ -79,6 +79,7 @@ def update_job(job_id):
         Otherwise, it returns an error message.
     """
     user_id = get_jwt_identity()
+    print('--------update--------->', request.json)
     job = job_controller.update_job(user_id, job_id, request.json)
     return make_response_(
         "success",

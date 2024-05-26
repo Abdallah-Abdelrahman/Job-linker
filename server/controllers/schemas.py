@@ -101,7 +101,7 @@ class JobSchema(Schema):
     job_description = fields.Str(required=False)
     exper_years = fields.Str(required=False)
     salary = fields.Float(required=False)
-    application_deadline = MultiFormatDateTime()
+    application_deadline = fields.DateTime()
     is_open = fields.Boolean(required=False)
     responsibilities = fields.List(fields.Str(), required=False)
 

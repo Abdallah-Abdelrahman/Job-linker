@@ -10,7 +10,15 @@ import { useUpdateMeMutation, useUploadProfileImageMutation } from '../../app/se
 import { useCreateMajorMutation } from '../../app/services/major';
 import { college_majors } from '../../constants';
 import Photo from './Photo';
-import { type Education, useUpdateEducationForCurrentCandidateMutation, useUpdateCurrentCandidateMutation, useAddLanguageToCurrentCandidateMutation, useRemoveLanguageFromCurrentCandidateMutation, useRemoveSkillFromCurrentCandidateMutation, useAddSkillToCurrentCandidateMutation } from '../../app/services/candidate';
+import {
+  type Education,
+  useUpdateEducationForCurrentCandidateMutation,
+  useUpdateCurrentCandidateMutation,
+  useAddLanguageToCurrentCandidateMutation,
+  useRemoveLanguageFromCurrentCandidateMutation,
+  useRemoveSkillFromCurrentCandidateMutation,
+  useAddSkillToCurrentCandidateMutation
+} from '../../app/services/candidate';
 import UpdateOrCancel from './UpdateOrCancel';
 
 type ActionType = 'reset' | 'contact_info' | undefined
@@ -576,7 +584,7 @@ function Skill({ skill }: SkillProps) {
       removeCandidSkill({ skill_id: skill.id }).unwrap(),
       add({ name: value })
         .unwrap()
-        .then(({data}) => addCandidSkill({ skill_id: data.id }))
+        .then(({ data }) => addCandidSkill({ skill_id: data.id }))
         .catch(err => console.log({ err }))
         .finally(() => {
           setIsEditing(false);
@@ -592,7 +600,7 @@ function Skill({ skill }: SkillProps) {
           <UpdateOrCancel
             size='sm'
             rounded='full'
-            isLoading={isLoading1||isLoading2||isLoading3}
+            isLoading={isLoading1 || isLoading2 || isLoading3}
             cancel={() => {
               setIsEditing(false);
               setValue(skill.name);

@@ -54,6 +54,7 @@ function Insights({ onClose, isOpen }: Props) {
     generateInsights(formdata);
   };
 
+  //console.log({error});
   return (
     <MyModal
       title='Scan Resume'
@@ -67,13 +68,13 @@ function Insights({ onClose, isOpen }: Props) {
       body={
         isUninitialized
           ? <form id='insight' onSubmit={handleSubmit}>
-            < Upload isError={isFileError} />
+            <Upload label='Upload your cv' isError={isFileError} />
           </form>
           : <Skeleton isLoaded={!isLoading}>
             {isError
               ? <Box className='flex flex-col justify-center items-center gap-4'>
                 <Text className='w-full p-3 border border-l-4 border-l-red-400 bg-red-100 text-red-400 rounded-md rounded-tl-none rounded-bl-none'>
-                  {error.status === 413
+                  {error.originalStatus === 413
                     ? (
                       'file is too large'
                     )
