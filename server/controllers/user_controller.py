@@ -234,7 +234,8 @@ class UserController:
                     "major": candidate.major.to_dict,
                     "skills": [skill.to_dict for skill in candidate.skills],
                     "languages": [
-                        language.to_dict for language in candidate.languages
+                        language.to_dict
+                        for language in candidate.languages
                         ],
                     "applications": [
                         application.to_dict
@@ -245,7 +246,8 @@ class UserController:
                         for experience in candidate.experiences
                     ],
                     "education": [
-                        education.to_dict for education in candidate.educations
+                        education.to_dict
+                        for education in candidate.educations
                     ],
                 }
         elif user.role == "recruiter":
