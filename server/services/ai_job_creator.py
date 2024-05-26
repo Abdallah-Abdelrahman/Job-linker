@@ -3,6 +3,7 @@
 from datetime import datetime, timezone
 
 from marshmallow import ValidationError
+from dateutil.parser import parse
 
 from server.controllers.job_controller import JobController
 from server.controllers.major_controller import MajorController
@@ -37,13 +38,11 @@ class AIJobCreator:
 
     def parse_date(self, date_string):
         """Try to parse the application_deadline"""
-        formats = ["%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d"]
-        for fmt in formats:
-            try:
-                dt = datetime.strptime(date_string, fmt)
-                return dt.replace(tzinfo=timezone.utc)
-            except ValueError:
-                pass
+        try:
+            # Try to parse the date string using dateutil.parser.parse
+            return parse(date_string).isoformat()
+        except ValueError:
+            pass
         # If all formats fail, return None
         return None
 
@@ -67,7 +66,6 @@ class AIJobCreator:
                 self.ai_data["application_deadline"]
             )
 
-        print("----job ai------->", self.ai_data)
         # Validate data
         try:
             self.ai_data = job_schema.load(self.ai_data)

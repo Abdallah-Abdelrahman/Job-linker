@@ -60,6 +60,7 @@ class JobController:
         """
         # Validate data
         try:
+            data['application_deadline'] = data['application_deadline'].isoformat()
             data = job_schema.load(data)
         except ValidationError as err:
             raise ValueError(err.messages)
