@@ -1,4 +1,4 @@
-import { Link, useMatch, useParams } from 'react-router-dom';
+import { Link, useMatch, useOutletContext, useParams } from 'react-router-dom';
 import { useGetJobQuery, useUpdateJobMutation } from '../../app/services/job';
 import {
   Box,
@@ -23,9 +23,11 @@ import { useAppSelector } from '../../hooks/store';
 import { selectCurrentUser } from '../../features/auth';
 import { useCreateApplicationMutation } from '../../app/services/application';
 import MyModal from '../MyModal';
-import { useReducer, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { type Job } from '../profile/types';
 import { UpdateOrCancel } from '../profile';
+
+type Context = { setAppliedCandidates?: React.Dispatch<React.SetStateAction<never[]>> }
 
 const init = (data: Job) => {
   return (data);
@@ -33,6 +35,7 @@ const init = (data: Job) => {
 
 function Job() {
   const { job_id } = useParams();
+  const context = useOutletContext<Context>();
   const match = useMatch('/find_jobs/' + job_id);
   const user = useAppSelector(selectCurrentUser);
   const { onClose, isOpen, onOpen } = useDisclosure();
@@ -128,12 +131,16 @@ function Job() {
       });
   };
 
-  if (isSuccess && job.data.job_title && !state.job_title) {
-    // update the state when promise resloved
-    dispatch({ type: 'init', payload: job.data });
-  }
+  // effect to update the state when promise resloved
+  useEffect(() => {
+    if (isSuccess && job.data.job_title && !state.job_title) {
+      dispatch({ type: 'init', payload: job.data });
+      if (typeof context?.setAppliedCandidates == 'function') {
+        context.setAppliedCandidates(job.data.applied_candidates);
+      }
+    }
+  }, [context, isSuccess, job.data, state.job_title]);
 
-  //console.log({ state });
   return (
     <Box className='relative p-1'>
       <Skeleton isLoaded={isSuccess}>
