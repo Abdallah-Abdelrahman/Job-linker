@@ -13,6 +13,7 @@ import { ErrorPage, Layout, Private } from './components';
 import { Verify, Register, Login, Profile, Home, Explore } from './routes';
 import './index.css';
 import { Job } from './components/job';
+import { Candidate } from './components/profile';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -25,6 +26,7 @@ const router = createBrowserRouter(
       <Route path='login' element={<Login />} />
       <Route path='verify' element={<Verify />} />
       <Route element={<Private />}>
+        <Route path='jobs/applied_candidates/:id' element={<Candidate as='recruiter' />} />
         <Route path='@me' element={<Profile />}>
           <Route path='jobs/:job_id' element={<Job />} />
         </Route>
