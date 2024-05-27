@@ -2,8 +2,8 @@
 
 from datetime import datetime, timezone
 
-from marshmallow import ValidationError
 from dateutil.parser import parse
+from marshmallow import ValidationError
 
 from server.controllers.job_controller import JobController
 from server.controllers.major_controller import MajorController
