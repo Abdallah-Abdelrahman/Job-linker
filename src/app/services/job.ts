@@ -49,7 +49,7 @@ export const jobApi = api.injectEndpoints({
         method: 'PUT',
         body: updates,
       }),
-      invalidatesTags: ['job'],
+      invalidatesTags: ['job', 'me'],
     }),
     deleteJob: builder.mutation<void, { job_id: string }>({
       query: ({ job_id }) => ({

@@ -2,8 +2,6 @@
 This module provides views for the Job model in the Job-linker application.
 """
 
-from json import loads
-
 from flasgger.utils import swag_from
 from flask import request
 from flask_jwt_extended import get_jwt_identity, jwt_required
@@ -11,9 +9,7 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 from server.api.utils import make_response_
 from server.api.v1.views import app_views
 from server.controllers.job_controller import JobController
-from server.controllers.schemas import job_schema
 from server.decorators import handle_errors
-from server.extensions import cache
 
 job_controller = JobController()
 

@@ -6,12 +6,21 @@ import { useCreateSkillMutation } from '../../app/services/skill';
 import { useCreateLanguageMutation } from '../../app/services/language';
 import { useUpdateWorkExperienceMutation } from '../../app/services/work_experience';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
-import { useUpdateMeMutation, useUploadProfileImageMutation } from '../../app/services/auth';
+import { useMeQuery, useUpdateMeMutation, useUploadProfileImageMutation } from '../../app/services/auth';
 import { useCreateMajorMutation } from '../../app/services/major';
 import { college_majors } from '../../constants';
 import Photo from './Photo';
-import { type Education, useUpdateEducationForCurrentCandidateMutation, useUpdateCurrentCandidateMutation, useAddLanguageToCurrentCandidateMutation, useRemoveLanguageFromCurrentCandidateMutation, useRemoveSkillFromCurrentCandidateMutation, useAddSkillToCurrentCandidateMutation } from '../../app/services/candidate';
+import {
+  type Education,
+  useUpdateEducationForCurrentCandidateMutation,
+  useUpdateCurrentCandidateMutation,
+  useAddLanguageToCurrentCandidateMutation,
+  useRemoveLanguageFromCurrentCandidateMutation,
+  useRemoveSkillFromCurrentCandidateMutation,
+  useAddSkillToCurrentCandidateMutation
+} from '../../app/services/candidate';
 import UpdateOrCancel from './UpdateOrCancel';
+import { useMatch, useParams } from 'react-router-dom';
 
 type ActionType = 'reset' | 'contact_info' | undefined
 type S = Omit<T.CandidateProp['data'], 'candidate' | 'bio'> & { major: string }
@@ -25,7 +34,10 @@ type A = {
 const actionCreator = (payload: A['payload'], type?: A['type']) => ({ payload, type });
 
 
-function Candidate({ data }: T.CandidateProp) {
+function Candidate({ data, as }: T.CandidateProp) {
+  const { id } = useParams();
+  const match = useMatch('@me');
+  const { data: userData = { data: {} } } = useMeQuery({ id });
   const [isEditing, setIsEditing] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [state, dispatch] = useReducer<Reducer<S, A>>(
@@ -45,11 +57,11 @@ function Candidate({ data }: T.CandidateProp) {
       });
     },
     {
-      name: data.name ?? '',
-      email: data.email ?? '',
-      image_url: data.image_url ?? '',
-      contact_info: data.contact_info ?? '',
-      major: data.candidate.major.name ?? ''
+      name: data?.name ?? '',
+      email: data?.email ?? '',
+      image_url: data?.image_url ?? '',
+      contact_info: data?.contact_info ?? '',
+      major: data?.candidate.major.name ?? ''
     }
   );
   const [update, { isLoading: isLoading_MME }] = useUpdateMeMutation();
@@ -75,6 +87,8 @@ function Candidate({ data }: T.CandidateProp) {
         setIsEditing(false);
       });
   };
+  const renderedData = !as ? data : userData.data;
+
 
   return (
     <Box className='grid grid-cols-4 gap-6 container mt-4 mx-auto sm:grid-cols-12'>
@@ -82,19 +96,25 @@ function Candidate({ data }: T.CandidateProp) {
       <Box
         className='relative  col-span-4 bg-white flex p-6 flex-col items-center gap-2 rounded-md shadow-md sm:col-span-4 sm:max-h-[900px] sm:overflow-auto'
       >
-        <Button
-          className='!absolute top-6 right-6'
-          onClick={() => setIsEditing(true)}
-        >
-          <MyIcon href='/sprite.svg#edit' className='w-6 h-6' />
-        </Button>
+        {as
+          ? null
+          : (
+            <Button
+              className='!absolute top-6 right-6'
+              onClick={() => setIsEditing(true)}
+            >
+              <MyIcon href='/sprite.svg#edit' className='w-6 h-6' />
+            </Button>
+          )
+        }
+
         <Photo
           disabled={!isEditing}
           isLoading={isLoading_MUPLOAD}
-          imageUrl={data.image_url}
+          imageUrl={renderedData?.imageUrl}
           setFile={setFile}
         />
-        {isEditing
+        {isEditing && !as
           ?
           <FormControl size='lg'>
             <Input
@@ -102,10 +122,10 @@ function Candidate({ data }: T.CandidateProp) {
               onChange={(e) => dispatch(actionCreator({ name: e.target.value }))}
             />
           </FormControl>
-          : <Heading as='h2' size='lg' className='capitalize'>{data.name}</Heading>
+          : <Heading as='h2' size='lg' className='capitalize'>{renderedData?.name}</Heading>
         }
 
-        {isEditing
+        {isEditing && !as
           ? <FormControl size='lg'>
             <Select
               value={state.major}
@@ -114,17 +134,17 @@ function Candidate({ data }: T.CandidateProp) {
               {college_majors.map((m, idx) => <option key={idx} value={m} children={m} />)}
             </Select>
           </FormControl>
-          : <Text className='tracking-wide'>{data.candidate.major.name}</Text>
+          : <Text className='tracking-wide'>{renderedData?.candidate?.major.name}</Text>
         }
         <hr className='w-full' />
         <Stack className='w-full mt-2 space-y-6'>
           <Contact_info
             isEditing={isEditing}
             dispatch={dispatch}
-            data={data.contact_info}
+            data={renderedData?.contact_info}
             state={state}
           />
-          {isEditing
+          {isEditing && !as
             && (
               <ButtonGroup>
                 <IconButton
@@ -148,8 +168,8 @@ function Candidate({ data }: T.CandidateProp) {
             {/*Skills*/}
             <Heading as='h4' mb='2' size='lg' className='capitalize'>skills</Heading>
             <ul className='flex flex-wrap gap-4 max-h-64 overflow-auto'>
-              {data.candidate.skills.map((skill, idx) =>
-                <Skill key={idx} skill={skill} />
+              {renderedData?.candidate?.skills.map((skill, idx) =>
+                <Skill key={idx} skill={skill} isEditable={Boolean(match)} />
               )}
             </ul>
           </Box>
@@ -157,8 +177,8 @@ function Candidate({ data }: T.CandidateProp) {
             {/*Languages*/}
             <Heading as='h4' mb='2' size='lg' className='capitalize'>languages</Heading>
             <List as='ul' className='flex flex-wrap gap-4 max-h-40 overflow-auto'>
-              {data.candidate.languages.map((l, idx) =>
-                <Language key={idx} language={l} />
+              {renderedData?.candidate?.languages.map((l, idx) =>
+                <Language key={idx} language={l} isEditable={Boolean(match)} />
               )}
             </List>
           </Box>
@@ -172,7 +192,7 @@ function Candidate({ data }: T.CandidateProp) {
           <Heading as='h4' mb='2' size='lg' className='capitalize'>
             About me
           </Heading>
-          <Bio bio={data.bio} />
+          <Bio isEditable={Boolean(match)} bio={renderedData?.bio} />
         </Box>
         {/*Experience*/}
         <Box>
@@ -180,8 +200,8 @@ function Candidate({ data }: T.CandidateProp) {
             experience
           </Heading>
           <List as='ul' className='flex flex-col gap-4'>
-            {data.candidate.experiences.map((xp, idx) =>
-              <Experience key={idx} xp={xp} />
+            {renderedData?.candidate?.experiences.map((xp, idx) =>
+              <Experience isEditable={Boolean(match)} key={idx} xp={xp} />
             )}
           </List>
         </Box>
@@ -191,9 +211,9 @@ function Candidate({ data }: T.CandidateProp) {
             education
           </Heading>
           <List as='ul' className='flex flex-col gap-4'>
-            {data.candidate.education.map((ed, idx, arr) => (
+            {renderedData?.candidate?.education.map((ed, idx, arr) => (
               <Fragment key={idx}>
-                <Education ed={ed} />
+                <Education isEditable={Boolean(match)} ed={ed} />
                 {idx !== arr.length - 1
                   && (
                     <Divider colorScheme='blue' />
@@ -209,6 +229,7 @@ function Candidate({ data }: T.CandidateProp) {
 
 type EducationProps = {
   ed: Education
+  isEditable: boolean
 };
 function Education({ ed }: EducationProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -305,12 +326,14 @@ function Education({ ed }: EducationProps) {
       )
       : (/* render normal jsx */
         <ListItem className='relative'>
-          <Button
-            onClick={() => setIsEditing(true)}
-            className='!absolute !p-0 top-0 right-0'
-          >
-            <MyIcon href='/sprite.svg#edit' className='w-5 h-5' />
-          </Button>
+          {isEditing && (
+            <Button
+              onClick={() => setIsEditing(true)}
+              className='!absolute !p-0 top-0 right-0'
+            >
+              <MyIcon href='/sprite.svg#edit' className='w-5 h-5' />
+            </Button>
+          )}
           <Box className='flex flex-col gap-3 w-full'>
             <Box className='flex gap-2'>
               <Box className='flex gap-1'>
@@ -362,8 +385,9 @@ function Education({ ed }: EducationProps) {
 
 type BioProps = {
   bio: string
+  isEditable: boolean
 }
-function Bio({ bio }: BioProps) {
+function Bio({ bio, isEditable }: BioProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(bio);
   const [textareaH, setTextareaH] = useState(0);
@@ -415,12 +439,14 @@ function Bio({ bio }: BioProps) {
       )
       : (/* render normal version */
         <>
-          <Button
-            className='!absolute !px-1 top-0 right-0'
-            onClick={() => setIsEditing(true)}
-          >
-            <MyIcon href='/sprite.svg#edit' className='w-5 h-5' />
-          </Button>
+          {isEditable && (
+            <Button
+              className='!absolute !px-1 top-0 right-0'
+              onClick={() => setIsEditing(true)}
+            >
+              <MyIcon href='/sprite.svg#edit' className='w-5 h-5' />
+            </Button>
+          )}
           <Text>{bio}</Text>
         </>
       )
@@ -429,8 +455,9 @@ function Bio({ bio }: BioProps) {
 }
 type ExperProps = {
   xp: T.Experience
+  isEditable: boolean
 }
-function Experience({ xp }: ExperProps) {
+function Experience({ xp, isEditable }: ExperProps) {
   const [textareaH, setTextareaH] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [state, dispatch] = useReducer(
@@ -529,9 +556,11 @@ function Experience({ xp }: ExperProps) {
         : (/* render normal fields */
           <>
             <Box className='relative flex flex-col gap-3 w-full'>
-              <Button onClick={() => setIsEditing(true)} className='!absolute !px-1 top-0 right-0'>
-                <MyIcon href='/sprite.svg#edit' className='w-5 h-5' />
-              </Button>
+              {isEditable && (
+                <Button onClick={() => setIsEditing(true)} className='!absolute !px-1 top-0 right-0'>
+                  <MyIcon href='/sprite.svg#edit' className='w-5 h-5' />
+                </Button>
+              )}
               <Heading as='h6' size='md' className='capitalize max-w-[80%]'>{xp.title.toLowerCase()}</Heading>
               <Box className='space-y-2'>
                 <Box className='flex gap-2'>
@@ -564,8 +593,9 @@ function Experience({ xp }: ExperProps) {
 }
 type SkillProps = {
   skill: T.Skill
+  isEditable: boolean
 }
-function Skill({ skill }: SkillProps) {
+function Skill({ skill, isEditable }: SkillProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(skill.name);
   const [removeCandidSkill, { isLoading: isLoading1 }] = useRemoveSkillFromCurrentCandidateMutation();
@@ -576,7 +606,7 @@ function Skill({ skill }: SkillProps) {
       removeCandidSkill({ skill_id: skill.id }).unwrap(),
       add({ name: value })
         .unwrap()
-        .then(({data}) => addCandidSkill({ skill_id: data.id }))
+        .then(({ data }) => addCandidSkill({ skill_id: data.id }))
         .catch(err => console.log({ err }))
         .finally(() => {
           setIsEditing(false);
@@ -592,7 +622,7 @@ function Skill({ skill }: SkillProps) {
           <UpdateOrCancel
             size='sm'
             rounded='full'
-            isLoading={isLoading1||isLoading2||isLoading3}
+            isLoading={isLoading1 || isLoading2 || isLoading3}
             cancel={() => {
               setIsEditing(false);
               setValue(skill.name);
@@ -602,10 +632,12 @@ function Skill({ skill }: SkillProps) {
           />
         </>
         : <>
-          <MyIcon
-            href='/sprite.svg#edit' className='absolute top-0 right-0 w-3 h-3 cursor-pointer'
-            onClick={() => setIsEditing(true)}
-          />
+          {isEditable && (
+            <MyIcon
+              href='/sprite.svg#edit' className='absolute top-0 right-0 w-3 h-3 cursor-pointer'
+              onClick={() => setIsEditing(true)}
+            />
+          )}
           <Text>{value}</Text>
         </>
       }
@@ -617,8 +649,9 @@ function Skill({ skill }: SkillProps) {
 
 type LangaugeProps = {
   language: T.Language
+  isEditable: boolean
 }
-function Language({ language }: LangaugeProps) {
+function Language({ language, isEditable }: LangaugeProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [value, setValue] = useState(language.name);
   const [add, { isLoading: isLoading1 }] = useCreateLanguageMutation();
@@ -661,10 +694,12 @@ function Language({ language }: LangaugeProps) {
         )
         : (/* render normal text component */
           <>
-            <MyIcon
-              href='/sprite.svg#edit' className='absolute top-0 right-0 w-3 h-3 cursor-pointer'
-              onClick={() => setIsEditing(true)}
-            />
+            {isEditable && (
+              <MyIcon
+                href='/sprite.svg#edit' className='absolute top-0 right-0 w-3 h-3 cursor-pointer'
+                onClick={() => setIsEditing(true)}
+              />
+            )}
             <Text>{value}</Text>
           </>
         )

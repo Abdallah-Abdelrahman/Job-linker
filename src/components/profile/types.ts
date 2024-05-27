@@ -82,7 +82,8 @@ export type CandData = {
   },
 }
 export interface CandidateProp {
-  data: CandData
+  data?: CandData
+  as?: 'recruiter'
 }
 
 export interface RecruiterProp {

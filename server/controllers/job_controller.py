@@ -60,6 +60,9 @@ class JobController:
         """
         # Validate data
         try:
+            data["application_deadline"] = data[
+                    "application_deadline"
+                    ].isoformat()
             data = job_schema.load(data)
         except ValidationError as err:
             raise ValueError(err.messages)
@@ -136,9 +139,11 @@ class JobController:
                     "name": app.candidate.user.name,
                     "email": app.candidate.user.email,
                     "application_status": app.application_status,
-                    "cv_url": app.candidate.user.user_files[0].file_url
-                    if app.candidate.user.user_files
-                    else None,
+                    "cv_url": (
+                        app.candidate.user.user_files[0].file_url
+                        if app.candidate.user.user_files
+                        else None
+                    ),
                 }
                 for app in applications
                 if app.candidate and app.candidate.user
@@ -315,9 +320,7 @@ class JobController:
             UnauthorizedError: If the user is not a recruiter.
         """
         if not user_id or not job_id or not skill_id:
-            raise ValueError(
-                    "User ID, Job ID and Skill ID must be provided"
-                    )
+            raise ValueError("User ID, Job ID and Skill ID must be provided")
 
         user = storage.get(User, user_id)
         if not user or user.role != "recruiter":
@@ -429,10 +432,13 @@ class JobController:
                 create_job_data(
                     job,
                     storage.get_all_by_attr(Application, "job_id", job.id),
-                    json.loads(recruiter.user.contact_info).get("company_name")
-                    if recruiter and recruiter.user
-                    and recruiter.user.contact_info
-                    else None,
+                    (
+                        json.loads(recruiter.user.contact_info).get(
+                            "company_name")
+                        if recruiter and recruiter.user
+                        and recruiter.user.contact_info
+                        else None
+                    ),
                 )
                 for job in jobs
                 if (recruiter := storage.get_by_attr(
@@ -498,9 +504,12 @@ class JobController:
             create_job_data(
                 job,
                 storage.get_all_by_attr(Application, "job_id", job.id),
-                json.loads(recruiter.user.contact_info).get("company_name")
-                if recruiter and recruiter.user and recruiter.user.contact_info
-                else None,
+                (
+                    json.loads(recruiter.user.contact_info).get("company_name")
+                    if recruiter and recruiter.user
+                    and recruiter.user.contact_info
+                    else None
+                ),
             )
             for job in jobs
             if (recruiter := storage.get_by_attr(
