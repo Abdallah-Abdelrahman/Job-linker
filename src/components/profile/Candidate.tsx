@@ -1,12 +1,12 @@
 import { Text, Heading, Box, Stack, Button, ButtonGroup, Input, InputGroup, InputLeftElement, Textarea, FormControl, List, ListItem, IconButton, Select, Divider, InputLeftAddon } from '@chakra-ui/react';
 import MyIcon from '../Icon';
 import * as T from './types';
-import { Fragment, Reducer, useEffect, useReducer, useState } from 'react';
+import { Fragment, Reducer, useReducer, useState } from 'react';
 import { useCreateSkillMutation } from '../../app/services/skill';
 import { useCreateLanguageMutation } from '../../app/services/language';
 import { useUpdateWorkExperienceMutation } from '../../app/services/work_experience';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
-import { useLazyMeQuery, useMeQuery, useUpdateMeMutation, useUploadProfileImageMutation } from '../../app/services/auth';
+import { useMeQuery, useUpdateMeMutation, useUploadProfileImageMutation } from '../../app/services/auth';
 import { useCreateMajorMutation } from '../../app/services/major';
 import { college_majors } from '../../constants';
 import Photo from './Photo';
@@ -20,7 +20,7 @@ import {
   useAddSkillToCurrentCandidateMutation
 } from '../../app/services/candidate';
 import UpdateOrCancel from './UpdateOrCancel';
-import { useParams } from 'react-router-dom';
+import { useMatch, useParams } from 'react-router-dom';
 
 type ActionType = 'reset' | 'contact_info' | undefined
 type S = Omit<T.CandidateProp['data'], 'candidate' | 'bio'> & { major: string }
@@ -36,6 +36,7 @@ const actionCreator = (payload: A['payload'], type?: A['type']) => ({ payload, t
 
 function Candidate({ data, as }: T.CandidateProp) {
   const { id } = useParams();
+  const match = useMatch('@me');
   const { data: userData = { data: {} } } = useMeQuery({ id });
   const [isEditing, setIsEditing] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -168,7 +169,7 @@ function Candidate({ data, as }: T.CandidateProp) {
             <Heading as='h4' mb='2' size='lg' className='capitalize'>skills</Heading>
             <ul className='flex flex-wrap gap-4 max-h-64 overflow-auto'>
               {renderedData?.candidate?.skills.map((skill, idx) =>
-                <Skill key={idx} skill={skill} isEditable={false} />
+                <Skill key={idx} skill={skill} isEditable={Boolean(match)} />
               )}
             </ul>
           </Box>
@@ -177,7 +178,7 @@ function Candidate({ data, as }: T.CandidateProp) {
             <Heading as='h4' mb='2' size='lg' className='capitalize'>languages</Heading>
             <List as='ul' className='flex flex-wrap gap-4 max-h-40 overflow-auto'>
               {renderedData?.candidate?.languages.map((l, idx) =>
-                <Language key={idx} language={l} />
+                <Language key={idx} language={l} isEditable={Boolean(match)} />
               )}
             </List>
           </Box>
@@ -191,7 +192,7 @@ function Candidate({ data, as }: T.CandidateProp) {
           <Heading as='h4' mb='2' size='lg' className='capitalize'>
             About me
           </Heading>
-          <Bio bio={renderedData?.bio} />
+          <Bio isEditable={Boolean(match)} bio={renderedData?.bio} />
         </Box>
         {/*Experience*/}
         <Box>
@@ -200,7 +201,7 @@ function Candidate({ data, as }: T.CandidateProp) {
           </Heading>
           <List as='ul' className='flex flex-col gap-4'>
             {renderedData?.candidate?.experiences.map((xp, idx) =>
-              <Experience key={idx} xp={xp} />
+              <Experience isEditable={Boolean(match)} key={idx} xp={xp} />
             )}
           </List>
         </Box>
@@ -212,7 +213,7 @@ function Candidate({ data, as }: T.CandidateProp) {
           <List as='ul' className='flex flex-col gap-4'>
             {renderedData?.candidate?.education.map((ed, idx, arr) => (
               <Fragment key={idx}>
-                <Education ed={ed} />
+                <Education isEditable={Boolean(match)} ed={ed} />
                 {idx !== arr.length - 1
                   && (
                     <Divider colorScheme='blue' />
