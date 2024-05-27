@@ -13,8 +13,12 @@ import {
   ButtonGroup,
   InputGroup,
   InputLeftAddon,
+  UnorderedList,
+  ListItem,
+  List,
+  Flex,
 } from '@chakra-ui/react';
-import React, { Reducer, useReducer } from 'react';
+import React, { Reducer, useEffect, useReducer } from 'react';
 import MyIcon from '../Icon';
 import MyModal from '../MyModal';
 import { AddJob } from '../job';
@@ -44,6 +48,7 @@ function Recruiter({ data }: T.RecruiterProp) {
   const [updateMe, { isLoading }] = useUpdateMeMutation();
   const [isEditing, setIsEditing] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const [appliedCandids, setAppliedCandidates] = useState([]);
   const [state, dispatch] = useReducer<RecReducer>(
     (prevState, newState) => {
       if (newState.type === 'reset') {
@@ -74,46 +79,6 @@ function Recruiter({ data }: T.RecruiterProp) {
       .finally(() => {
         setIsEditing(false);
       });
-  };
-
-  const FileLinks = ({ user_files }) => {
-    const fileLinks = user_files
-      .map((file) => {
-        const { filename, original_filename } = file;
-        const { data: file_data, error } = useGetUploadedFileQuery({
-          file_type: 'jobs',
-          filename: filename.split('/').pop(),
-        });
-
-        if (error) {
-          return null;
-        }
-
-        const fileUrl = file_data?.data?.url;
-        if (!fileUrl) {
-          return null;
-        }
-
-        return (
-          <li key={file.id}>
-            <a href={fileUrl} target='_blank' rel='noopener noreferrer'>
-              {original_filename}
-            </a>
-          </li>
-        );
-      })
-      .filter(Boolean);
-
-    return (
-      <Box className='w-full mt-6'>
-        <Heading as='h3' size='md' mb={2}>
-          My Files
-        </Heading>
-        <ul className='list-disc list-inside'>
-          {fileLinks.length > 0 ? fileLinks : <Text>No files available</Text>}
-        </ul>
-      </Box>
-    );
   };
 
   return (
@@ -147,35 +112,35 @@ function Recruiter({ data }: T.RecruiterProp) {
         <hr className='w-full' />
         <Stack className='w-full mt-2 space-y-6'>
           {isEditing ? (
-          <InputGroup>
-            <InputLeftAddon children='company' />
-            <Input
-              value={state.company_name}
-              onChange={(e) => dispatch({ company_name: e.target.value })}
-            />
-          </InputGroup>
+            <InputGroup>
+              <InputLeftAddon children='company' />
+              <Input
+                value={state.company_name}
+                onChange={(e) => dispatch({ company_name: e.target.value })}
+              />
+            </InputGroup>
           ) : (
             <Text>{data.contact_info.company_name}</Text>
           )}
           {isEditing ? (
-          <InputGroup>
-            <InputLeftAddon children='address' />
-            <Input
-              value={state.company_address}
-              onChange={(e) => dispatch({ company_address: e.target.value })}
-            />
-          </InputGroup>
+            <InputGroup>
+              <InputLeftAddon children='address' />
+              <Input
+                value={state.company_address}
+                onChange={(e) => dispatch({ company_address: e.target.value })}
+              />
+            </InputGroup>
           ) : (
             <Text>{data.contact_info.company_address}</Text>
           )}
           {isEditing ? (
-          <InputGroup>
-            <InputLeftAddon children='email' />
-            <Input
-              value={state.company_email}
-              onChange={(e) => dispatch({ company_email: e.target.value })}
-            />
-          </InputGroup>
+            <InputGroup>
+              <InputLeftAddon children='email' />
+              <Input
+                value={state.company_email}
+                onChange={(e) => dispatch({ company_email: e.target.value })}
+              />
+            </InputGroup>
           ) : (
             <Text>{data.contact_info.company_email}</Text>
           )}
@@ -192,9 +157,61 @@ function Recruiter({ data }: T.RecruiterProp) {
         </Stack>
         {/* User files */}
         {/*<FileLinks user_files={data.user_files} />*/}
+        {match && (
+          <List className='w-full mt-4 capitalize'>
+            <Heading size='base' mb='2'>applied candidates</Heading>
+            {(appliedCandids.length <= 0) && (
+              <Text className='text-slate-400' children='no canddiate has applied yet for this job!' />
+            )}
+            {appliedCandids.map((cand, idx) => {
+              const clr = {
+                applied: 'text-purple-600',
+                shortlisted: 'text-yellow-600',
+                hired: 'text-teal-600',
+                rejected: 'text-red-600'
+              };
+              const bg = {
+                applied: 'bg-purple-50',
+                shortlisted: 'bg-yellow-50',
+                hired: 'bg-teal-50',
+                rejected: 'bg-red-50'
+              };
+
+              return (
+                <ListItem key={idx} className='relative p-2 space-y-2 border shadow-md rounded-md '>
+                  <Flex gap='2'>
+                    <Box className='bg-slate-100 p-2 rounded-full'>
+                      <MyIcon href='/sprite.svg#user' className='w-5 h-5 fill-gray-500' />
+                    </Box>
+                    <Link
+                      to={`/jobs/applied_candidates/${cand.id}`}
+                      className='text-sky-500 !self-center'
+                      children={cand.name}
+                    />
+                  </Flex>
+                  <Flex gap='2'>
+                    <Box className='flex justify-center items-center bg-slate-100 p-2 rounded-full'>
+                      <MyIcon href='/sprite.svg#file' className=' w-5 h-5 fill-gray-500' />
+                    </Box>
+                    <Link
+                      to={cand.cv_url}
+                      className='text-sky-500 !self-center'
+                      children='download cv'
+                    />
+                  </Flex>
+                  <Box className={`p-2 absolute top-2 right-2 ${bg[cand.application_status]} rounded-full`}>
+                    <Text className={`${clr[cand.application_status]}`} children={cand.application_status} />
+                  </Box>
+                </ListItem>
+
+              );
+            }
+            )}
+          </List>
+        )}
       </Box>
 
-      {/*Jobs*/}
+      {/* Jobs's List */}
       <Box className='col-span-4 bg-white flex flex-col rounded-md shadow-md p-6 gap-4 sm:col-span-8'>
         <Box className='relative'>
           <Heading as='h4' mb='4' size='lg' className='capitalize'>
@@ -256,7 +273,7 @@ function Recruiter({ data }: T.RecruiterProp) {
             <Box as='ul' className='flex flex-col gap-4'>
               {match ? (
                 <Box as='li'>
-                  <Outlet />
+                  <Outlet context={{ setAppliedCandidates }} />
                 </Box>
               ) : (
                 data.recruiter.jobs.map((job, idx) => {

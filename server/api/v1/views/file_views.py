@@ -157,7 +157,6 @@ def download_file(file_type, filename):
             # Send the file with the correct MIME type
             response = make_response(send_from_directory(directory, filename))
             response.headers.set("Content-Type", mime_type)
-            print("-------------> download <------------")
             return response
         except NotFound:
             return make_response_("error", "File not found", {}), 404

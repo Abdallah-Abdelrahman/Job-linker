@@ -58,7 +58,6 @@ const baseQueryWithReauth: BaseQueryFn<
   let result = await baseQuery(args, api, extraOptions);
 
   if (result.error && result.error.status === 401) {
-//    console.log('-------token expires------->');
     api.dispatch(setCredentials({ isRefreshing: true }));
 
     // try to get a new token
@@ -117,11 +116,12 @@ export const api = createApi({
         params: param,
       }),
     }),
-    me: builder.query<UserResponse, void>({
-      query: () => ({
-        url: '@me',
-        //headers: {'Authorization': `Bearer ${token}`},
-      }),
+    me: builder.query<UserResponse, { id: string }>({
+      query: ({ id }) => {
+        return ({
+          url: id ? `@me/${id}` : '@me',
+        });
+      },
       providesTags: ['me', 'refresh', 'recruiters', 'candidates', 'job'],
     }),
     upload: builder.mutation<UserResponse, FormData>({

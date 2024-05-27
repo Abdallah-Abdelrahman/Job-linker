@@ -1,4 +1,4 @@
-import { Link, useMatch, useParams } from 'react-router-dom';
+import { Link, useMatch, useOutletContext, useParams } from 'react-router-dom';
 import { useGetJobQuery, useUpdateJobMutation } from '../../app/services/job';
 import {
   Box,
@@ -23,16 +23,19 @@ import { useAppSelector } from '../../hooks/store';
 import { selectCurrentUser } from '../../features/auth';
 import { useCreateApplicationMutation } from '../../app/services/application';
 import MyModal from '../MyModal';
-import { useReducer, useRef, useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { type Job } from '../profile/types';
 import { UpdateOrCancel } from '../profile';
 
+type Context = { setAppliedCandidates?: React.Dispatch<React.SetStateAction<never[]>> }
+
 const init = (data: Job) => {
   return (data);
-}
+};
 
 function Job() {
   const { job_id } = useParams();
+  const context = useOutletContext<Context>();
   const match = useMatch('/find_jobs/' + job_id);
   const user = useAppSelector(selectCurrentUser);
   const { onClose, isOpen, onOpen } = useDisclosure();
@@ -53,11 +56,15 @@ function Job() {
         return (job.data);
       }
       if (newState.type === 'init') {
-        const { created_at, applied_candidates, id, is_open, ...rest } = newState.payload;
+        const { created_at,
+          applied_candidates,
+          id,
+          is_open,
+          ...rest
+        } = newState.payload;
         return (rest);
       }
       if (newState.type === 'responsibilities') {
-        /*         const oldResp = prevState.responsibilities.filter(idx => idx !== newState.payload.index); */
         let newResp = [...prevState.responsibilities];
         newResp[newState.payload.index] = newState.payload.value;
 
@@ -70,7 +77,7 @@ function Job() {
       location: job.data.location,
       salary: job.data.salary ?? 0,
       job_description: job.data.job_description,
-      /*       application_deadline: job.data.application_deadline, */
+      application_deadline: job.data.application_deadline,
       responsibilities: job.data.responsibilities
     },
     init
@@ -124,19 +131,26 @@ function Job() {
       });
   };
 
-  if (isSuccess && job.data.job_title && !state.job_title) {
-    // update the state when promise resloved
-    dispatch({ type: 'init', payload: job.data })
-  }
+  // effect to update the state when promise resloved
+  useEffect(() => {
+    if (isSuccess && job.data.job_title && !state.job_title) {
+      dispatch({ type: 'init', payload: job.data });
+      if (typeof context?.setAppliedCandidates == 'function') {
+        context.setAppliedCandidates(job.data.applied_candidates);
+      }
+    }
+  }, [context, isSuccess, job.data, state.job_title]);
 
-  //console.log({ state });
   return (
-    <Box>
+    <Box className='relative p-1'>
       <Skeleton isLoaded={isSuccess}>
-        <Box className='relative space-y-2'>
+        <Box className='space-y-2'>
           {!match
             && (
-              <Button onClick={() => setIsEditing(true)} className='!absolute !p-0 !m-0 top-0 right-0'>
+              <Button
+                onClick={() => setIsEditing(true)}
+                className='!absolute !p-0 !m-0 top-0 right-0'
+              >
                 <MyIcon href='/sprite.svg#edit' className='w-5 h-5' />
               </Button>
             )}
@@ -154,8 +168,9 @@ function Job() {
                   <InputLeftAddon children='salary' />
                   <Input
                     type='number'
-                    value={state.salary ?? 0}
-                    onChange={(e) => dispatch({ salary: e.target.value ?? 0 })}
+                    min='0'
+                    value={state.salary}
+                    onChange={(e) => dispatch({ salary: e.target.value })}
                   />
                 </InputGroup>
                 <Textarea
@@ -190,7 +205,6 @@ function Job() {
                     </ListItem>
                   )}
                 </List>
-                {/*
                 <InputGroup>
                   <InputLeftAddon children='deadline' />
                   <Input
@@ -198,7 +212,6 @@ function Job() {
                     value={new Date(state.application_deadline).toISOString().slice(0, 16)}
                     onChange={(e) => dispatch({ application_deadline: e.target.value })} />
                 </InputGroup>
-                */}
                 <UpdateOrCancel
                   isLoading={isLoading}
                   update={handleUpdate}
