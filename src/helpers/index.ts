@@ -1,1 +1,1 @@
-export { formatFromNow } from './dates';
+export { formatFromNow, formateDate } from './dates';
