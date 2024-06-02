@@ -1,3 +1,8 @@
+/**
+ * utility to format date from current time
+ * @param {Date} date - date object
+ * @returns string format in `today`, `yesterday`, `last week`, `Month year`
+ */
 function formatFromNow(date: Date) {
   const now = new Date();
   const dateToFormat = new Date(date);
@@ -19,4 +24,12 @@ function formatFromNow(date: Date) {
   }
 }
 
-export { formatFromNow };
+/**
+ * utility to format date
+ * @param {Date} date - date object
+ * @returns string format in `Month year`
+ */
+function formateDate(date: Date) {
+  return new Date(date).toLocaleDateString('en', { year: 'numeric', month: 'short' });
+}
+export { formatFromNow, formateDate };

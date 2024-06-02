@@ -1,26 +1,36 @@
-import { Text, Heading, Box, Stack, Button, ButtonGroup, Input, InputGroup, InputLeftElement, Textarea, FormControl, List, ListItem, IconButton, Select, Divider, InputLeftAddon } from '@chakra-ui/react';
+import {
+  Text,
+  Heading,
+  Box,
+  Stack,
+  Button,
+  ButtonGroup,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  FormControl,
+  List,
+  IconButton,
+  Select,
+  Divider
+} from '@chakra-ui/react';
 import MyIcon from '../Icon';
 import * as T from './types';
 import { Fragment, Reducer, useReducer, useState } from 'react';
-import { useCreateSkillMutation } from '../../app/services/skill';
-import { useCreateLanguageMutation } from '../../app/services/language';
-import { useUpdateWorkExperienceMutation } from '../../app/services/work_experience';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
 import { useMeQuery, useUpdateMeMutation, useUploadProfileImageMutation } from '../../app/services/auth';
 import { useCreateMajorMutation } from '../../app/services/major';
 import { college_majors } from '../../constants';
 import Photo from './Photo';
 import {
-  type Education,
-  useUpdateEducationForCurrentCandidateMutation,
   useUpdateCurrentCandidateMutation,
-  useAddLanguageToCurrentCandidateMutation,
-  useRemoveLanguageFromCurrentCandidateMutation,
-  useRemoveSkillFromCurrentCandidateMutation,
-  useAddSkillToCurrentCandidateMutation
 } from '../../app/services/candidate';
-import UpdateOrCancel from './UpdateOrCancel';
 import { useMatch, useParams } from 'react-router-dom';
+import Bio from './Bio';
+import Education from './Education';
+import Experience from './Experience';
+import Skill from './Skill';
+import Language from './Language';
 
 type ActionType = 'reset' | 'contact_info' | undefined
 type S = Omit<T.CandidateProp['data'], 'candidate' | 'bio'> & { major: string }
@@ -35,7 +45,7 @@ const actionCreator = (payload: A['payload'], type?: A['type']) => ({ payload, t
 
 
 function Candidate({ data, as }: T.CandidateProp) {
-  const { id } = useParams();
+  const { id } = useParams() as { id: string };
   const match = useMatch('@me');
   const { data: userData = { data: {} } } = useMeQuery({ id });
   const [isEditing, setIsEditing] = useState(false);
@@ -70,7 +80,7 @@ function Candidate({ data, as }: T.CandidateProp) {
   const [upload, { isLoading: isLoading_MUPLOAD }] = useUploadProfileImageMutation();
   const handleUpdate = () => {
     const { major, image_url, email, ...rest } = state;
-    console.log({ state })
+    console.log({ state });
     const formdata = new FormData();
     formdata.append('file', file!);
 
@@ -227,486 +237,8 @@ function Candidate({ data, as }: T.CandidateProp) {
   );
 }
 
-type EducationProps = {
-  ed: Education
-  isEditable: boolean
-};
-function Education({ ed }: EducationProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [update, { isLoading }] = useUpdateEducationForCurrentCandidateMutation();
-  const [state, dispatch] = useReducer(
-    (prevState, newState) => {
-      if (newState.type === 'reset') {
-        return (ed);
-      }
-      return ({ ...prevState, ...newState });
-    },
-    {
-      degree: ed.degree,
-      institute: ed.institute,
-      field_of_study: ed.field_of_study,
-      start_date: ed.start_date,
-      end_date: ed.end_date
-    });
-  const handleUpdate = () => {
-    update({
-      education_id: ed.id,
-      education: {
-        ...state,
-        start_date: new Date(state.start_date),
-        end_date: new Date(state.end_date),
-      }
-    })
-      .unwrap()
-      .then(_ => setIsEditing(false))
-      .catch(err => console.log({ err }))
-      .finally(() => {
-        setIsEditing(false);
-      });
-  }
 
-  return (
-    isEditing
-      ? (/*render editing jsx */
-        <Stack>
-          <InputGroup>
-            <InputLeftAddon>field</InputLeftAddon>
-            <Input
-              value={state.field_of_study}
-              onChange={(e) => dispatch({ field_of_study: e.target.value })}
-            />
-          </InputGroup>
-          <InputGroup>
-            <InputLeftAddon>school</InputLeftAddon>
-            <Input
-              value={state.institute}
-              onChange={(e) => dispatch({ institute: e.target.value })}
-            />
-          </InputGroup>
-          <InputGroup>
-            <InputLeftAddon>degree</InputLeftAddon>
-            <Input
-              value={state.degree}
-              onChange={(e) => dispatch({ degree: e.target.value })}
-            />
-          </InputGroup>
-          <InputGroup>
-            <InputLeftAddon>start_date</InputLeftAddon>
-            <Input
-              type='datetime-local'
-              value={new Date(state.start_date).toISOString().slice(0, 16)}
-              onChange={(e) => dispatch({ start_date: e.target.value })}
-            />
-          </InputGroup>
-          <InputGroup>
-            <InputLeftAddon>end_date</InputLeftAddon>
-            <Input
-              type='datetime-local'
-              value={new Date(state.end_date).toISOString().slice(0, 16)}
-              onChange={(e) => dispatch({ end_date: e.target.value })}
-            />
-          </InputGroup>
-          <ButtonGroup>
-            <IconButton
-              aria-label='button'
-              icon={<CloseIcon />}
-              onClick={() => {
-                setIsEditing(false);
-                dispatch({ type: 'reset' });
-              }}
-            />
-            <IconButton
-              aria-label='button'
-              isLoading={isLoading}
-              icon={<CheckIcon />}
-              onClick={handleUpdate}
-            />
-          </ButtonGroup>
-        </Stack>
-      )
-      : (/* render normal jsx */
-        <ListItem className='relative'>
-          {isEditing && (
-            <Button
-              onClick={() => setIsEditing(true)}
-              className='!absolute !p-0 top-0 right-0'
-            >
-              <MyIcon href='/sprite.svg#edit' className='w-5 h-5' />
-            </Button>
-          )}
-          <Box className='flex flex-col gap-3 w-full'>
-            <Box className='flex gap-2'>
-              <Box className='flex gap-1'>
-                <MyIcon
-                  href='/sprite.svg#field_of_study'
-                  className='w-5 h-5 fill-gray-500'
-                />
-                <Text className='text-gray-500'>field</Text>
-              </Box >
-              <Text className='font-semibold'>{ed.field_of_study}</Text>
-            </Box >
-            <Box className='flex gap-2'>
-              <Box className='flex gap-1'>
-                <MyIcon
-                  href='/sprite.svg#school'
-                  className='w-5 h-5 fill-gray-500'
-                />
-                <Text className='text-gray-500'>school</Text>
-              </Box >
-              <Text className='font-semibold'>{ed.institute}</Text>
-            </Box >
-            <Box className='flex gap-2'>
-              <Box className='flex gap-1'>
-                <MyIcon
-                  href='/sprite.svg#degree'
-                  className='w-5 h-5 fill-gray-500'
-                />
-                <Text className='text-gray-500'>degree</Text>
-              </Box>
-              <Text className='font-semibold'>{ed.degree}</Text>
-            </Box>
-            <Box className='flex gap-2'>
-              <Box className='flex gap-1'>
-                <MyIcon
-                  href='/sprite.svg#date'
-                  className='w-5 h-5 fill-gray-500'
-                />
-                <Text className='text-gray-500'>date</Text>
-              </Box>
-              <Text className='font-semibold'>
-                {formateDate(ed.start_date)} - {formateDate(ed.end_date)}
-              </Text>
-            </Box>
-          </Box >
-        </ListItem >
-      )
-  );
-}
 
-type BioProps = {
-  bio: string
-  isEditable: boolean
-}
-function Bio({ bio, isEditable }: BioProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [value, setValue] = useState(bio);
-  const [textareaH, setTextareaH] = useState(0);
-  const [update, { isLoading }] = useUpdateMeMutation();
-  const handleUpdate = () => {
-    update({ bio: value })
-      .unwrap()
-      .then(_ => setIsEditing(false))
-      .catch(err => console.log({ err }))
-  }
-
-  return (
-    isEditing
-      ? (/* render eiditing version */
-        <Stack>
-          <Textarea
-            ref={(el) => {
-              if (!el) return;
-              if (!textareaH) {
-                setTextareaH(el.scrollHeight);
-              }
-            }}
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value);
-              e.target.style.height = 'iherit';
-              e.target.style.height = `${e.target.scrollHeight}px`;
-            }}
-            resize='vertical'
-            h={textareaH + 'px'}
-          />
-          <ButtonGroup>
-            <IconButton
-              aria-label='button'
-              icon={<CloseIcon />}
-              onClick={() => {
-                setIsEditing(false);
-                setValue(bio);
-              }}
-            />
-            <IconButton
-              aria-label='button'
-              isLoading={isLoading}
-              icon={<CheckIcon />}
-              onClick={handleUpdate}
-            />
-          </ButtonGroup>
-        </Stack>
-      )
-      : (/* render normal version */
-        <>
-          {isEditable && (
-            <Button
-              className='!absolute !px-1 top-0 right-0'
-              onClick={() => setIsEditing(true)}
-            >
-              <MyIcon href='/sprite.svg#edit' className='w-5 h-5' />
-            </Button>
-          )}
-          <Text>{bio}</Text>
-        </>
-      )
-  );
-
-}
-type ExperProps = {
-  xp: T.Experience
-  isEditable: boolean
-}
-function Experience({ xp, isEditable }: ExperProps) {
-  const [textareaH, setTextareaH] = useState(0);
-  const [isEditing, setIsEditing] = useState(false);
-  const [state, dispatch] = useReducer(
-    (prevState, newState) => {
-      if (newState.type === 'reset') return (prevState);
-      return ({ ...prevState, ...newState });
-    },
-    {
-      title: xp.title,
-      company: xp.company,
-      start_date: xp.start_date,
-      end_date: xp.end_date,
-      description: xp.description
-    });
-  const [update, { isLoading }] = useUpdateWorkExperienceMutation();
-  const handleUpdate = () => {
-    update({
-      work_experience_id: xp.id, xp: {
-        ...state,
-        start_date: new Date(state.start_date),
-        end_date: new Date(state.end_date)
-      }
-    })
-      .unwrap()
-      .then(_ => setIsEditing(false))
-      .catch(err => console.log({ err }))
-      .finally(() => { setIsEditing(false); });
-  };
-
-  return (
-    <ListItem>
-      {isEditing
-        ? (/* render editing fields */
-          <Stack>
-            <InputGroup>
-              <Input
-                value={state.title}
-                onChange={(e) => dispatch({ title: e.target.value })}
-              />
-            </InputGroup>
-            <InputGroup>
-              <InputLeftElement children={<MyIcon href='/sprite.svg#company' className='w-5 h-5 fill-gray-500' />} />
-              <Input
-                value={state.company}
-                onChange={(e) => dispatch({ company: e.target.value })}
-              />
-            </InputGroup>
-            <InputGroup>
-              <InputLeftElement children={<MyIcon href='/sprite.svg#date' className='w-5 h-5 fill-gray-500' />} />
-              <Input
-                type='datetime-local'
-                value={new Date(state.start_date).toISOString().slice(0, 16)}
-                onChange={(e) => dispatch({ start_date: e.target.value })}
-              />
-            </InputGroup>
-            <InputGroup>
-              <InputLeftElement children={<MyIcon href='/sprite.svg#date' className='w-5 h-5 fill-gray-500' />} />
-              <Input
-                type='datetime-local'
-                value={new Date(state.end_date).toISOString().slice(0, 16)}
-                onChange={(e) => dispatch({ end_date: e.target.value })}
-              />
-            </InputGroup>
-            <InputGroup>
-              <Textarea
-                ref={(el) => {
-                  if (!el) return;
-                  if (!textareaH) {
-                    setTextareaH(el.scrollHeight);
-                  }
-                }}
-                value={state.description}
-                onChange={(e) => {
-                  dispatch({ description: e.target.value });
-                  e.target.style.height = 'iherit';
-                  e.target.style.height = `${e.target.scrollHeight}px`;
-                }}
-                resize='vertical'
-                h={textareaH + 'px'}
-              />
-            </InputGroup>
-            <ButtonGroup>
-              <IconButton aria-label='button' icon={<CloseIcon />} onClick={() => {
-                setIsEditing(false);
-                dispatch({ type: 'reset' });
-              }} />
-              <IconButton
-                aria-label='button'
-                isLoading={isLoading}
-                icon={<CheckIcon />}
-                onClick={handleUpdate}
-              />
-            </ButtonGroup>
-          </Stack>
-        )
-        : (/* render normal fields */
-          <>
-            <Box className='relative flex flex-col gap-3 w-full'>
-              {isEditable && (
-                <Button onClick={() => setIsEditing(true)} className='!absolute !px-1 top-0 right-0'>
-                  <MyIcon href='/sprite.svg#edit' className='w-5 h-5' />
-                </Button>
-              )}
-              <Heading as='h6' size='md' className='capitalize max-w-[80%]'>{xp.title.toLowerCase()}</Heading>
-              <Box className='space-y-2'>
-                <Box className='flex gap-2'>
-                  <Box className='flex gap-1'>
-                    <MyIcon href='/sprite.svg#company' className='w-5 h-5 fill-gray-500' />
-                    <Text className='text-gray-500' children='at' />
-                  </Box>
-                  <Text className='!max-w-[70%] capitalize font-semibold' children={xp.company.toLowerCase()} />
-                </Box>
-                <Box className='flex gap-2'>
-                  <Box className='flex gap-1 text-gray-500'>
-                    <MyIcon href='/sprite.svg#date' className='w-5 h-5 fill-gray-500' />
-                    <Text children='date' />
-                  </Box>
-                  <Text
-                    className='font-semibold'
-                    children={`${formateDate(xp.start_date)} - ${formateDate(xp.end_date)}`}
-                  />
-                </Box>
-              </Box>
-            </Box>
-            <Text className='mt-2'>{xp.description}</Text>
-
-          </>
-        )
-      }
-    </ListItem>
-
-  );
-}
-type SkillProps = {
-  skill: T.Skill
-  isEditable: boolean
-}
-function Skill({ skill, isEditable }: SkillProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [value, setValue] = useState(skill.name);
-  const [removeCandidSkill, { isLoading: isLoading1 }] = useRemoveSkillFromCurrentCandidateMutation();
-  const [add, { isLoading: isLoading2 }] = useCreateSkillMutation();
-  const [addCandidSkill, { isLoading: isLoading3 }] = useAddSkillToCurrentCandidateMutation();
-  const handleUpdate = () => {
-    Promise.allSettled([
-      removeCandidSkill({ skill_id: skill.id }).unwrap(),
-      add({ name: value })
-        .unwrap()
-        .then(({ data }) => addCandidSkill({ skill_id: data.id }))
-        .catch(err => console.log({ err }))
-        .finally(() => {
-          setIsEditing(false);
-        })
-    ]);
-  };
-
-  return (
-    <li className='relative p-2 pr-4 bg-teal-50 text-teal-500 rounded-tl-lg rounded-br-lg'>
-      {isEditing
-        ? <>
-          <Input className='!w-max' value={value} onChange={(e) => setValue(e.target.value)} />
-          <UpdateOrCancel
-            size='sm'
-            rounded='full'
-            isLoading={isLoading1 || isLoading2 || isLoading3}
-            cancel={() => {
-              setIsEditing(false);
-              setValue(skill.name);
-
-            }}
-            update={handleUpdate}
-          />
-        </>
-        : <>
-          {isEditable && (
-            <MyIcon
-              href='/sprite.svg#edit' className='absolute top-0 right-0 w-3 h-3 cursor-pointer'
-              onClick={() => setIsEditing(true)}
-            />
-          )}
-          <Text>{value}</Text>
-        </>
-      }
-
-    </li>
-
-  );
-}
-
-type LangaugeProps = {
-  language: T.Language
-  isEditable: boolean
-}
-function Language({ language, isEditable }: LangaugeProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [value, setValue] = useState(language.name);
-  const [add, { isLoading: isLoading1 }] = useCreateLanguageMutation();
-  const [removeCandidLang, { isLoading: isLoading2 }] = useRemoveLanguageFromCurrentCandidateMutation();
-  const [addLangToCandid, { isLoading: isLoading3 }] = useAddLanguageToCurrentCandidateMutation();
-
-  const handleUpdate = () => {
-    Promise.allSettled([
-      removeCandidLang({ lang_id: language.id }).unwrap(),
-      add({ name: value })
-        .unwrap()
-        .then(({ data }) => addLangToCandid({ lang_id: data.id }))
-    ])
-      .then(_ => setIsEditing(false))
-      .catch(err => console.log({ err }))
-      .finally(() => {
-        setIsEditing(false);
-      });
-  };
-
-  return (
-    <ListItem
-      className='relative p-2 bg-orange-50 text-orange-500 rounded-tl-lg rounded-br-lg'
-    >
-      {isEditing
-        ? (/* render input field to edit value */
-          <>
-            <Input className='!w-max' value={value} onChange={(e) => setValue(e.target.value)} />
-            <UpdateOrCancel
-              size='sm'
-              rounded='full'
-              isLoading={isLoading1 || isLoading2 || isLoading3}
-              update={handleUpdate}
-              cancel={() => {
-                setIsEditing(false);
-                setValue(language.name);
-              }}
-            />
-          </>
-        )
-        : (/* render normal text component */
-          <>
-            {isEditable && (
-              <MyIcon
-                href='/sprite.svg#edit' className='absolute top-0 right-0 w-3 h-3 cursor-pointer'
-                onClick={() => setIsEditing(true)}
-              />
-            )}
-            <Text>{value}</Text>
-          </>
-        )
-      }
-    </ListItem>
-  );
-}
 type ContactProps = {
   data: Record<'address' | 'github' | 'linkedin' | 'whatsapp' | 'phone', string>,
   dispatch: React.Dispatch<A>,
@@ -714,7 +246,7 @@ type ContactProps = {
   state: S
 }
 
-export function Contact_info({ data, isEditing, state, dispatch }: ContactProps) {
+function Contact_info({ data, isEditing, state, dispatch }: ContactProps) {
   if (!data) {
     return (null);
   }
@@ -759,13 +291,5 @@ export function Contact_info({ data, isEditing, state, dispatch }: ContactProps)
   );
 }
 
-/**
- * utility to format date
- * @param {Date} date - date object
- * @returns string format in `Month year`
- */
-function formateDate(date: Date) {
-  return new Date(date).toLocaleDateString('en', { year: 'numeric', month: 'short' });
-}
 
-export default Candidate;
+export { Candidate as default, Contact_info };
