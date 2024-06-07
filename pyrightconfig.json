@@ -1,0 +1,8 @@
+{
+  "include": ["server"],
+  "exclude": ["**/node_modules", "**/__pycache__"],
+  "reportMissingTypeStubs": true,
+  "pythonVersion": "3.12",
+  "ignore": ["server/venv"],
+  "venvPath": "server/venv"
+}
