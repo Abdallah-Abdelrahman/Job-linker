@@ -574,7 +574,7 @@ class JobController:
             if not v.is_open:
                 continue
             # Skip if the job is expired
-            if v.application_deadline
+            if v.application_deadline\
             and datetime.utcnow() > v.application_deadline:
                 continue
             # Calculate match scores for location and title

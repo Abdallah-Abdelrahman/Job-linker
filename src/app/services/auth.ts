@@ -6,7 +6,6 @@ import type {
   FetchArgs,
   FetchBaseQueryError,
 } from '@reduxjs/toolkit/query';
-import { unsetCredentials } from '../../features/auth/authSlice';
 
 export interface ServerResponse<T> {
   message: string;
@@ -35,8 +34,14 @@ export interface RegisterRequest {
   role: 'candidate' | 'recruiter';
 }
 
+const env = {
+  development: "http://127.0.0.1:5000",
+  test: "http://0.0.0.0:5000",
+  production: "https://www.eduresource.tech",
+};
+
 const baseQuery = fetchBaseQuery({
-  baseUrl: '/api/v1',
+  baseUrl: `${env[process.env.NODE_ENV]}/api/v1` as string,
   prepareHeaders: async (headers, { getState }) => {
     const token = (getState() as RootState).auth.jwt;
     if (token) {
