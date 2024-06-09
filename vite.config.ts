@@ -5,7 +5,7 @@ import tailwindcss from "tailwindcss";
 const env = {
   development: "http://127.0.0.1:5000",
   test: "http://0.0.0.0:5000",
-  production: "",
+  production: "https://www.eduresource.tech",
 };
 // https://vitejs.dev/config/
 export default defineConfig({
