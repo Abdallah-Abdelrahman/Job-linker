@@ -27,7 +27,7 @@ Welcome to JobLinker, a revolutionary platform that leverages the power of Artif
 - **Flask**: A lightweight WSGI web application framework for crafting elegant API services. [Flask](https://flask.palletsprojects.com/en/3.0.x/)
 - **SQLAlchemy**: A SQL toolkit and Object-Relational Mapping (ORM) system for Python, providing a full suite of well known enterprise-level persistence patterns. [SQLAlchemy](https://www.sqlalchemy.org/)
 
-## Visit: [Job Linker](https://job-linker.netlify.app)
+## Visit: <a href='https://job-linker.netlify.app' target='_blank'>Job linker</a>
 [![Home Page](https://i.postimg.cc/tRM82wCt/Screenshot-2024-05-24-075939.png)](https://postimg.cc/hhVCGCmf)
 
 ## Get Insights & ATS Friendliness score for your CV
