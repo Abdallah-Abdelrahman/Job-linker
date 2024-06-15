@@ -109,6 +109,8 @@ Guidelines:
    - Each suggestion should correspond to one of the evaluation criteria mentioned above.
    - Ensure suggestions are clear, concise, and relevant to improving the ATS score.
 
+5. Your response should be in a json format, don't add any additional text outside the json.
+
 Example Response:
 {
 "ats_score": 0.85,

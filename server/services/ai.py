@@ -11,9 +11,11 @@ from pdfminer.pdfparser import PDFSyntaxError
 import google.generativeai as genai
 from dateutil.parser import parse, ParserError
 from dateutil.relativedelta import relativedelta
+from dotenv import load_dotenv
 from server.exception import UnreadableCVError
 from server.prompts import CANDID_PROMPT, JOB_PROMPT, ATS_FRIENDLY_PROMPT
 
+load_dotenv()
 
 class AIService():
     '''class AIService
@@ -55,12 +57,13 @@ class AIService():
         Args:
             pdf(str): path to resume file
         '''
-        genai.configure(api_key=getenv('GOOGLE_API_KEY'))
+        GOOGLE_API_KEY = getenv('GOOGLE_API_KEY')
+        genai.configure(api_key=GOOGLE_API_KEY)
 
         self.__insights = None
         self.pdf = pdf
         self.model = genai.GenerativeModel(
-            model_name='gemini-1.0-pro',
+            model_name='gemini-1.5-flash',
             generation_config=self.generation_config,
             safety_settings=self.safety_settings)
 
@@ -139,6 +142,13 @@ class AIService():
                 dict_['application_deadline'] = one_month_ahead.isoformat()
         return dict_
 
+    def clean_json_response(self, response_text):
+        """Clean the JSON response by removing unwanted characters."""
+        # Remove the starting and ending ticks
+        if response_text.startswith("```json") and response_text.endswith("```"):
+            response_text = response_text[7:-3]
+        return response_text
+
     def to_dict(self, prompt_enquiry, text=''):
         '''The function translates gemeni response to a dictionary
 
@@ -149,10 +159,14 @@ class AIService():
         '''
         if not text:
             text = self.prompt(prompt_enquiry)
+
+        # Clean the text to remove unwanted characters
+        cleaned_text = self.clean_json_response(text)
+
         try:
             # strips out any spaces or new lines or back-slashes
             # txt_cp = ''.join([c for c in text if c not in '\n'])
-            dict_ = loads(text)
+            dict_ = loads(cleaned_text)
             if prompt_enquiry == CANDID_PROMPT:
                 dict_ = self.__handle_cv(dict_)
             if prompt_enquiry == JOB_PROMPT:
