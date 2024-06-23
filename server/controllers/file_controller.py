@@ -53,16 +53,13 @@ class FileController:
         return file_path, file.filename
 
     def process_upload(
-            self,
-            file_path,
-            original_filename,
-            user_id,
-            major_id=None
-            ):
+        self, file_path, original_filename,
+        user_id, major_id=None
+    ):
         """Process the uploaded file based on the user's role.
         It creates candidate profile or job from the uploaded file.
         """
-        ai = AIService(pdf=file_path)
+        ai = AIService(file_path=file_path)
 
         # This logic will work with authorized or Unauthorized users
         user = storage.get(User, user_id)
@@ -123,7 +120,7 @@ class FileController:
 
     def generate_insights(self, file_path):
         """Generate ATS insights for the uploaded file."""
-        ai = AIService(pdf=file_path)
+        ai = AIService(file_path=file_path)
         ai_data = ai.to_dict(ATS_FRIENDLY_PROMPT)
         size = os.stat(file_path).st_size
         if os.path.exists(file_path):
