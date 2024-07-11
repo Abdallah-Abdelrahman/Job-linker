@@ -54,9 +54,6 @@ function Insights({ onClose, isOpen }: Props) {
     generateInsights(formdata);
   };
 
-  if (isError) {
-    console.log({ error });
-  }
   return (
     <MyModal
       title='Scan Resume'
@@ -80,7 +77,7 @@ function Insights({ onClose, isOpen }: Props) {
                     ? (
                       'file is too large'
                     )
-                    : (error.data.message)
+                    : (error.data ? error.data.message: 'The format of your pdf is invalid!')
                   }
                 </Text>
                 <MyIcon href='/sprite.svg#upload-error' />
