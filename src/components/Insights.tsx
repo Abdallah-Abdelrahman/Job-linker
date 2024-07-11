@@ -54,7 +54,9 @@ function Insights({ onClose, isOpen }: Props) {
     generateInsights(formdata);
   };
 
-  //console.log({error});
+  if (isError) {
+    console.log({ error });
+  }
   return (
     <MyModal
       title='Scan Resume'
