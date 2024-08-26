@@ -84,5 +84,5 @@ class ApplicationConfig:
         os.makedirs(path, exist_ok=True)
 
     # Configure Caching
-    CACHE_TYPE = "simple"
-    CACHE_DEFAULT_TIMEOUT = 300
+    # CACHE_TYPE = "simple"
+    # CACHE_DEFAUT_TIMEOUT = 300
