@@ -11,28 +11,28 @@ import {
   InputLeftElement,
   Icon,
   InputGroup
-} from "@chakra-ui/react";
-import { useLoginMutation } from "../app/services/auth";
-import { NavLink, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useState, useEffect } from "react";
-import { useAppSelector } from "../hooks/store";
-import { selectCurrentUser, setCredentials } from "../features/auth";
-import { MyIcon } from "../components";
+} from '@chakra-ui/react';
+import { useLoginMutation } from '../app/services/auth';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { useAppSelector } from '../hooks/store';
+import { selectCurrentUser, setCredentials } from '../features/auth';
+import { MyIcon } from '../components';
 
 function Login() {
   const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useAppSelector(selectCurrentUser);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
     if (!email || !password) {
-      setErrorMessage("Please fill in all fields");
+      setErrorMessage('Please fill in all fields');
       return;
     }
     login({ email, password })
@@ -40,13 +40,13 @@ function Login() {
       .then(({ data }) => {
         if (data.jwt) {
           dispatch(setCredentials({ ...data, isRefreshed: true }));
-          navigate("/@me");
+          navigate('/@me');
         } else {
           setErrorMessage(data.message);
         }
       })
       .catch((err) => {
-        let actualErrorMessage = err.data?.message || "An error occurred";
+        let actualErrorMessage = err.data?.message || 'An error occurred';
         try {
           // Attempt to parse the error message
           const errorData = JSON.parse(err.data.message.replace(/'/g, '"'));
