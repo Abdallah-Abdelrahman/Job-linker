@@ -188,7 +188,7 @@ export const candApi = api.injectEndpoints({
         method: 'PUT',
         body: education,
       }),
-      invalidatesTags: ['me']
+      invalidatesTags: ['me'],
     }),
     deleteEducationForCurrentCandidate: builder.mutation<
       void,

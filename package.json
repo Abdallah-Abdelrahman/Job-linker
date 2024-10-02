@@ -7,6 +7,7 @@
     "dev": "vite",
     "api": "python -m server.api.v1.app",
     "build": "vite build",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.tsx\" \"src/**/*.css\"",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -16,6 +17,7 @@
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@reduxjs/toolkit": "^2.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
     "axios": "^1.6.8",
     "framer-motion": "^11.1.7",
     "jwt-decode": "^4.0.0",

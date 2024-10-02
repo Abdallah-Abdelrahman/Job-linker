@@ -1,9 +1,10 @@
+import { Box, Heading, Skeleton } from '@chakra-ui/react';
 import {
-  Box,
-  Heading,
-  Skeleton,
-} from '@chakra-ui/react';
-import { User, useMeQuery, useUpdateMeMutation, useUploadMutation } from '../app/services/auth';
+  User,
+  useMeQuery,
+  useUpdateMeMutation,
+  useUploadMutation,
+} from '../app/services/auth';
 import { useCreateCandidateMutation } from '../app/services/candidate';
 import { useCreateRecruiterMutation } from '../app/services/recruiter';
 import { useAppSelector } from '../hooks/store';
@@ -13,8 +14,6 @@ import { selectCurrentUser } from '../features/auth';
 import { Candidate } from '../components/profile';
 import { Recruiter } from '../components/profile';
 import { MyForm } from '../components/profile';
-
-
 
 // Profile component
 const Profile = () => {
@@ -34,24 +33,24 @@ const Profile = () => {
   const { role } = useAppSelector(selectCurrentUser);
 
   const handleCandidateFormSubmit = async (formdata: FormData) => {
-//    console.log(formdata.get('file'));
+    //    console.log(formdata.get('file'));
     try {
       addMajor({ name: formdata.get('major') })
         .unwrap()
         .then((data) => {
           createCandidate({ major_id: data.data.id })
             .unwrap()
-            .then(_ => {
+            .then((_) => {
               uploadCV(formdata)
                 .unwrap()
-                .then(_ => {
-                  updateUser({ profile_complete: true })
-//                    .then(_ => console.log('----------profile completed-------->'))
-//                    .catch(err => console.log('------not completed---->', { err }));
+                .then((_) => {
+                  updateUser({ profile_complete: true });
+                  //                    .then(_ => console.log('----------profile completed-------->'))
+                  //                    .catch(err => console.log('------not completed---->', { err }));
                 })
-                .catch()
-            })
-//            .catch((err) => console.log({ err }));
+                .catch();
+            });
+          //            .catch((err) => console.log({ err }));
         })
         .catch((err) => console.error({ err }));
     } catch (error) {
@@ -65,13 +64,13 @@ const Profile = () => {
     try {
       createRecruiter()
         .unwrap()
-        .then(_ => {
+        .then((_) => {
           updateUser({ contact_info: Object.fromEntries(formdata) })
             .unwrap()
-            .then(_ => {
-              updateUser({ profile_complete: true })
-//                .then(_ => console.log('----------profile completed-------->'))
-//                .catch(err => console.log('------not completed---->', { err }));
+            .then((_) => {
+              updateUser({ profile_complete: true });
+              //                .then(_ => console.log('----------profile completed-------->'))
+              //                .catch(err => console.log('------not completed---->', { err }));
             })
             .catch((error) => {
               console.error(error);
@@ -87,28 +86,31 @@ const Profile = () => {
 
   // candidate profile
   if (role == 'candidate' && isSuccess && userData.data.profile_complete)
-    return (<Candidate data={userData.data} />);
+    return <Candidate data={userData.data} />;
 
   // recruiter profile
   if (role == 'recruiter' && isSuccess && userData.data.profile_complete)
-    return (<Recruiter data={userData.data} />);
+    return <Recruiter data={userData.data} />;
 
   // if user hasn't completed their profile yet,
   // return a form to complete
   return (
-    <Box className='mx-auto max-w-2xl my-8'>
+    <Box className="mx-auto max-w-2xl my-8">
       <Skeleton isLoaded={!isLoading}>
-        <Heading as='h2' size='xl' className='mb-8 capitalize'>
+        <Heading as="h2" size="xl" className="mb-8 capitalize">
           complete your Profile
         </Heading>
         <MyForm
           role={role}
-          onSubmit={role == 'candidate'
-            ? handleCandidateFormSubmit
-            : handleRecruiterFormSubmit}
-          isLoading={role == 'candidate'
-            ? candidLoading || cvLoading || majorLoading
-            : recLoading
+          onSubmit={
+            role == 'candidate'
+              ? handleCandidateFormSubmit
+              : handleRecruiterFormSubmit
+          }
+          isLoading={
+            role == 'candidate'
+              ? candidLoading || cvLoading || majorLoading
+              : recLoading
           }
         />
       </Skeleton>

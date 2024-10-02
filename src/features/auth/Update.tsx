@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import {
   Button,
   FormControl,
@@ -9,13 +9,13 @@ import {
   Heading,
   AlertIcon,
   Spinner,
-} from "@chakra-ui/react";
+} from '@chakra-ui/react';
 
-import { useUpdateMeMutation } from "../../app/services/auth";
-import { useUpdateCurrentCandidateMutation } from "../../app/services/candidate";
-import { useUpdateCurrentRecruiterMutation } from "../../app/services/recruiter";
+import { useUpdateMeMutation } from '../../app/services/auth';
+import { useUpdateCurrentCandidateMutation } from '../../app/services/candidate';
+import { useUpdateCurrentRecruiterMutation } from '../../app/services/recruiter';
 
-import { selectCurrentUser } from "./authSlice";
+import { selectCurrentUser } from './authSlice';
 
 function ProfileEdit() {
   const currentUser = useSelector(selectCurrentUser);
@@ -51,14 +51,14 @@ function ProfileEdit() {
 
     try {
       await updateCurrentUser(userData);
-      if (currentUser.role === "candidate") {
+      if (currentUser.role === 'candidate') {
         await updateCandidate(candidateData);
-      } else if (currentUser.role === "recruiter") {
+      } else if (currentUser.role === 'recruiter') {
         await updateRecruiter(recruiterData);
       }
-      alert("Profile updated successfully");
+      alert('Profile updated successfully');
     } catch (err) {
-      alert("An error occurred while updating the profile");
+      alert('An error occurred while updating the profile');
     }
   };
 
@@ -91,7 +91,7 @@ function ProfileEdit() {
         </FormControl>
 
         {/* Fields for candidates */}
-        {currentUser.role === "candidate" && (
+        {currentUser.role === 'candidate' && (
           <FormControl>
             <FormLabel>Major ID</FormLabel>
             <Input
@@ -102,7 +102,7 @@ function ProfileEdit() {
         )}
 
         {/* Fields for recruiters */}
-        {currentUser.role === "recruiter" && (
+        {currentUser.role === 'recruiter' && (
           <>
             <FormControl>
               <FormLabel>Company Name</FormLabel>

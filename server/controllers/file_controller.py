@@ -4,6 +4,7 @@ Job-linker application.
 """
 
 import os
+import pybreaker
 from datetime import datetime
 
 from flask_bcrypt import Bcrypt
@@ -18,6 +19,9 @@ from server.prompts import ATS_FRIENDLY_PROMPT, CANDID_PROMPT, JOB_PROMPT
 from server.services.ai import AIService
 from server.services.ai_cand_creator import AICandidateProfileCreator
 from server.services.ai_job_creator import AIJobCreator
+
+
+circuit_breaker = pybreaker.CircuitBreaker(fail_max=5, reset_timeout=60)
 
 
 class FileController:
@@ -118,6 +122,7 @@ class FileController:
                 201,
             )
 
+    @circuit_breaker
     def generate_insights(self, file_path):
         """Generate ATS insights for the uploaded file."""
         ai = AIService(file_path=file_path)

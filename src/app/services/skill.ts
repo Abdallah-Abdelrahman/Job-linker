@@ -26,11 +26,11 @@ export const skillApi = api.injectEndpoints({
       { skill_id: string; skill: Partial<Skill> }
     >({
       query: ({ skill_id, skill }) => {
-        return ({
+        return {
           url: `skills/${skill_id}`,
           method: 'PUT',
           body: skill,
-        });
+        };
       },
     }),
     deleteSkill: builder.mutation<void, { skill_id: string }>({

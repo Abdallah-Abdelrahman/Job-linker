@@ -3,9 +3,9 @@ import { Text, FormControl, Input, FormLabel, Box } from '@chakra-ui/react';
 import { MyIcon } from '.';
 
 type Props = {
-  isError: boolean
-  label: string
-}
+  isError: boolean;
+  label: string;
+};
 
 function Upload(props: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -21,8 +21,10 @@ function Upload(props: Props) {
   });
 
   return (
-    <FormControl className='px-4 flex flex-col items-center gap-2'>
-      <FormLabel className='self-start text-gray-600 !text-base'>{props.label}</FormLabel>
+    <FormControl className="px-4 flex flex-col items-center gap-2">
+      <FormLabel className="self-start text-gray-600 !text-base">
+        {props.label}
+      </FormLabel>
       <Box
         ref={boxRef}
         tabIndex={0}
@@ -34,26 +36,28 @@ function Upload(props: Props) {
           inputRef.current?.click();
         }}
       >
-        <MyIcon
-          href='/sprite.svg#upload-0x01'
-          className='w-10 h-10'
-        />
+        <MyIcon href="/sprite.svg#upload-0x01" className="w-10 h-10" />
         <Input
           ref={inputRef}
-          type='file'
-          name='file'
+          type="file"
+          name="file"
           hidden
           onChange={(evt) => setFile(evt.currentTarget.files?.[0].name)}
         />
-        <Text className='text-sm text-gray-500'>
-          {!file
-            ? <span>click to upload your file<br /> max size: 2MB<br /> media type: pdf</span>
-            : file}
+        <Text className="text-sm text-gray-500">
+          {!file ? (
+            <span>
+              click to upload your file
+              <br /> max size: 2MB
+              <br /> media type: pdf
+            </span>
+          ) : (
+            file
+          )}
         </Text>
       </Box>
     </FormControl>
   );
 }
-
 
 export default Upload;

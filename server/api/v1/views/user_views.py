@@ -78,21 +78,20 @@ def login_user():
         if successful.
         Otherwise, it returns an error message.
     """
-    user, access_token, refresh_token = user_controller.login_user(
-            request.json
-            )
+    user, access_token, refresh_token = user_controller.login_user(request.json)
     response_data = make_response_(
-        "success",
-        "User logged in successfully",
-        {"role": user.role, "jwt": access_token},
+        status="success",
+        message="User logged in successfully",
+        data={"role": user.role, "jwt": access_token},
+        cookies={
+            'refresh_token': {'value': refresh_token, 'max_age': 86400},
+            'access_token': {'value': access_token, 'max_age': 3600}
+        }
     )
-    response = response_data
-    set_refresh_cookies(response, refresh_token)
-    return response
-
+    return response_data
 
 @app_views.route("/refresh", methods=["POST"])
-@jwt_required(refresh=True, locations="cookies")
+@jwt_required(refresh=True, locations=["cookies"])
 @handle_errors
 @swag_from("docs/app_views/refresh_token.yaml")
 def refresh_token():
@@ -109,13 +108,13 @@ def refresh_token():
     user_id = get_jwt_identity()
     user = user_controller.get_current_user(user_id)
     jwt = create_access_token(identity=user_id)
-    return (
-        make_response_(
-            "success",
-            "Token refreshed successfully",
-            {"jwt": jwt, "role": user.get("role")},
-        ),
-        200,
+    return make_response_(
+        status="success",
+        message="Token refreshed successfully",
+        data={"jwt": jwt, "role": user.get("role")},
+        cookies={
+            'access_token': {'value': jwt, 'max_age': 3600}
+        }
     )
 
 

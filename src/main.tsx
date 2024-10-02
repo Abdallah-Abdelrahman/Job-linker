@@ -17,22 +17,25 @@ import { Candidate } from './components/profile';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route path='/' element={<Layout />} errorElement={<ErrorPage />}>
+    <Route path="/" element={<Layout />} errorElement={<ErrorPage />}>
       <Route index element={<Home />} />
-      <Route path='find_jobs' element={<Explore />}>
-        <Route path=':job_id' element={<Job />} />
+      <Route path="find_jobs" element={<Explore />}>
+        <Route path=":job_id" element={<Job />} />
       </Route>
-      <Route path='signup' element={<Register />} />
-      <Route path='login' element={<Login />} />
-      <Route path='verify' element={<Verify />} />
+      <Route path="signup" element={<Register />} />
+      <Route path="login" element={<Login />} />
+      <Route path="verify" element={<Verify />} />
       <Route element={<Private />}>
-        <Route path='jobs/applied_candidates/:id' element={<Candidate as='recruiter' />} />
-        <Route path='@me' element={<Profile />}>
-          <Route path='jobs/:job_id' element={<Job />} />
+        <Route
+          path="jobs/applied_candidates/:id"
+          element={<Candidate as="recruiter" />}
+        />
+        <Route path="@me" element={<Profile />}>
+          <Route path="jobs/:job_id" element={<Job />} />
         </Route>
       </Route>
-      <Route path='*' element={<ErrorPage />} />
-    </Route>
+      <Route path="*" element={<ErrorPage />} />
+    </Route>,
   ),
 );
 
@@ -43,5 +46,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <RouterProvider router={router} />
       </ChakraProvider>
     </Provider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

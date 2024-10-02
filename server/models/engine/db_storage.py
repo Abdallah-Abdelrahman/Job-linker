@@ -1,7 +1,8 @@
 """
 Contains the class DBStorage
 """
-
+import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
@@ -18,6 +19,9 @@ from server.models.skill import Skill
 from server.models.user import User
 from server.models.user_file import UserFile
 from server.models.work_experience import WorkExperience
+
+load_dotenv()
+
 
 classes = {
     "Candidate": Candidate,
@@ -40,22 +44,20 @@ class DBStorage:
     __engine = None
     __session = None
 
-    def __init__(self, engine="sqlite:///:memory:"):
+    def __init__(self):
         """Instantiate a DBStorage object"""
 
-        #        JOBS_MYSQL_USER = getenv("JOBS_MYSQL_USER")
-        #        JOBS_MYSQL_PWD = getenv("JOBS_MYSQL_PWD")
-        #        JOBS_MYSQL_HOST = getenv("JOBS_MYSQL_HOST")
-        #        JOBS_MYSQL_DB = getenv("JOBS_MYSQL_DB")
-        #        JOBS_ENV = getenv("JOBS_ENV")
-        self.__engine = create_engine(engine, pool_size=30, max_overflow=5)
-        # .format(
-        #    JOBS_MYSQL_USER, JOBS_MYSQL_PWD, JOBS_MYSQL_HOST, JOBS_MYSQL_DB
-        # )
-        # )
-
-    #       if JOBS_ENV == "test":
-    #           Base.metadata.drop_all(self.__engine)
+        JOBS_MYSQL_USER = os.environ["JOBS_MYSQL_USER"]
+        JOBS_MYSQL_PWD = os.environ["JOBS_MYSQL_PWD"]
+        JOBS_MYSQL_HOST = os.environ["JOBS_MYSQL_HOST"]
+        JOBS_MYSQL_DB = os.environ["JOBS_MYSQL_DB"]
+        self.__engine = create_engine(
+            "mysql+mysqldb://{}:{}@{}/{}".format(
+                JOBS_MYSQL_USER, JOBS_MYSQL_PWD, JOBS_MYSQL_HOST, JOBS_MYSQL_DB
+            ),
+            pool_size=20,
+            max_overflow=0
+        )
 
     def all(self, cls=None):
         """query on the current database session"""

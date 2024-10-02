@@ -13,6 +13,7 @@ from server.api.v1.views import app_views
 from server.config import ApplicationConfig
 from server.controllers.file_controller import FileController
 from server.decorators import handle_errors
+from server.extensions import limiter
 
 file_controller = FileController()
 
@@ -48,6 +49,7 @@ def upload():
 
 @app_views.route("/upload/insights", methods=["POST"])
 @handle_errors
+@limiter.limit("3 per minute")
 @swag_from("docs/app_views/upload_insights.yaml")
 def upload_insights():
     """save file into server and return ATS insights"""

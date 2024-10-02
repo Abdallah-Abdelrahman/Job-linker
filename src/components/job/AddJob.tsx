@@ -8,23 +8,31 @@ import { useAppSelector } from '../../hooks/store';
 import { selectCurrentUser } from '../../features/auth';
 
 type Props = {
-  [k in 'setLoading' | 'setUnInitialized']: React.Dispatch<React.SetStateAction<boolean>>
-}
+  [k in 'setLoading' | 'setUnInitialized']: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
+};
 function AddJob({ setLoading, setUnInitialized }: Props) {
   const user = useAppSelector(selectCurrentUser);
   const [uploadJOB] = useUploadMutation();
   const [add_major] = useCreateMajorMutation();
-  const [formError, dispatch] = useReducer((oldState, newState) => {
-    return { ...oldState, ...newState };
-  }, { major: false, file: false });
+  const [formError, dispatch] = useReducer(
+    (oldState, newState) => {
+      return { ...oldState, ...newState };
+    },
+    { major: false, file: false },
+  );
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (evt) => {
     evt.preventDefault();
     const formdata = new FormData(evt.currentTarget);
-    const { major, file } = Object.fromEntries(formdata) as { major: string, file: File };
+    const { major, file } = Object.fromEntries(formdata) as {
+      major: string;
+      file: File;
+    };
     let canSubmit = false;
 
-    dispatch({ major: !(major), file: !(file.name) });
+    dispatch({ major: !major, file: !file.name });
     canSubmit = Boolean(major && file.name);
 
     if (canSubmit) {
@@ -32,29 +40,28 @@ function AddJob({ setLoading, setUnInitialized }: Props) {
 
       add_major({ name: major })
         .unwrap()
-        .then(data => {
+        .then((data) => {
           setLoading(true);
           setUnInitialized(false);
-          formdata.append('major_id', (data.data.id));
+          formdata.append('major_id', data.data.id);
           uploadJOB(formdata)
             .unwrap()
             //            .then(d => console.log({ d }))
             //            .catch(e => console.log('--------upload error------->', e))
-            .finally(_ => setLoading(false));
-        })
+            .finally((_) => setLoading(false));
+        });
       //        .catch(e => console.log('--------add_major error------->', e))
-
     }
   };
 
   return (
-    <form id='job' onSubmit={handleSubmit} className='space-y-4'>
+    <form id="job" onSubmit={handleSubmit} className="space-y-4">
       <FormControl>
         <Select
           isInvalid={formError.major}
-          name='major'
-          placeholder='select your major'
-          color='gray.600'
+          name="major"
+          placeholder="select your major"
+          color="gray.600"
         >
           {college_majors.map((major) => (
             <option key={major} value={major}>
@@ -64,11 +71,10 @@ function AddJob({ setLoading, setUnInitialized }: Props) {
         </Select>
       </FormControl>
       <Upload
-        label='Upload your job description file'
+        label="Upload your job description file"
         isError={formError.file}
       />
     </form>
-
   );
 }
 

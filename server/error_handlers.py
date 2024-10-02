@@ -41,6 +41,13 @@ def register_error_handlers(app):
     def file_exceed(e):
         return make_response_("error", "File is greater than 2MB"), 413
 
+    @app.errorhandler(429)
+    def rate_limit_exceeded(e):
+        return make_response_(
+            "error",
+            "You have exceeded the request limit. Please wait a minute before making more requests."
+            ), 429
+
     @app.errorhandler(500)
     def internal_server_error(e):
         return make_response_("error", "Internal Server Error"), 500

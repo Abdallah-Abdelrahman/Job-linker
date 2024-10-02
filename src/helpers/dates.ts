@@ -20,7 +20,10 @@ function formatFromNow(date: Date) {
     return 'last week';
   } else {
     // Format the date to display month and year if more than a week ago
-    return new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(dateToFormat);
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      year: 'numeric',
+    }).format(dateToFormat);
   }
 }
 
@@ -30,6 +33,9 @@ function formatFromNow(date: Date) {
  * @returns string format in `Month year`
  */
 function formateDate(date: Date) {
-  return new Date(date).toLocaleDateString('en', { year: 'numeric', month: 'short' });
+  return new Date(date).toLocaleDateString('en', {
+    year: 'numeric',
+    month: 'short',
+  });
 }
 export { formatFromNow, formateDate };

@@ -10,29 +10,29 @@ import {
   Text,
   InputLeftElement,
   Icon,
-  InputGroup
-} from "@chakra-ui/react";
-import { useLoginMutation } from "../app/services/auth";
-import { NavLink, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useState, useEffect } from "react";
-import { useAppSelector } from "../hooks/store";
-import { selectCurrentUser, setCredentials } from "../features/auth";
-import { MyIcon } from "../components";
+  InputGroup,
+} from '@chakra-ui/react';
+import { useLoginMutation } from '../app/services/auth';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { useAppSelector } from '../hooks/store';
+import { selectCurrentUser, setCredentials } from '../features/auth';
+import { MyIcon } from '../components';
 
 function Login() {
   const [login, { isLoading }] = useLoginMutation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useAppSelector(selectCurrentUser);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
     if (!email || !password) {
-      setErrorMessage("Please fill in all fields");
+      setErrorMessage('Please fill in all fields');
       return;
     }
     login({ email, password })
@@ -40,13 +40,13 @@ function Login() {
       .then(({ data }) => {
         if (data.jwt) {
           dispatch(setCredentials({ ...data, isRefreshed: true }));
-          navigate("/@me");
+          navigate('/@me');
         } else {
           setErrorMessage(data.message);
         }
       })
       .catch((err) => {
-        let actualErrorMessage = err.data?.message || "An error occurred";
+        let actualErrorMessage = err.data?.message || 'An error occurred';
         try {
           // Attempt to parse the error message
           const errorData = JSON.parse(err.data.message.replace(/'/g, '"'));
@@ -63,24 +63,27 @@ function Login() {
     if (user.jwt || user.isRefreshed) {
       navigate('/@me');
     }
-
   }, [user, navigate]);
 
   return (
-    <Box className='containter grid mx-auto my-8 flex-1'>
-      <Heading as='h1' size='3xl' className='mb-8 max-w-md w-full mx-auto capitalize'>
+    <Box className="containter grid mx-auto my-8 flex-1">
+      <Heading
+        as="h1"
+        size="3xl"
+        className="mb-8 max-w-md w-full mx-auto capitalize"
+      >
         login
       </Heading>
 
       <form
-        className='max-w-md w-full mx-auto p-6 flex flex-col gap-4 bg-white shadow-lg rounded-lg'
+        className="max-w-md w-full mx-auto p-6 flex flex-col gap-4 bg-white shadow-lg rounded-lg"
         onSubmit={handleSubmit}
       >
         <InputGroup>
-          <InputLeftElement pointerEvents='none'>
+          <InputLeftElement pointerEvents="none">
             <MyIcon
-              href='/sprite.svg#email-address'
-              className='w-6 h-6 fill-sky-600'
+              href="/sprite.svg#email-address"
+              className="w-6 h-6 fill-sky-600"
             />
           </InputLeftElement>
           <Input
@@ -93,8 +96,11 @@ function Login() {
           />
         </InputGroup>
         <InputGroup>
-          <InputLeftElement pointerEvents='none'>
-            <MyIcon href='/sprite.svg#password' className='w-6 h-6 fill-sky-600' />
+          <InputLeftElement pointerEvents="none">
+            <MyIcon
+              href="/sprite.svg#password"
+              className="w-6 h-6 fill-sky-600"
+            />
           </InputLeftElement>
           <Input
             required
@@ -113,10 +119,12 @@ function Login() {
         )}
         <Text>
           Dont't have an acount?
-          <NavLink to='/signup' className='text-sky-600 mx-2'>register</NavLink>
+          <NavLink to="/signup" className="text-sky-600 mx-2">
+            register
+          </NavLink>
         </Text>
         <Button
-          className='w-max !bg-sky-500 !text-sky-50'
+          className="w-max !bg-sky-500 !text-sky-50"
           type="submit"
           isLoading={isLoading}
         >

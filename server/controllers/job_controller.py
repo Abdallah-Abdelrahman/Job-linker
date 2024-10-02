@@ -84,8 +84,7 @@ class JobController:
                 "job_description"
                 ]:
             raise ValueError(
-                "A job with the same title and description already exists"
-                )
+                "A job with the same title and description already exists")
 
         # Create new job
         new_job = Job(
@@ -236,11 +235,7 @@ class JobController:
 
     def handle_job_closure(self, job, recruiter):
         """Handle Job Closing Process and email notifications"""
-        applications = storage.get_all_by_attr(
-                Application,
-                "job_id",
-                job.id
-                )
+        applications = storage.get_all_by_attr(Application, "job_id", job.id)
         shortlisted_candidates = []
         company_name = json.loads(
             recruiter.user.contact_info).get("company_name")
@@ -326,9 +321,7 @@ class JobController:
             UnauthorizedError: If the user is not a recruiter.
         """
         if not user_id or not job_id or not skill_id:
-            raise ValueError(
-                    "User ID, Job ID and Skill ID must be provided"
-                    )
+            raise ValueError("User ID, Job ID and Skill ID must be provided")
 
         user = storage.get(User, user_id)
         if not user or user.role != "recruiter":
@@ -450,9 +443,7 @@ class JobController:
                 )
                 for job in jobs
                 if (recruiter := storage.get_by_attr(
-                    Recruiter,
-                    "id",
-                    job.recruiter_id
+                    Recruiter, "id", job.recruiter_id
                     ))
                 is not None
             ]
@@ -523,9 +514,7 @@ class JobController:
             )
             for job in jobs
             if (recruiter := storage.get_by_attr(
-                Recruiter,
-                "id",
-                job.recruiter_id
+                Recruiter, "id", job.recruiter_id
                 ))
             is not None
             and job.is_open
@@ -574,8 +563,7 @@ class JobController:
             if not v.is_open:
                 continue
             # Skip if the job is expired
-            if v.application_deadline\
-            and datetime.utcnow() > v.application_deadline:
+            if v.application_deadline and datetime.utcnow() > v.application_deadline:
                 continue
             # Calculate match scores for location and title
             location_score = (
@@ -616,11 +604,10 @@ class JobController:
 
         # Filter out expired jobs
         jobs = [
-            job
-            for job in jobs
-            if not job.application_deadline
-            or datetime.utcnow() < job.application_deadline
-        ]
+                job for job in jobs
+                if not job.application_deadline
+                or datetime.utcnow() < job.application_deadline
+                ]
 
         # Sort jobs by created_at
         jobs.sort(key=lambda job: job.created_at, reverse=True)

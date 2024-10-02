@@ -111,10 +111,7 @@ class WorkExperienceController:
             and existing_work_experience.company == data["company"]
             and existing_work_experience.description == data["description"]
         ):
-            raise ValueError(
-                "A work experience with the same title, "
-                "company, and description already exists"
-            )
+            return existing_work_experience
 
         # Create new work experience
         new_work_experience = WorkExperience(candidate_id=candidate.id, **data)

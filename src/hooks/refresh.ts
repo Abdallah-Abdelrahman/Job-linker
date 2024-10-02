@@ -13,11 +13,13 @@ function useRefresh() {
       fetch('/api/v1/refresh', {
         method: 'POST',
         credentials: 'include',
-        headers: { 'X-CSRF-TOKEN': document.cookie.split('=')[1] }
+        headers: { 'X-CSRF-TOKEN': document.cookie.split('=')[1] },
       })
-        .then(resp => {
+        .then((resp) => {
           if (!ignore) {
-            dispatch(setCredentials({ isRefreshing: true, isRefreshed: resp.ok }));
+            dispatch(
+              setCredentials({ isRefreshing: true, isRefreshed: resp.ok }),
+            );
           }
           return resp.json();
         })
@@ -25,7 +27,7 @@ function useRefresh() {
           // console.log('----useRefresh---->');
           dispatch(setCredentials({ ...data, isRefreshing: false }));
         })
-        .catch(err => console.error({ err }))
+        .catch((err) => console.error({ err }))
         .finally(() => {
           dispatch(setCredentials({ isRefreshing: false }));
         });

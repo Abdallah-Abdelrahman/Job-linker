@@ -48,7 +48,7 @@ class ApplicationConfig:
     """
 
     SECRET_KEY = os.environ["SECRET_KEY"]
-
+    os.environ['ANTIWORD_PATH'] = '/usr/bin/antiword'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
     # SESSION_TYPE = "redis"
@@ -56,6 +56,16 @@ class ApplicationConfig:
     # SESSION_USE_SIGNER = True
     # SESSION_REDIS = redis.from_url("redis://127.0.0.1:6379")
     JWT_SECRET_KEY = os.environ["SECRET_KEY"]
+    JWT_ACCESS_COOKIE_PATH = '/'
+    JWT_REFRESH_COOKIE_PATH = '/refresh'
+    JWT_COOKIE_SECURE = True  # Ensure this is True for production (HTTPS)
+    JWT_COOKIE_CSRF_PROTECT = False  # Adjust based on your CSRF protection needs
+
+    # Redis configuration
+    REDIS_HOST = os.environ["REDIS_HOST"]
+    REDIS_PORT = os.environ["REDIS_PORT"]
+    REDIS_DB_JWT = os.environ["REDIS_DB_JWT"]
+    REDIS_DB_LIMITER = os.environ["REDIS_DB_LIMITER"]
 
     # Set the lifespan of access tokens to 30 minutes
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)

@@ -6,7 +6,11 @@ import { useEffect, useRef, useState } from 'react';
  *
  * @returns Object {isSticking} has flag whether it reaches threshold of stickiness or not
  */
-export default function useIsSticky({ elementRef }: { elementRef: React.RefObject<HTMLElement> }) {
+export default function useIsSticky({
+  elementRef,
+}: {
+  elementRef: React.RefObject<HTMLElement>;
+}) {
   const previousTop = useRef<number>(-1);
   const [isSticking, setIsSticking] = useState<boolean>(false);
 
@@ -32,7 +36,6 @@ export default function useIsSticky({ elementRef }: { elementRef: React.RefObjec
       window.removeEventListener('scroll', trackSticky);
     };
   }, [elementRef]);
-
 
   return { isSticking };
 }

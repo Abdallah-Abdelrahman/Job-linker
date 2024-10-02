@@ -1,4 +1,4 @@
-import { api } from "./auth";
+import { api } from './auth';
 
 export interface Language {
   language_id: string;
@@ -12,12 +12,12 @@ export interface LanguageResponse {
 export const languageApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getLanguages: builder.query<Language[], void>({
-      query: () => "languages",
+      query: () => 'languages',
     }),
     createLanguage: builder.mutation<LanguageResponse, Partial<Language>>({
       query: (language) => ({
-        url: "languages",
-        method: "POST",
+        url: 'languages',
+        method: 'POST',
         body: language,
       }),
     }),
@@ -27,14 +27,14 @@ export const languageApi = api.injectEndpoints({
     >({
       query: ({ language_id, language }) => ({
         url: `languages/${language_id}`,
-        method: "PUT",
+        method: 'PUT',
         body: language,
       }),
     }),
     deleteLanguage: builder.mutation<void, { language_id: string }>({
       query: ({ language_id }) => ({
         url: `languages/${language_id}`,
-        method: "DELETE",
+        method: 'DELETE',
       }),
     }),
   }),

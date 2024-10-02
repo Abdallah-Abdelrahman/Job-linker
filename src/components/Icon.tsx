@@ -1,6 +1,6 @@
 type IconProps = {
-  [k in 'href' | 'className']?: string
-}
+  [k in 'href' | 'className']?: string;
+};
 
 function MyIcon({ href, ...style }: IconProps) {
   return (

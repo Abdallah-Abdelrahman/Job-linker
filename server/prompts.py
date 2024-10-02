@@ -79,46 +79,51 @@ Notes:
 - Ensure the extracted information is accurate and corresponds to the details provided in the job description.
 """
 
-
 ATS_FRIENDLY_PROMPT = """\
-As a professional applicant tracking system (ATS) evaluator, please analyze the following CV text and provide a detailed assessment. The analysis should include the following:
+As a professional applicant tracking system (ATS) evaluator, please analyze the following CV text and provide a detailed assessment. The analysis should include the following in JSON format:
 {
-"ats_score": "<float: ATS friendliness score between 0.0 and 1.0>",
-"suggestions": ["<str: Suggestion 1>", "<str: Suggestion 2>", "..."]
+    "ats_score": "<float: ATS friendliness score between 0.0 and 1.0>",
+    "suggestions": ["<str: Suggestion 1>", "<str: Suggestion 2>", "..."]
 }
 
 Guidelines:
-1. Input Format: The CV is provided in raw text extracted from a PDF. Do not make any suggestions about font style, size, or design.
-2. Evaluation Criteria: Base your analysis on the following sections:
-   - Profile Summary/About Me: Clarity, conciseness, relevance, and presence of keywords.
-   - Education: Proper formatting, relevance to the job, inclusion of degrees, institutions, and dates.
-   - Work Experience: Use of action verbs, quantifiable achievements, relevance, proper formatting (job titles, companies, dates).
-   - Skills: Relevance to the job, proper categorization, presence of both hard and soft skills.
-   - Languages: Inclusion of languages spoken, proficiency levels.
-   - Contact Information: Presence of phone number, email, LinkedIn profile, and other relevant contact details.
+1. **Input Format**: The CV is provided in raw text extracted from a PDF. Avoid making suggestions about visual aspects like font style, size, or design.
 
-3. Scoring:
-    The 'ats_score' should be a float between 0.0 and 1.0.
-    The score must follow these guidelines.
-    For example:
-    If a CV does not strictly meet the evaluation criteria, its score should be below 0.3.
-    If a CV is rich in relevant content, its score should be above 0.4.
+2. **Evaluation Criteria**: Base your analysis on the following sections:
 
-4. Suggestions:
-   - Provide specific and actionable suggestions to improve the CV’s ATS-friendliness.
+   - **Profile Summary/About Me**: Evaluate for clarity, conciseness, relevance to the job role, and presence of industry-specific keywords. Check if it provides a strong personal branding statement.
+
+   - **Education**: Assess proper formatting, relevance to the desired job, inclusion of complete details such as degrees, institutions, majors, and dates. Prioritize recent and relevant educational achievements.
+
+   - **Work Experience**: Analyze the use of action verbs, the presence of quantifiable achievements (e.g., increased sales by 30%), relevance to the target job, and proper formatting (e.g., job titles, companies, dates). Ensure chronological order and clarity of responsibilities.
+
+   - **Skills**: Check for relevance to the job, proper categorization into hard skills (e.g., programming languages) and soft skills (e.g., leadership), and ensure that skills are clearly listed, ideally in a dedicated section.
+
+   - **Languages**: Include analysis of languages spoken, specifying proficiency levels (e.g., native, fluent, intermediate). Consider relevance to the job requirements.
+
+   - **Contact Information**: Confirm the presence and accuracy of contact details such as phone number, professional email address, LinkedIn profile, and other relevant links (e.g., personal website or portfolio). Verify that no unnecessary personal details are included (e.g., date of birth, photograph).
+
+3. **Scoring**:
+    - The 'ats_score' should be a float between 0.0 and 1.0.
+    - The score must be based on the overall ATS compatibility and adherence to the evaluation criteria.
+    - Provide lower scores (below 0.3) for CVs that do not meet the basic requirements (e.g., missing sections, lack of relevance, poor formatting).
+    - Provide higher scores (above 0.7) for CVs that excel in relevance, clarity, completeness, and use of keywords.
+
+4. **Suggestions**:
+   - Provide specific and actionable suggestions for improving the CV’s ATS-friendliness.
    - Each suggestion should correspond to one of the evaluation criteria mentioned above.
-   - Ensure suggestions are clear, concise, and relevant to improving the ATS score.
+   - Make sure suggestions are clear, concise, and prioritized based on the impact on ATS-friendliness. Suggest both additions and modifications as necessary.
 
-5. Your response should be in a json format, don't add any additional text outside the json.
+5. **Response Format**: Ensure your response is in valid JSON format with no additional text outside the JSON object.
 
 Example Response:
 {
-"ats_score": 0.85,
-"suggestions": [
-    "Improve the profile summary by including more keywords relevant to the job.",
-    "Ensure each work experience entry includes quantifiable achievements.",
-    "List your skills in a separate section with proper categorization."
-]
+    "ats_score": 0.85,
+    "suggestions": [
+        "Enhance the profile summary by incorporating more relevant industry keywords.",
+        "Add quantifiable achievements to each work experience entry to demonstrate impact.",
+        "Categorize skills into technical and soft skills, and ensure they align with the job requirements."
+    ]
 }
 """
 

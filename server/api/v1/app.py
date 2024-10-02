@@ -1,17 +1,24 @@
 """
 This module sets up the Flask application for the Job-linker application.
 """
+import os
 import redis
-
+from server.models import storage
 from server.error_handlers import register_error_handlers
 from server.extensions import app, jwt
 from server.jwt_handlers import register_jwt_handlers
-from server.models import storage
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+redis_host = os.environ['REDIS_HOST']
+redis_port = int(os.environ['REDIS_PORT'])
+redis_db_jwt = int(os.environ['REDIS_DB_JWT'])
 
 jwt_redis_blocklist = redis.StrictRedis(
-    host="localhost", port=6379, db=0, decode_responses=True
-)
-
+        host=redis_host, port=redis_port, db=redis_db_jwt, decode_responses=True
+        )
 
 def create_app():
     """
@@ -19,21 +26,21 @@ def create_app():
 
     Sets up error handlers, JWT handlers, and blueprints.
     """
-    # Setup our redis connection for storing the blocklisted tokens.
-    # You will probably
-    # want your redis instance configured to persist data to disk,
-    # so that a restart
+    # Setup our redis connection for storing the blocklisted tokens. You will probably
+    # want your redis instance configured to persist data to disk, so that a restart
     # does not cause your application to forget that a JWT was revoked.
     from server.api.v1.views import app_views
 
     register_error_handlers(app)
     register_jwt_handlers(jwt)
 
+
     app.register_blueprint(app_views)
+
 
     @jwt.token_in_blocklist_loader
     def check_if_token_is_revoked(jwt_header, jwt_payload: dict):
-        """Callback function to check if a JWT exists in the redis blocklist"""
+        '''Callback function to check if a JWT exists in the redis blocklist'''
         jti = jwt_payload.get("jti")
         token_in_redis = jwt_redis_blocklist.get(jti)
         return token_in_redis is not None
@@ -45,7 +52,6 @@ def create_app():
 
     return app
 
-
 if __name__ == "__main__":
     app = create_app()
-    app.run(host="0.0.0.0", port=5000, debug=True, threaded=True)
+    app.run(host="0.0.0.0", port=8000, debug=False, threaded=True)

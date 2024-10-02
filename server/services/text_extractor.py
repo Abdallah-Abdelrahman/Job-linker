@@ -45,7 +45,9 @@ def parse_docx(file_path: str) -> str:
 def parse_doc(file_path: str) -> str:
     """Extract text from a DOC file."""
     try:
-        txt = textract.process(file_path).decode("utf-8").strip()
+        txt = textract.process(
+                file_path, method='antiword', antiword='/usr/bin/antiword'
+                ).decode("utf-8").strip()
         if not txt:
             raise UnreadableCVError()
         return txt

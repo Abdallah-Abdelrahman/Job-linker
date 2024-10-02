@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Button,
   FormControl,
@@ -11,36 +11,36 @@ import {
   AlertIcon,
   InputGroup,
   InputLeftElement,
-  Text
-} from "@chakra-ui/react";
-import { useRegisterMutation } from "../app/services/auth";
-import { MyIcon } from "../components";
-import { useAppSelector } from "../hooks/store";
-import { selectCurrentUser } from "../features/auth";
+  Text,
+} from '@chakra-ui/react';
+import { useRegisterMutation } from '../app/services/auth';
+import { MyIcon } from '../components';
+import { useAppSelector } from '../hooks/store';
+import { selectCurrentUser } from '../features/auth';
 
 function Register() {
   const [signup, { isLoading }] = useRegisterMutation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [role, setRole] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [role, setRole] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   const user = useAppSelector(selectCurrentUser);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
     if (!email || !password || !name || !role) {
-      setErrorMessage("Please fill in all fields");
+      setErrorMessage('Please fill in all fields');
       return;
     }
     signup({ email, password, name, role })
       .unwrap()
       .then((data) => {
-        navigate("/login");
+        navigate('/login');
       })
       .catch((err) => {
-        let actualErrorMessage = err.data?.message || "An error occurred";
+        let actualErrorMessage = err.data?.message || 'An error occurred';
         try {
           // Attempt to parse the error message
           const errorData = JSON.parse(err.data.message.replace(/'/g, '"'));
@@ -57,20 +57,26 @@ function Register() {
     if (user.jwt || user.isRefreshed) {
       navigate('/@me');
     }
-
   }, [user, navigate]);
 
   return (
     <Box className="containter mx-auto my-8 flex-1">
-      <Heading as="h1" size="3xl" className="mb-8 max-w-md w-full mx-auto capitalize">
+      <Heading
+        as="h1"
+        size="3xl"
+        className="mb-8 max-w-md w-full mx-auto capitalize"
+      >
         Register
       </Heading>
-      <form className="max-w-md w-full mx-auto p-6 flex flex-col gap-4 bg-white shadow-lg rounded-lg" onSubmit={handleSubmit}>
+      <form
+        className="max-w-md w-full mx-auto p-6 flex flex-col gap-4 bg-white shadow-lg rounded-lg"
+        onSubmit={handleSubmit}
+      >
         <InputGroup>
           <InputLeftElement>
             <MyIcon
-              href='/sprite.svg#username'
-              className='w-6 h-6 fill-sky-500'
+              href="/sprite.svg#username"
+              className="w-6 h-6 fill-sky-500"
             />
           </InputLeftElement>
           <Input
@@ -85,8 +91,8 @@ function Register() {
         <InputGroup>
           <InputLeftElement>
             <MyIcon
-              href='/sprite.svg#email-address'
-              className='w-6 h-6 fill-sky-500'
+              href="/sprite.svg#email-address"
+              className="w-6 h-6 fill-sky-500"
             />
           </InputLeftElement>
           <Input
@@ -100,7 +106,10 @@ function Register() {
         </InputGroup>
         <InputGroup>
           <InputLeftElement>
-            <MyIcon href='/sprite.svg#password' className='w-6 h-6 fill-sky-500' />
+            <MyIcon
+              href="/sprite.svg#password"
+              className="w-6 h-6 fill-sky-500"
+            />
           </InputLeftElement>
           <Input
             required
@@ -130,18 +139,14 @@ function Register() {
         )}
         <Button
           type="submit"
-          className='w-max !bg-sky-500 !text-sky-50'
+          className="w-max !bg-sky-500 !text-sky-50"
           isLoading={isLoading}
         >
           Register
         </Button>
-        <Text className='flex gap-1'>
+        <Text className="flex gap-1">
           have an account?
-          <Link
-            to='/login'
-            className='text-sky-600'
-            children=' sign in'
-          />
+          <Link to="/login" className="text-sky-600" children=" sign in" />
         </Text>
       </form>
     </Box>

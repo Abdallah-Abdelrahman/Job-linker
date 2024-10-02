@@ -35,9 +35,9 @@ export interface RegisterRequest {
 }
 
 const env = {
-  development: "http://127.0.0.1:5000",
-  test: "http://0.0.0.0:5000",
-  production: "https://www.eduresource.tech",
+  development: 'http://127.0.0.1:5000',
+  test: 'http://0.0.0.0:5000',
+  production: 'https://www.eduresource.tech',
 };
 
 const baseQuery = fetchBaseQuery({
@@ -123,9 +123,9 @@ export const api = createApi({
     }),
     me: builder.query<UserResponse, { id: string }>({
       query: ({ id }) => {
-        return ({
+        return {
           url: id ? `@me/${id}` : '@me',
-        });
+        };
       },
       providesTags: ['me', 'refresh', 'recruiters', 'candidates', 'job'],
     }),

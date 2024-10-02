@@ -13,31 +13,26 @@ import {
   ModalOverlay,
   Skeleton,
   Progress,
-  Heading
-}
-  from
-  '@chakra-ui/react';
+  Heading,
+} from '@chakra-ui/react';
 
 type Props = {
-  onClose: () => void,
-  isOpen: boolean,
-  body: React.ReactNode
-  title: string,
-  confirm: React.ReactNode
-}
+  onClose: () => void;
+  isOpen: boolean;
+  body: React.ReactNode;
+  title: string;
+  confirm: React.ReactNode;
+};
 
 function MyModal({ title, onClose, isOpen, body, confirm }: Props) {
-
   return (
-    <Modal onClose={onClose} isOpen={isOpen} size='4xl' isCentered>
+    <Modal onClose={onClose} isOpen={isOpen} size="4xl" isCentered>
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader className='capitalize'>{title}</ModalHeader>
+        <ModalHeader className="capitalize">{title}</ModalHeader>
         <ModalCloseButton />
-        <ModalBody>
-          {body}
-        </ModalBody>
-        <ModalFooter className='space-x-4'>
+        <ModalBody>{body}</ModalBody>
+        <ModalFooter className="space-x-4">
           <Button onClick={onClose}>Close</Button>
           {confirm}
         </ModalFooter>
