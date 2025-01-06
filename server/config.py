@@ -88,7 +88,3 @@ class ApplicationConfig:
 
     for path in [UPLOAD_JOB, UPLOAD_CV, UPLOAD_IMAGE, UPLOAD_TEMP]:
         os.makedirs(path, exist_ok=True)
-
-    # Configure Caching
-    # CACHE_TYPE = "simple"
-    # CACHE_DEFAUT_TIMEOUT = 300

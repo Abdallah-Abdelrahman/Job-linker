@@ -41,7 +41,8 @@ const env = {
 };
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: `${env[process.env.NODE_ENV]}/api/v1` as string,
+  baseUrl: `/api/v1` as string,
+  credentials: 'include',
   prepareHeaders: async (headers, { getState }) => {
     const token = (getState() as RootState).auth.jwt;
     if (token) {
@@ -108,7 +109,6 @@ export const api = createApi({
         url: 'login',
         method: 'POST',
         body: credentials,
-        credentials: 'include',
       }),
     }),
     register: builder.mutation<UserResponse, RegisterRequest>({

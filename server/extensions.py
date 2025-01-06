@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 app.config.from_object(ApplicationConfig)
 app.url_map.strict_slashes = False
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
+CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "http://localhost:5173"}})
 
 swagger = Swagger(app)
 jwt = JWTManager(app)
