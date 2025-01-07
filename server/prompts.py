@@ -1,7 +1,7 @@
 """Module defines prompts to feed it to gemini"""
 
 CANDID_PROMPT = """\
-    Please provide a dictionary extracted from this CV in the following format:
+    Please provide a dictionary extracted from this CV written in (arabic or english) in the following format:
     {
     "bio": "<str: A brief biography of the candidate>",
     "name": "<str>",
@@ -33,6 +33,7 @@ CANDID_PROMPT = """\
     }
 
     Notes:
+    - the cv language might be arabic or english beware that.
     - Enclose each property in double quotes.
     - The 'start_date' and 'end_date' should respect the format '%Y-%m-%dT%H:%M:%S.%f'.
     - If the 'end_date' is 'present' set it to the current date.

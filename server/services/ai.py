@@ -98,6 +98,7 @@ class AIService():
         text = ''
         for chunk in resp:
             text += chunk.text
+        print('AI-------->', text)
         return text
 
     def __handle_cv(self, dict_: Dict[str, Any]) -> Dict[str, Any]:
@@ -181,7 +182,7 @@ class AIService():
 
 
 if __name__ == '__main__':
-    ai = AIService(pdf=f'{getcwd()}/server/cv/2024-05-13-01-02-49_Abdallah.pdf')
+    ai = AIService(pdf=f'{getcwd()}/server/cvs/cv-pta-ar-0x00.pdf')
     dict_ = ai.to_dict(CANDID_PROMPT)
     print(dict_)
     # print(ai.get_insights())
