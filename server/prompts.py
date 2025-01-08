@@ -1,8 +1,8 @@
 """Module defines prompts to feed it to gemini"""
 
 CANDID_PROMPT = """\
-    Please provide a dictionary extracted from this CV in the following format:
-    {
+Please provide a dictionary extracted from this CV in the following format:
+{
     "bio": "<str: A brief biography of the candidate>",
     "name": "<str>",
     "email": "<str>",
@@ -30,16 +30,99 @@ CANDID_PROMPT = """\
         },
     ],
     "languages": ["<str: Language name 1>", "<str: Language name 2>", "..."]
-    }
+}
 
-    Notes:
-    - Enclose each property in double quotes.
-    - The 'start_date' and 'end_date' should respect the format '%Y-%m-%dT%H:%M:%S.%f'.
-    - If the 'end_date' is 'present' set it to the current date.
-    - Skills: Extract the skills listed in the CV. Each skill should be represented by a string and listed in an array. Each skill should not exceed 100 characters.
-    - Each language should be represented by a string containing the language name.
-    - The description for each experience must not include any bullet points, remove them if any exists in the text.
-    """
+Notes:
+1. **Language Handling**:
+   - Detect the language of the CV (Arabic or English).
+   - Return the extracted information in the same language as the CV.
+   - If the CV contains both Arabic and English, prioritize the dominant language.
+
+2. **Formatting**:
+   - Enclose each property in double quotes.
+   - The 'start_date' and 'end_date' should respect the format '%Y-%m-%dT%H:%M:%S.%f'.
+   - If the 'end_date' is 'present', set it to the current date.
+
+3. **Skills**:
+   - Extract the skills listed in the CV.
+   - Each skill should be represented by a string and listed in an array.
+   - Each skill should not exceed 100 characters.
+
+4. **Languages**:
+   - Each language should be represented by a string containing the language name.
+   - If the CV is in Arabic, return language names in Arabic (e.g., "العربية" for Arabic, "الإنجليزية" for English).
+   - If the CV is in English, return language names in English (e.g., "Arabic", "English").
+
+5. **Descriptions**:
+   - The description for each experience must not include any bullet points. Remove them if any exist in the text.
+   - Ensure descriptions are concise and relevant.
+
+6. **Special Cases**:
+   - If a field is missing or cannot be extracted, set its value to `null`.
+   - Handle Arabic text with proper Unicode encoding (e.g., "العربية" instead of "?????").
+
+Example Output for Arabic CV:
+{
+    "bio": "مهندس برمجيات ذو خبرة واسعة في تطوير تطبيقات الويب والهواتف المحمولة.",
+    "name": "محمد أحمد",
+    "email": "mohamed.ahmed@example.com",
+    "contact_info": {"address": "القاهرة، مصر", "linkedin": "linkedin.com/in/mohamed-ahmed", "github": "github.com/mohamed-ahmed", "phone": "+201234567890", "whatsapp": "+201234567890"},
+    "major": "هندسة البرمجيات",
+    "skills": ["تطوير الويب", "تطبيقات الهواتف", "قواعد البيانات"],
+    "experiences": [
+        {
+            "title": "مهندس برمجيات",
+            "company": "شركة التقنية",
+            "start_date": "2020-01-01T00:00:00.000",
+            "end_date": "2023-12-31T00:00:00.000",
+            "location": "القاهرة، مصر",
+            "description": "تطوير تطبيقات الويب باستخدام React وNode.js."
+        },
+    ],
+    "educations": [
+        {
+            "institute": "جامعة القاهرة",
+            "degree": "بكالوريوس",
+            "field_of_study": "هندسة البرمجيات",
+            "start_date": "2016-09-01T00:00:00.000",
+            "end_date": "2020-06-30T00:00:00.000",
+            "description": "دراسة متخصصة في هندسة البرمجيات وتطوير التطبيقات."
+        },
+    ],
+    "languages": ["العربية", "الإنجليزية"]
+}
+
+Example Output for English CV:
+{
+    "bio": "Software engineer with extensive experience in web and mobile application development.",
+    "name": "Mohamed Ahmed",
+    "email": "mohamed.ahmed@example.com",
+    "contact_info": {"address": "Cairo, Egypt", "linkedin": "linkedin.com/in/mohamed-ahmed", "github": "github.com/mohamed-ahmed", "phone": "+201234567890", "whatsapp": "+201234567890"},
+    "major": "Software Engineering",
+    "skills": ["Web Development", "Mobile Applications", "Databases"],
+    "experiences": [
+        {
+            "title": "Software Engineer",
+            "company": "Tech Company",
+            "start_date": "2020-01-01T00:00:00.000",
+            "end_date": "2023-12-31T00:00:00.000",
+            "location": "Cairo, Egypt",
+            "description": "Developed web applications using React and Node.js."
+        },
+    ],
+    "educations": [
+        {
+            "institute": "Cairo University",
+            "degree": "Bachelor",
+            "field_of_study": "Software Engineering",
+            "start_date": "2016-09-01T00:00:00.000",
+            "end_date": "2020-06-30T00:00:00.000",
+            "description": "Specialized studies in software engineering and application development."
+        },
+    ],
+    "languages": ["Arabic", "English"]
+}
+"""
 
 JOB_PROMPT = """\
 As a professional data extraction system, please extract the following information from the given job description text. Provide the extracted information in the form of a dictionary with the specified structure:
