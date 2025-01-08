@@ -1,6 +1,7 @@
 """
 This module contains the configuration settings for the Flask application.
 """
+
 import os
 from datetime import timedelta
 
@@ -77,7 +78,7 @@ class ApplicationConfig:
     UPLOAD_CV = os.path.join(BASE_UPLOAD_PATH, "cvs")
     UPLOAD_IMAGE = os.path.join(BASE_UPLOAD_PATH, "images")
     UPLOAD_TEMP = os.path.join(BASE_UPLOAD_PATH, "temp")
-    ALLOWED_EXTENSIONS = {"pdf"}
+    ALLOWED_EXTENSIONS = {"pdf", "doc", "docx"}
     ALLOWED_IMAGE_EXTENSIONS = {"jpg", "jpeg", "png"}
     MAX_IMAGE_CONTENT_LENGTH = 2 * 1024 * 1024
     MAX_CONTENT_LENGTH = 2 * 1000 * 1000

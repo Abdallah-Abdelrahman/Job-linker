@@ -1,6 +1,6 @@
 """ Utils for the flask app """
 
-from flask import jsonify
+from flask import Response, json, jsonify
 
 
 def make_response_(status, message, data=None):
@@ -18,4 +18,13 @@ def make_response_(status, message, data=None):
     """
     if data is None:
         data = {}
-    return jsonify({"status": status, "message": message, "data": data})
+    response = {
+            "status": status,
+            "message": message,
+            "data": data
+        }
+        
+    return Response(
+        json.dumps(response, ensure_ascii=False),  # ensure_ascii=False to handle Arabic
+        content_type="application/json"
+    )

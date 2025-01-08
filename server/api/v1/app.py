@@ -25,11 +25,13 @@ def create_app():
     # so that a restart
     # does not cause your application to forget that a JWT was revoked.
     from server.api.v1.views import app_views
+    from server.api.v2.views import app_views2
 
     register_error_handlers(app)
     register_jwt_handlers(jwt)
 
     app.register_blueprint(app_views)
+    app.register_blueprint(app_views2)
 
     @jwt.token_in_blocklist_loader
     def check_if_token_is_revoked(jwt_header, jwt_payload: dict):

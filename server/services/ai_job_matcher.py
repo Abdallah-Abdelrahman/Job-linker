@@ -73,6 +73,17 @@ class AIJobMatcher:
         combined_info = candidate_info + " " + job_info
 
         # Ask the AI to calculate the match score
-        match_score = self.ai.prompt(JOB_MATCHING_PROMPT, combined_info)
+        match_score_str = self.ai.prompt(JOB_MATCHING_PROMPT, combined_info)
+
+
+        try:
+            # Clean and convert the match score to float
+            match_score = float(match_score_str.strip())
+        except ValueError:
+            raise ValueError("AI returned an invalid match score")
+
+        # Ensure match score is within the expected range
+        if not (0.0 <= match_score <= 1.0):
+            raise ValueError("Match score is out of the valid range (0.0 to 1.0)")
 
         return match_score
