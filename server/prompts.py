@@ -1,5 +1,191 @@
 """Module defines prompts to feed it to gemini"""
 
+PTA_PROMPT = """\
+Please provide a dictionary extracted from this CV in the following format:
+{
+    "profession": "<str: Profession of the candidate>",
+    "age": "<str: Age of the candidate>",
+    "intro": "<str: A brief introduction or summary of the candidate>",
+    "experiences": [
+        {
+            "company_name": "<str: Name of the company>",
+            "start_date": "<str: Start date in 'YYYY-MM-DD' format>",
+            "end_date": "<str: End date in 'YYYY-MM-DD' format>",
+            "description": "<str: Description of the role and responsibilities>",
+            "job_title": "<str: Job title>"
+        },
+    ],
+    "education": [
+        {
+            "degree": "<str: Degree obtained>",
+            "major": "<str: Major field of study>",
+            "university": "<str: Name of the university>",
+            "graduate_date": "<str: Graduation date in 'YYYY-MM-DD' format>",
+            "gpa": "<float: GPA score>",
+            "gpa_from": "<float: GPA scale>"
+        },
+    ],
+    "skills": [
+        {
+            "name": "<str: Skill name>"
+        },
+    ],
+    "certificates": [
+        {
+            "name": "<str: Certificate name>"
+        },
+    ],
+    "links": [
+        {
+            "name": "<str: Name of the link (e.g., LinkedIn, Twitter)>",
+            "link": "<str: URL of the link>"
+        },
+    ]
+}
+
+Notes:
+1. **Language Handling**:
+   - Detect the language of the CV (Arabic or English).
+   - Return the extracted information in the same language as the CV.
+   - If the CV contains both Arabic and English, prioritize the dominant language.
+
+2. **Formatting**:
+   - Enclose each property in double quotes.
+   - The 'start_date', 'end_date', and 'graduate_date' should respect the format 'YYYY-MM-DD'.
+   - If the 'end_date' is 'present', set it to the current date.
+
+3. **Skills**:
+   - Extract the skills listed in the CV.
+   - Each skill should be represented as an object with a 'name' property.
+   - Each skill name should not exceed 100 characters.
+
+4. **Certificates**:
+   - Extract the certificates listed in the CV.
+   - Each certificate should be represented as an object with a 'name' property.
+
+5. **Links**:
+   - Extract the links (e.g., LinkedIn, Twitter) listed in the CV.
+   - Each link should be represented as an object with 'name' and 'link' properties.
+
+6. **Descriptions**:
+   - The description for each experience must not include any bullet points. Remove them if any exist in the text.
+   - Ensure descriptions are concise and relevant.
+
+7. **Special Cases**:
+   - If a field is missing or cannot be extracted, set its value to `null`.
+   - Handle Arabic text with proper Unicode encoding (e.g., "العربية" instead of "?????").
+
+Example Output for Arabic CV:
+{
+    "profession": "مهندس برمجيات",
+    "age": "23",
+    "intro": "مهندس برمجيات ذو خبرة واسعة في تطوير تطبيقات الويب والهواتف المحمولة.",
+    "experiences": [
+        {
+            "company_name": "شركة التقنية",
+            "start_date": "2020-01-01",
+            "end_date": "2023-12-31",
+            "description": "تطوير تطبيقات الويب باستخدام React وNode.js.",
+            "job_title": "مهندس برمجيات"
+        },
+    ],
+    "education": [
+        {
+            "degree": "بكالوريوس",
+            "major": "هندسة البرمجيات",
+            "university": "جامعة القاهرة",
+            "graduate_date": "2020-06-30",
+            "gpa": 3.5,
+            "gpa_from": 4.0
+        },
+    ],
+    "skills": [
+        {
+            "name": "تطوير الويب"
+        },
+        {
+            "name": "React"
+        },
+        {
+            "name": "Node.js"
+        }
+    ],
+    "certificates": [
+        {
+            "name": "شهادة Scrum"
+        },
+        {
+            "name": "شهادة Odoo"
+        }
+    ],
+    "links": [
+        {
+            "name": "LinkedIn",
+            "link": "linkedin.com/in/example"
+        },
+        {
+            "name": "Twitter",
+            "link": "twitter.com/example"
+        }
+    ]
+}
+
+Example Output for English CV:
+{
+    "profession": "Software Engineer",
+    "age": "23",
+    "intro": "Software engineer with extensive experience in web and mobile application development.",
+    "experiences": [
+        {
+            "company_name": "Tech Company",
+            "start_date": "2020-01-01",
+            "end_date": "2023-12-31",
+            "description": "Developed web applications using React and Node.js.",
+            "job_title": "Software Engineer"
+        },
+    ],
+    "education": [
+        {
+            "degree": "Bachelor",
+            "major": "Software Engineering",
+            "university": "Cairo University",
+            "graduate_date": "2020-06-30",
+            "gpa": 3.5,
+            "gpa_from": 4.0
+        },
+    ],
+    "skills": [
+        {
+            "name": "Web Development"
+        },
+        {
+            "name": "React"
+        },
+        {
+            "name": "Node.js"
+        }
+    ],
+    "certificates": [
+        {
+            "name": "Scrum Certification"
+        },
+        {
+            "name": "Odoo Certification"
+        }
+    ],
+    "links": [
+        {
+            "name": "LinkedIn",
+            "link": "linkedin.com/in/example"
+        },
+        {
+            "name": "Twitter",
+            "link": "twitter.com/example"
+        }
+    ]
+}
+"""
+
 CANDID_PROMPT = """\
 Please provide a dictionary extracted from this CV in the following format:
 {
@@ -31,12 +217,11 @@ Please provide a dictionary extracted from this CV in the following format:
     ],
     "languages": ["<str: Language name 1>", "<str: Language name 2>", "..."]
 }
-
 Notes:
 1. **Language Handling**:
    - Detect the language of the CV (Arabic or English).
    - Return the extracted information in the same language as the CV.
-   - If the CV contains both Arabic and English, prioritize the dominant language.
+   - The headlines like bio, experience, education, etc., might be written in arabic beware that.
 
 2. **Formatting**:
    - Enclose each property in double quotes.
@@ -198,6 +383,8 @@ Guidelines:
    - Make sure suggestions are clear, concise, and prioritized based on the impact on ATS-friendliness. Suggest both additions and modifications as necessary.
 
 5. **Response Format**: Ensure your response is in valid JSON format with no additional text outside the JSON object.
+
+5. Your response should be in a json format, don't add any additional text outside the json.
 
 Example Response:
 {

@@ -30,12 +30,14 @@ def create_app():
     # want your redis instance configured to persist data to disk, so that a restart
     # does not cause your application to forget that a JWT was revoked.
     from server.api.v1.views import app_views
+    from server.api.v2.views import app_views2
 
     register_error_handlers(app)
     register_jwt_handlers(jwt)
 
 
     app.register_blueprint(app_views)
+    app.register_blueprint(app_views2)
 
 
     @jwt.token_in_blocklist_loader

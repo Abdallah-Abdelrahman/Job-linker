@@ -1,6 +1,6 @@
 """Utils for the flask app"""
 
-from flask import jsonify, make_response
+from flask import Response, json, jsonify
 
 def make_response_(status, message, data=None, cookies=None):
     """
@@ -19,11 +19,13 @@ def make_response_(status, message, data=None, cookies=None):
     """
     if data is None:
         data = {}
-    response = make_response(jsonify({"status": status, "message": message, "data": data}))
-    
-    # Set cookies if provided
-    if cookies:
-        for cookie_name, cookie_value in cookies.items():
-            response.set_cookie(cookie_name, cookie_value['value'], httponly=True, samesite='None', secure=True, max_age=cookie_value.get('max_age'))
-    
-    return response
+    response = {
+            "status": status,
+            "message": message,
+            "data": data
+        }
+        
+    return Response(
+        json.dumps(response, ensure_ascii=False),  # ensure_ascii=False to handle Arabic
+        content_type="application/json"
+    )

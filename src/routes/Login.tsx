@@ -10,7 +10,7 @@ import {
   Text,
   InputLeftElement,
   Icon,
-  InputGroup,
+  InputGroup
 } from '@chakra-ui/react';
 import { useLoginMutation } from '../app/services/auth';
 import { NavLink, useNavigate } from 'react-router-dom';

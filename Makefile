@@ -1,4 +1,5 @@
 .PHONY: run setup stop restart
+.DEFAULT_GOAL:= help
 
 TMUX := $(shell command -v tmux 2> /dev/null)
 YARN := $(shell command -v yarn 2> /dev/null)
@@ -6,8 +7,12 @@ NPM := $(shell command -v npm 2> /dev/null)
 PIP := $(shell command -v pip 2> /dev/null)
 PYTHON := $(shell command -v python3.10 2> /dev/null)
 VENV_DIR := server/venv
+CYAN := \033[36m
+BOLD := \e[1m
+RESET := \033[0m
 
-setup: check-dependencies create-venv install-dependencies
+setup: ## install system-level tools as well as application dependencies
+	@$(MAKE) -s check-dependencies create-venv install-dependencies
 
 check-dependencies:
 ifndef TMUX
@@ -37,13 +42,17 @@ install-dependencies:
 	$(VENV_DIR)/bin/pip install -r server/requirements.txt
 	$(YARN) install
 
-run:
+run: ## run the application in detached terminal session
 	@. server/venv/bin/activate && \
 	$(TMUX) new-session -d -s api 'yarn api' && echo 'api is running...' && \
 	$(TMUX) new-session -d -s client 'yarn dev' && echo 'client is running...'
-list:
+list: ## list current running sessions
 	@$(TMUX) ls # list running processes
-stop:
-	@$(TMUX) send-keys -t api C-c && sleep 0.2
-	@$(TMUX) send-keys -t client C-c && sleep 0.2
-restart: stop run
+stop: ## stop the application session
+	@$(TMUX) kill-session -t api
+	@$(TMUX) kill-session -t client
+restart: ## restart nextjs app
+	@$(MAKE) -s stop run
+
+help: ## Show this help message
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "$(CYAN)%-20s$(RESET) %s\n", $$1, $$2}'

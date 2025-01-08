@@ -39,4 +39,6 @@ clean_candidate.py
 server/cvs/2024*
 deploy.sh
 server/images/*
+rsa*
 .mypy_cache
+pta/*

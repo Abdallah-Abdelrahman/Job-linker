@@ -41,7 +41,8 @@ const env = {
 };
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: `${env[process.env.NODE_ENV]}/api/v1` as string,
+  baseUrl: `/api/v1` as string,
+  credentials: 'include',
   prepareHeaders: async (headers, { getState }) => {
     const token = (getState() as RootState).auth.jwt;
     if (token) {
@@ -65,12 +66,14 @@ const baseQueryWithReauth: BaseQueryFn<
   if (result.error && result.error.status === 401) {
     api.dispatch(setCredentials({ isRefreshing: true }));
 
+    // get crf cookie, using regex positive-lookbehind
+    const crf = document.cookie.match(/(?<=csrf_refresh_token=)([^;]*)/);
     // try to get a new token
     const refreshResult = await baseQuery(
       {
         url: '/refresh',
         method: 'POST',
-        headers: { 'X-CSRF-TOKEN': document.cookie.split('=')[1] },
+        headers: { 'X-CSRF-TOKEN': crf ? crf[0] : '' },
         credentials: 'include',
       },
       api,

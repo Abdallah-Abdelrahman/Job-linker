@@ -77,6 +77,12 @@ class ApplicationConfig:
     # Set the lifespan of refresh tokens to 1 day
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
 
+    # Controls how the cookies should be sent in a cross-site browsing context
+    JWT_COOKIE_SAMESITE = "None"
+
+    # This should always be True in production
+    JWT_COOKIE_SECURE = True
+
     BASE_UPLOAD_PATH = os.path.join(os.getcwd(), "server")
     UPLOAD_JOB = os.path.join(BASE_UPLOAD_PATH, "jobs")
     UPLOAD_CV = os.path.join(BASE_UPLOAD_PATH, "cvs")
@@ -93,7 +99,3 @@ class ApplicationConfig:
 
     for path in [UPLOAD_JOB, UPLOAD_CV, UPLOAD_IMAGE, UPLOAD_TEMP]:
         os.makedirs(path, exist_ok=True)
-
-    # Configure Caching
-    CACHE_TYPE = "simple"
-    CACHE_DEFAULT_TIMEOUT = 300
