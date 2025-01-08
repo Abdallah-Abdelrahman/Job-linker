@@ -40,3 +40,4 @@ deploy.sh
 server/images/*
 rsa*
 .mypy_cache
+pta/*
