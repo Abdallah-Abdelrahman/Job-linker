@@ -4,7 +4,7 @@ Contains the class DBStorage
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-
+from os import getenv
 import server.models as models
 from server.models.application import Application
 from server.models.base_model import Base
@@ -40,22 +40,13 @@ class DBStorage:
     __engine = None
     __session = None
 
-    def __init__(self, engine="sqlite:///:memory:"):
+    def __init__(self):
         """Instantiate a DBStorage object"""
-
-        #        JOBS_MYSQL_USER = getenv("JOBS_MYSQL_USER")
-        #        JOBS_MYSQL_PWD = getenv("JOBS_MYSQL_PWD")
-        #        JOBS_MYSQL_HOST = getenv("JOBS_MYSQL_HOST")
-        #        JOBS_MYSQL_DB = getenv("JOBS_MYSQL_DB")
-        #        JOBS_ENV = getenv("JOBS_ENV")
-        self.__engine = create_engine(engine, pool_size=30, max_overflow=5)
-        # .format(
-        #    JOBS_MYSQL_USER, JOBS_MYSQL_PWD, JOBS_MYSQL_HOST, JOBS_MYSQL_DB
-        # )
-        # )
-
-    #       if JOBS_ENV == "test":
-    #           Base.metadata.drop_all(self.__engine)
+        engine = getenv("ENGINE")
+        if engine == "sqlite":
+            self.__engine = create_engine(engine)
+        else:
+            self.__engine = create_engine(engine, pool_size=30, max_overflow=5)
 
     def all(self, cls=None):
         """query on the current database session"""

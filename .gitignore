@@ -1,6 +1,9 @@
 # python
-**/venv
+**/.venv
 **/__pycache__
+
+.env
+*.env
 
 # Logs
 logs
