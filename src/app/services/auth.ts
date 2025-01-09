@@ -34,14 +34,14 @@ export interface RegisterRequest {
   role: 'candidate' | 'recruiter';
 }
 
-const env = {
+export const env = {
   development: 'http://127.0.0.1:5000',
   test: 'http://0.0.0.0:5000',
   production: 'https://www.eduresource.tech',
 };
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: `/api/v1` as string,
+  baseUrl: `${env['production']}/api/v1` as string,
   credentials: 'include',
   prepareHeaders: async (headers, { getState }) => {
     const token = (getState() as RootState).auth.jwt;
@@ -55,8 +55,7 @@ const baseQuery = fetchBaseQuery({
 /**
  * custom wrapper around baseQuery to refresh token on 401 status error
  *
- */
-const baseQueryWithReauth: BaseQueryFn<
+ */ const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
   unknown,
   FetchBaseQueryError

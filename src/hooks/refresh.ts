@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { setCredentials } from '../features/auth/authSlice';
 import { useAppDispatch } from './store';
+import { env } from '../app/services/auth';
 
 function useRefresh() {
   const dispatch = useAppDispatch();
@@ -10,7 +11,7 @@ function useRefresh() {
 
     const reloadHandler = () => {
       // refresh token
-      fetch('/api/v1/refresh', {
+      fetch(`${env["production"]}/api/v1/refresh`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'X-CSRF-TOKEN': document.cookie.split('=')[1] },
