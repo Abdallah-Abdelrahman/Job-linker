@@ -73,6 +73,12 @@ class ApplicationConfig:
     # This should always be True in production
     JWT_COOKIE_SECURE = True
 
+    # Flask Cache
+    CACHE_TYPE = "RedisCache"
+    CACHE_REDIS_HOST = "localhost"
+    CACHE_REDIS_PORT = 6379
+    CACHE_REDIS_DB = 3
+
     BASE_UPLOAD_PATH = os.path.join(os.getcwd(), "server")
     UPLOAD_JOB = os.path.join(BASE_UPLOAD_PATH, "jobs")
     UPLOAD_CV = os.path.join(BASE_UPLOAD_PATH, "cvs")
