@@ -13,5 +13,5 @@ from server.models.engine.db_storage import DBStorage
 
 load_dotenv()
 
-storage = DBStorage(engine=getenv("ENGINE"))
+storage = DBStorage()
 storage.reload()
