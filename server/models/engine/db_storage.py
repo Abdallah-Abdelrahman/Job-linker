@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-
+from os import getenv
 import server.models as models
 from server.models.application import Application
 from server.models.base_model import Base
@@ -46,18 +46,11 @@ class DBStorage:
 
     def __init__(self):
         """Instantiate a DBStorage object"""
-
-        JOBS_MYSQL_USER = os.environ["JOBS_MYSQL_USER"]
-        JOBS_MYSQL_PWD = os.environ["JOBS_MYSQL_PWD"]
-        JOBS_MYSQL_HOST = os.environ["JOBS_MYSQL_HOST"]
-        JOBS_MYSQL_DB = os.environ["JOBS_MYSQL_DB"]
-        self.__engine = create_engine(
-            "mysql+mysqldb://{}:{}@{}/{}".format(
-                JOBS_MYSQL_USER, JOBS_MYSQL_PWD, JOBS_MYSQL_HOST, JOBS_MYSQL_DB
-            ),
-            pool_size=20,
-            max_overflow=0
-        )
+        engine = getenv("ENGINE")
+        if engine == "sqlite":
+            self.__engine = create_engine(engine)
+        else:
+            self.__engine = create_engine(engine, pool_size=30, max_overflow=5)
 
     def all(self, cls=None):
         """query on the current database session"""

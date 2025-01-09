@@ -1,8 +1,10 @@
 # python
-**/venv
+**/.venv
 **/__pycache__
-**/.venv 
-**/*.env
+
+.env
+*.env
+
 # Logs
 logs
 *.log
