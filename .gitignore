@@ -32,6 +32,8 @@ dist-ssr
 *.sln
 *.sw?
 **/.pylintrc
+
+# Testing
 dump.sql
 ats.db
 database.db
