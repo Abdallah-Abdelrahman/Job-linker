@@ -172,7 +172,8 @@ class AIService:
             return dict_
         except JSONDecodeError as e:
             # retry until we get valid json
-            print("---JSON issues------>", self.file_path, e)
+            print("---JSON issues------>", e)
+            print("---JSON issues------>", cleaned_text)
             return self.to_dict(prompt_enquiry)
 
     def get_insights(self):
