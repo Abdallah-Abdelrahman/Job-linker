@@ -6,7 +6,7 @@ import terser from '@rollup/plugin-terser';
 const env: Record<'development' | 'test' | 'production', string> = {
   development: 'http://127.0.0.1:5000',
   test: 'http://0.0.0.0:5000',
-  production: 'https://www.eduresource.tech',
+  production: 'https://ats-saas.work.gd/joblinker',
 };
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({

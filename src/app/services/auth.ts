@@ -37,7 +37,7 @@ export interface RegisterRequest {
 export const env = {
   development: 'http://127.0.0.1:5000',
   test: 'http://0.0.0.0:5000',
-  production: 'https://www.eduresource.tech',
+  production: 'https://ats-saas.work.gd/joblinker',
 };
 
 const baseQuery = fetchBaseQuery({
